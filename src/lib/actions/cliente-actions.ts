@@ -101,10 +101,26 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
         entidadeId: cliente.id,
       },
     });
+
+    if (cliente.status === "FINALIZADO" && cliente.valor) {
+      const jaTemPagamento = await prisma.pagamento.count({ where: { clienteId: id } });
+      if (jaTemPagamento === 0) {
+        await prisma.pagamento.create({
+          data: {
+            clienteId: cliente.id,
+            valor: cliente.valor,
+            pago: false,
+            formaPagamento: null,
+            data: new Date(),
+          },
+        });
+      }
+    }
   }
 
   revalidatePath("/clientes");
   revalidatePath(`/clientes/${id}`);
+  revalidatePath("/financeiro");
   revalidatePath("/");
   return cliente;
 }
