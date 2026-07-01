@@ -24,7 +24,7 @@ export function Logo({
           alt={nomeEmpresa}
           width={320}
           height={80}
-          className="h-9 w-auto object-contain object-left"
+          className="h-10 w-auto object-contain object-left"
         />
       </div>
     );
@@ -37,7 +37,7 @@ export function Logo({
         alt={nomeEmpresa}
         width={320}
         height={80}
-        className="h-7 w-auto object-contain"
+        className="h-8 w-auto object-contain"
       />
     </div>
   );
