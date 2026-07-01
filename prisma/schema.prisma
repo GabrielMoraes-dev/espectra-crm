@@ -1,0 +1,205 @@
+// Prisma schema — CRM Interno Espectra
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------- Enums ----------
+
+enum EtapaLead {
+  NOVO
+  PRIMEIRO_CONTATO
+  RESPONDENDO
+  REUNIAO
+  PROPOSTA_ENVIADA
+  NEGOCIACAO
+  FECHADO
+  PERDIDO
+}
+
+enum StatusCliente {
+  EM_PRODUCAO
+  EM_REVISAO
+  PUBLICADO
+  FINALIZADO
+}
+
+enum EtapaProjeto {
+  BRIEFING
+  DESIGN
+  DESENVOLVIMENTO
+  REVISAO
+  PUBLICADO
+}
+
+enum PrioridadeTarefa {
+  BAIXA
+  MEDIA
+  ALTA
+}
+
+enum StatusTarefa {
+  A_FAZER
+  EM_ANDAMENTO
+  CONCLUIDA
+}
+
+// ---------- Models ----------
+
+model MembroEquipe {
+  id               String   @id @default(cuid())
+  nome             String
+  cargo            String
+  telefone         String?
+  email            String?
+  foto             String?
+  responsabilidades String  // armazenado como JSON string de string[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  clientes  Cliente[]
+  projetos  Projeto[]
+  tarefas   Tarefa[]
+}
+
+model Lead {
+  id             String    @id @default(cuid())
+  nome           String
+  empresa        String?
+  whatsapp       String?
+  instagram      String?
+  email          String?
+  origem         String?
+  valorEstimado  Float?
+  observacoes    String?
+  etapa          EtapaLead @default(NOVO)
+  clienteId      String?   @unique
+  cliente        Cliente?  @relation(fields: [clienteId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Cliente {
+  id               String        @id @default(cuid())
+  nome             String
+  empresa          String?
+  whatsapp         String?
+  instagram        String?
+  email            String?
+  site             String?
+  cidade           String?
+  estado           String?
+  nicho            String?
+  planoContratado  String?
+  valor            Float?
+  contratoUrl      String?
+  responsavelId    String?
+  responsavel      MembroEquipe? @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
+  dataEntrada      DateTime      @default(now())
+  prazo            DateTime?
+  status           StatusCliente @default(EM_PRODUCAO)
+  observacoes      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  lead             Lead?
+  timeline         TimelineEvent[]
+  projetos         Projeto[]
+  pagamentos       Pagamento[]
+  fotos            FotoCliente[]
+}
+
+model FotoCliente {
+  id        String   @id @default(cuid())
+  clienteId String
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  clienteId   String
+  cliente     Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  data        DateTime @default(now())
+  titulo      String
+  descricao   String?
+  createdAt   DateTime @default(now())
+}
+
+model Projeto {
+  id            String       @id @default(cuid())
+  clienteId     String
+  cliente       Cliente      @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  prazo         DateTime?
+  responsavelId String?
+  responsavel   MembroEquipe? @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
+  status        EtapaProjeto @default(BRIEFING)
+  observacoes   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Pagamento {
+  id             String   @id @default(cuid())
+  clienteId      String
+  cliente        Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  valor          Float
+  pago           Boolean  @default(false)
+  formaPagamento String?
+  data           DateTime @default(now())
+  createdAt      DateTime @default(now())
+}
+
+model Tarefa {
+  id            String            @id @default(cuid())
+  titulo        String
+  descricao     String?
+  responsavelId String?
+  responsavel   MembroEquipe?     @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
+  prazo         DateTime?
+  prioridade    PrioridadeTarefa  @default(MEDIA)
+  status        StatusTarefa      @default(A_FAZER)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model SOP {
+  id        String   @id @default(cuid())
+  titulo    String
+  categoria String
+  conteudo  String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model LinkInterno {
+  id        String   @id @default(cuid())
+  nome      String
+  url       String
+  icone     String?
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model ConfiguracaoEmpresa {
+  id           String  @id @default(cuid())
+  nomeEmpresa  String  @default("Espectra")
+  logoUrl      String?
+  sobre        String?
+  tema         String  @default("dark-navy")
+}
+
+model ActivityLog {
+  id            String   @id @default(cuid())
+  tipo          String
+  descricao     String
+  entidadeTipo  String?
+  entidadeId    String?
+  createdAt     DateTime @default(now())
+}

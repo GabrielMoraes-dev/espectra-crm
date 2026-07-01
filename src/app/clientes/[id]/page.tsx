@@ -1,0 +1,51 @@
+import { notFound } from "next/navigation";
+import { ClienteHeader } from "@/components/cliente/cliente-header";
+import { ClienteInfoGrid } from "@/components/cliente/cliente-info-grid";
+import { ClienteObservacoes } from "@/components/cliente/cliente-observacoes";
+import { ClienteTimeline } from "@/components/cliente/cliente-timeline";
+import { ClienteSideCards } from "@/components/cliente/cliente-side-cards";
+import { FadeIn } from "@/components/shared/fade-in";
+import { getClienteById } from "@/lib/data/clientes";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+export default async function ClienteDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const [cliente, membros] = await Promise.all([
+    getClienteById(id),
+    prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
+  ]);
+
+  if (!cliente) notFound();
+
+  return (
+    <div className="space-y-6">
+      <FadeIn>
+        <ClienteHeader cliente={cliente} membros={membros} />
+      </FadeIn>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <FadeIn delay={0.05}>
+            <ClienteInfoGrid cliente={cliente} />
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <ClienteObservacoes clienteId={cliente.id} observacoes={cliente.observacoes} />
+          </FadeIn>
+          <FadeIn delay={0.11}>
+            <ClienteTimeline clienteId={cliente.id} events={cliente.timeline} />
+          </FadeIn>
+        </div>
+
+        <FadeIn delay={0.14}>
+          <ClienteSideCards projetos={cliente.projetos} pagamentos={cliente.pagamentos} />
+        </FadeIn>
+      </div>
+    </div>
+  );
+}
