@@ -18,26 +18,24 @@ export function Logo({
 
   if (!collapsed) {
     return (
-      <div className={cn("flex items-center overflow-hidden", className)}>
+      <div className={cn("relative h-10 w-44 shrink-0", className)}>
         <Image
           src={src}
           alt={nomeEmpresa}
-          width={320}
-          height={80}
-          className="h-10 w-auto object-contain object-left"
+          fill
+          className="object-contain object-left"
         />
       </div>
     );
   }
 
   return (
-    <div className={cn("flex items-center justify-center overflow-hidden", className)}>
+    <div className={cn("relative h-8 w-10 shrink-0", className)}>
       <Image
         src={src}
         alt={nomeEmpresa}
-        width={320}
-        height={80}
-        className="h-8 w-auto object-contain"
+        fill
+        className="object-contain"
       />
     </div>
   );
