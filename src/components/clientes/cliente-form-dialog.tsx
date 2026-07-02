@@ -229,13 +229,7 @@ export function ClienteFormDialog({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <NichoField value={form.nicho} onChange={(v) => set("nicho", v)} />
-                      <div className="space-y-1.5">
-                        <Label htmlFor="plano">Plano contratado</Label>
-                        <Input id="plano" value={form.planoContratado} onChange={(e) => set("planoContratado", e.target.value)} />
-                      </div>
-                    </div>
+                    <NichoField value={form.nicho} onChange={(v) => set("nicho", v)} />
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
