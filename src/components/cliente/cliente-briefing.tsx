@@ -22,9 +22,7 @@ function Arquivos({ label, urls }: { label: string; urls: string[] }) {
         {urls.map((url) => (
           <li key={url}>
             <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
+              href={`${url}?download=1`}
               className="text-sm text-brand-300 underline underline-offset-2 hover:text-brand-100"
             >
               {url.split("/").pop()}
