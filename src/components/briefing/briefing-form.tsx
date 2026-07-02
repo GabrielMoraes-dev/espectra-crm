@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { createBriefing } from "@/lib/actions/briefing-actions";
 import { BriefingIdentificacaoSection } from "@/components/briefing/briefing-identificacao-section";
@@ -143,6 +144,9 @@ export function BriefingForm({ initialData }: { initialData?: BriefingInitialDat
   return (
     <form onSubmit={handleSubmit}>
       <header>
+        <div className="relative mb-8 h-9 w-36">
+          <Image src="/logo-espectra.png" alt="Espectra" fill className="object-contain object-left" />
+        </div>
         <p className="text-[11px] font-semibold tracking-[.22em] text-brand-300 uppercase">
           Posicionamento Digital
         </p>
