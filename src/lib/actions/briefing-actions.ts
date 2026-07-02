@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { briefingSchema, type BriefingFormValues } from "@/lib/validations";
+import { sendBriefingNotification } from "@/lib/email";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
@@ -128,6 +129,8 @@ export async function createBriefing(values: BriefingFormValues) {
   revalidatePath("/clientes");
   if (briefing.clienteId) revalidatePath(`/clientes/${briefing.clienteId}`);
   revalidatePath("/");
+
+  await sendBriefingNotification(briefing);
 
   return briefing;
 }
