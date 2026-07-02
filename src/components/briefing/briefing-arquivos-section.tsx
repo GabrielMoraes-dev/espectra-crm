@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { upload } from "@vercel/blob/client";
 import { Upload, Loader2, X, File as FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { uploadArquivo } from "@/lib/actions/upload-actions";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
 
 function FileField({
@@ -33,10 +33,11 @@ function FileField({
     try {
       const novasUrls: string[] = [];
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = await uploadArquivo(formData);
-        novasUrls.push(url);
+        const blob = await upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob-upload",
+        });
+        novasUrls.push(blob.url);
       }
       onChange([...urls, ...novasUrls]);
     } catch (err) {

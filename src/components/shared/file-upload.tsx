@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Upload, Loader2, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { uploadDocumentoDirect } from "@/lib/upload-client";
 
 export function FileUpload({
   value,
@@ -22,15 +23,8 @@ export function FileUpload({
     if (!file) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tipo", "pdf");
-
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      const json = await res.json();
-
-      if (!res.ok) throw new Error(json.error ?? "Falha no upload");
-      onChange(json.url as string);
+      const url = await uploadDocumentoDirect(file);
+      onChange(url);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar o arquivo");
     } finally {

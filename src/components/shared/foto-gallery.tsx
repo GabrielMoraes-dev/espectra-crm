@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { Upload, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { uploadImage } from "@/lib/actions/upload-actions";
+import { uploadImageDirect } from "@/lib/upload-client";
 import { addFotoCliente, deleteFotoCliente } from "@/lib/actions/cliente-actions";
 import type { FotoCliente } from "@/generated/prisma/client";
 
@@ -26,9 +26,7 @@ export function FotoGallery({
     setUploading(true);
     try {
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const url = await uploadImage(formData);
+        const url = await uploadImageDirect(file);
         const foto = await addFotoCliente(clienteId, url);
         setItems((prev) => [foto, ...prev]);
       }

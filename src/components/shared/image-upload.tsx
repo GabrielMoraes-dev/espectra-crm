@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Upload, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { uploadImage } from "@/lib/actions/upload-actions";
+import { uploadImageDirect } from "@/lib/upload-client";
 import { cn } from "@/lib/utils";
 
 export function ImageUpload({
@@ -27,9 +27,7 @@ export function ImageUpload({
     if (!file) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const url = await uploadImage(formData);
+      const url = await uploadImageDirect(file);
       onChange(url);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar a imagem");
