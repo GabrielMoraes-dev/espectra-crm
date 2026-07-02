@@ -7,7 +7,7 @@ export function BriefingSuccess() {
         <Image src="/logo-espectra.png" alt="Espectra" fill className="object-contain" />
       </div>
       <h2 className="font-heading text-2xl font-semibold text-foreground">
-        Recebemos seu briefing.
+        Recebemos seu briefing!
       </h2>
       <p className="mx-auto mt-3 max-w-sm text-sm text-muted-foreground">
         Obrigado por confiar à Espectra a forma como o mercado vai te enxergar. Em breve
