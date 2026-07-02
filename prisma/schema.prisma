@@ -82,6 +82,8 @@ model Lead {
   cliente        Cliente?  @relation(fields: [clienteId], references: [id])
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  briefings      Briefing[]
 }
 
 model Cliente {
@@ -112,6 +114,7 @@ model Cliente {
   projetos         Projeto[]
   pagamentos       Pagamento[]
   fotos            FotoCliente[]
+  briefings        Briefing[]
 }
 
 model FotoCliente {
@@ -120,6 +123,47 @@ model FotoCliente {
   cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   url       String
   createdAt DateTime @default(now())
+}
+
+model Briefing {
+  id                   String   @id @default(cuid())
+  leadId               String?
+  lead                 Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  clienteId            String?
+  cliente              Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+
+  // 1. Identificação
+  nome                 String
+  profissao            String
+  cidade               String
+  estado               String?
+  email                String
+  whatsapp             String
+  instagram            String?
+  registroProfissional String?
+
+  // 2. Como você quer ser percebido
+  apresentacao         String
+  historia             String
+  especialidades       String
+
+  // 3. Diferenciais e proposta de valor
+  diferenciais         String
+  motivoProcura        String
+  servicos             String
+  atendimento          String
+
+  // 4. Objetivo da landing page
+  objetivo             String
+  cta                  String
+
+  // 5. Materiais e arquivos — armazenados como JSON string de string[]
+  depoimentosUrls      String?
+  fotosUrls            String?
+  arquivosGeraisUrls   String
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model TimelineEvent {

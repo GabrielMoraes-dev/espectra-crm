@@ -51,6 +51,23 @@ export async function getClienteById(id: string) {
       timeline: { orderBy: { data: "desc" } },
       projetos: { orderBy: { createdAt: "desc" } },
       pagamentos: { orderBy: { data: "desc" } },
+      briefings: { orderBy: { createdAt: "desc" } },
+    },
+  });
+}
+
+export async function getClienteForPrefill(clienteId: string) {
+  return prisma.cliente.findUnique({
+    where: { id: clienteId },
+    select: {
+      id: true,
+      nome: true,
+      whatsapp: true,
+      instagram: true,
+      email: true,
+      cidade: true,
+      estado: true,
+      nicho: true,
     },
   });
 }

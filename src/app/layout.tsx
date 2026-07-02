@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/layout/app-shell";
+import { ChromeGate } from "@/components/layout/chrome-gate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <TooltipProvider delay={150}>
-          <AppShell>{children}</AppShell>
+          <ChromeGate shell={<AppShell>{children}</AppShell>}>{children}</ChromeGate>
           <Toaster richColors position="top-right" />
         </TooltipProvider>
       </body>

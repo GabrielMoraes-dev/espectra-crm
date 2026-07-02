@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -34,15 +33,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Envie uma imagem (PNG, JPG, WebP)" }, { status: 400 });
     }
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
     const ext = isPdf ? "pdf" : (file.name.split(".").pop() ?? "bin");
     const filename = `${randomUUID()}.${ext}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadsDir, filename), buffer);
+    const blob = await put(`uploads/${filename}`, file, { access: "public", addRandomSuffix: false });
 
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    return NextResponse.json({ url: blob.url });
   } catch (err) {
     console.error("[upload]", err);
     return NextResponse.json(

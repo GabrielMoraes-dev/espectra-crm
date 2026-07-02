@@ -42,3 +42,18 @@ export async function getLeads(filter: LeadsFilter) {
 export async function getAllLeadsForKanban() {
   return prisma.lead.findMany({ orderBy: { createdAt: "desc" } });
 }
+
+export async function getLeadForPrefill(leadId: string) {
+  return prisma.lead.findUnique({
+    where: { id: leadId },
+    select: {
+      id: true,
+      nome: true,
+      empresa: true,
+      whatsapp: true,
+      instagram: true,
+      email: true,
+      clienteId: true,
+    },
+  });
+}

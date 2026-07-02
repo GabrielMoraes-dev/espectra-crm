@@ -121,3 +121,35 @@ export const convertLeadSchema = z.object({
 });
 
 export type ConvertLeadValues = z.infer<typeof convertLeadSchema>;
+
+export const briefingSchema = z.object({
+  leadId: z.string().optional().or(z.literal("")),
+  clienteId: z.string().optional().or(z.literal("")),
+
+  nome: z.string().min(2, "Informe o nome"),
+  profissao: z.string().min(2, "Informe a profissão"),
+  cidade: z.string().min(1, "Informe a cidade"),
+  estado: z.string().optional().or(z.literal("")),
+  email: z.string().email("Email inválido"),
+  whatsapp: z.string().min(8, "Informe o WhatsApp"),
+  instagram: z.string().optional().or(z.literal("")),
+  registroProfissional: z.string().optional().or(z.literal("")),
+
+  apresentacao: z.string().min(1, "Campo obrigatório"),
+  historia: z.string().min(1, "Campo obrigatório"),
+  especialidades: z.string().min(1, "Campo obrigatório"),
+
+  diferenciais: z.string().min(1, "Campo obrigatório"),
+  motivoProcura: z.string().min(1, "Campo obrigatório"),
+  servicos: z.string().min(1, "Campo obrigatório"),
+  atendimento: z.string().min(1, "Campo obrigatório"),
+
+  objetivo: z.string().min(1, "Selecione um objetivo"),
+  cta: z.string().min(1, "Informe o texto do botão"),
+
+  depoimentosUrls: z.array(z.string()).optional(),
+  fotosUrls: z.array(z.string()).optional(),
+  arquivosGeraisUrls: z.array(z.string()).min(1, "Envie ao menos um arquivo"),
+});
+
+export type BriefingFormValues = z.infer<typeof briefingSchema>;

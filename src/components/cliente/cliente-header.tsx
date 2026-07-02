@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Link2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -26,6 +26,12 @@ export function ClienteHeader({
   const [openDelete, setOpenDelete] = useState(false);
   const router = useRouter();
   const statusConfig = STATUS_CLIENTE_CONFIG[cliente.status];
+
+  function copiarLinkBriefing() {
+    const url = `${window.location.origin}/formulario/cliente/${cliente.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link do briefing copiado");
+  }
 
   return (
     <div className="space-y-4">
@@ -53,6 +59,9 @@ export function ClienteHeader({
         </div>
 
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={copiarLinkBriefing}>
+            <Link2 className="size-4" /> Copiar link do briefing
+          </Button>
           <Button variant="outline" onClick={() => setOpenEdit(true)}>
             <Pencil className="size-4" /> Editar cliente
           </Button>

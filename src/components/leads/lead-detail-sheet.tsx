@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Pencil, Trash2, ArrowRightLeft, Phone, AtSign, Mail, Tag, Wallet } from "lucide-react";
+import { Pencil, Trash2, ArrowRightLeft, Phone, AtSign, Mail, Tag, Wallet, Link2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -62,6 +62,14 @@ export function LeadDetailSheet({
 
   const etapaConfig = ETAPA_LEAD_CONFIG[lead.etapa];
   const podeConverter = !lead.clienteId && lead.etapa !== "PERDIDO";
+  const podeEnviarBriefing = lead.etapa !== "PERDIDO";
+  const leadId = lead.id;
+
+  function copiarLinkBriefing() {
+    const url = `${window.location.origin}/formulario/lead/${leadId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link do briefing copiado");
+  }
 
   return (
     <>
@@ -81,6 +89,12 @@ export function LeadDetailSheet({
             <InfoRow icon={Mail} label="Email" value={lead.email ?? "—"} />
             <InfoRow icon={Tag} label="Origem" value={lead.origem ?? "—"} />
             <InfoRow icon={Wallet} label="Valor estimado" value={formatCurrency(lead.valorEstimado)} />
+
+            {podeEnviarBriefing && (
+              <Button variant="outline" className="w-full" onClick={copiarLinkBriefing}>
+                <Link2 className="size-4" /> Copiar link do briefing
+              </Button>
+            )}
 
             {lead.observacoes && (
               <div className="space-y-1 rounded-lg border border-border bg-card/50 p-3">
