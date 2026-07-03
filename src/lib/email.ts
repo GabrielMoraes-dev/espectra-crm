@@ -37,3 +37,33 @@ export async function sendBriefingNotification(briefing: Briefing) {
     console.error("[email] Falha ao enviar notificação de briefing", error);
   }
 }
+
+export async function sendBriefingConfirmation(briefing: Briefing) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, confirmação não enviada");
+    return;
+  }
+  if (!briefing.email) return;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  try {
+    await resend.emails.send({
+      from: "Espectra <onboarding@resend.dev>",
+      to: briefing.email,
+      subject: "Recebemos seu briefing!",
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+          <p>Olá, ${briefing.nome}!</p>
+          <p style="color: #555;">
+            Recebemos o briefing que você preencheu. Obrigado por confiar à Espectra a forma como
+            o mercado vai te enxergar. Em breve entraremos em contato com os próximos passos.
+          </p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar confirmação ao cliente", error);
+  }
+}

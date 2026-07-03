@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { briefingSchema, type BriefingFormValues } from "@/lib/validations";
-import { sendBriefingNotification } from "@/lib/email";
+import { sendBriefingNotification, sendBriefingConfirmation } from "@/lib/email";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
@@ -137,6 +137,7 @@ export async function createBriefing(values: BriefingFormValues) {
   revalidatePath("/");
 
   await sendBriefingNotification(briefing);
+  await sendBriefingConfirmation(briefing);
 
   return briefing;
 }
