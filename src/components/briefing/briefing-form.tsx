@@ -27,10 +27,18 @@ export type BriefingFormState = {
   apresentacao: string;
   historia: string;
   especialidades: string;
+  numeroDestaque: string;
   diferenciais: string;
   motivoProcura: string;
   servicos: string;
   atendimento: string;
+  ondeAtende: string;
+  enderecoFisico: string;
+  valoresServicos: string;
+  faqAgendamento: string;
+  faqAntesConsulta: string;
+  faqCancelamento: string;
+  faqHorarios: string;
   objetivo: string;
   cta: string;
   depoimentosUrls: string[];
@@ -66,10 +74,18 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     apresentacao: "",
     historia: "",
     especialidades: "",
+    numeroDestaque: "",
     diferenciais: "",
     motivoProcura: "",
     servicos: "",
     atendimento: "",
+    ondeAtende: "",
+    enderecoFisico: "",
+    valoresServicos: "",
+    faqAgendamento: "",
+    faqAntesConsulta: "",
+    faqCancelamento: "",
+    faqHorarios: "",
     objetivo: "",
     cta: "",
     depoimentosUrls: [],

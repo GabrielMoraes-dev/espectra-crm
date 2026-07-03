@@ -146,12 +146,20 @@ model Briefing {
   apresentacao         String
   historia             String
   especialidades       String
+  numeroDestaque       String?
 
   // 3. Diferenciais e proposta de valor
   diferenciais         String
   motivoProcura        String
   servicos             String
   atendimento          String
+  ondeAtende           String?
+  enderecoFisico       String?
+  valoresServicos      String?
+  faqAgendamento       String?
+  faqAntesConsulta     String?
+  faqCancelamento      String?
+  faqHorarios          String?
 
   // 4. Objetivo da landing page
   objetivo             String

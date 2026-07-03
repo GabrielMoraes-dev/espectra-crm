@@ -64,10 +64,37 @@ export function ClienteBriefing({ briefings }: { briefings: Briefing[] }) {
                 <Campo label="Como quer ser apresentado" valor={b.apresentacao} />
                 <Campo label="História" valor={b.historia} />
                 <Campo label="Especialidades" valor={b.especialidades} />
+                {b.numeroDestaque && <Campo label="Número de destaque" valor={b.numeroDestaque} />}
                 <Campo label="Diferenciais" valor={b.diferenciais} />
                 <Campo label="Por que um cliente procura" valor={b.motivoProcura} />
                 <Campo label="Serviços" valor={b.servicos} />
                 <Campo label="Atendimento" valor={b.atendimento} />
+
+                {(b.ondeAtende || b.enderecoFisico || b.valoresServicos) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {b.ondeAtende && <Campo label="Onde atende" valor={b.ondeAtende} />}
+                    {b.enderecoFisico && <Campo label="Endereço físico" valor={b.enderecoFisico} />}
+                    {b.valoresServicos && <Campo label="Valores" valor={b.valoresServicos} />}
+                  </div>
+                )}
+
+                {(b.faqAgendamento || b.faqAntesConsulta || b.faqCancelamento || b.faqHorarios) && (
+                  <div className="space-y-3 rounded-lg border border-border bg-card/50 p-3">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Perguntas frequentes respondidas
+                    </p>
+                    {b.faqAgendamento && (
+                      <Campo label="Como marcar um horário" valor={b.faqAgendamento} />
+                    )}
+                    {b.faqAntesConsulta && (
+                      <Campo label="O que saber antes da consulta" valor={b.faqAntesConsulta} />
+                    )}
+                    {b.faqCancelamento && (
+                      <Campo label="Política de cancelamento" valor={b.faqCancelamento} />
+                    )}
+                    {b.faqHorarios && <Campo label="Dias/horários" valor={b.faqHorarios} />}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <Campo label="Objetivo da landing" valor={b.objetivo} />

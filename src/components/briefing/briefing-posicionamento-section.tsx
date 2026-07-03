@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
@@ -54,6 +55,22 @@ export function BriefingPosicionamentoSection({
           placeholder="Áreas de atuação, técnicas, abordagens"
           value={form.especialidades}
           onChange={(e) => set("especialidades", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="numeroDestaque">
+          Tem algum número que representa bem sua experiência ou resultado?
+          <span className="ml-1 font-normal text-muted-foreground">(opcional)</span>
+          <span className="mt-1 block font-normal text-muted-foreground">
+            Ex: anos de atuação, clientes atendidos, taxa de satisfação, prêmio
+          </span>
+        </Label>
+        <Input
+          id="numeroDestaque"
+          placeholder="Ex: 10 anos de experiência"
+          value={form.numeroDestaque}
+          onChange={(e) => set("numeroDestaque", e.target.value)}
         />
       </div>
     </div>
