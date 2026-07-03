@@ -102,6 +102,10 @@ export async function deleteLead(id: string) {
   revalidatePath("/");
 }
 
+export async function registrarLinkCopiado(leadId: string) {
+  await prisma.lead.update({ where: { id: leadId }, data: { linkCopiadoEm: new Date() } });
+}
+
 export async function convertLeadToCliente(leadId: string, values: ConvertLeadValues) {
   const data = convertLeadSchema.parse(values);
   const lead = await prisma.lead.findUniqueOrThrow({ where: { id: leadId } });

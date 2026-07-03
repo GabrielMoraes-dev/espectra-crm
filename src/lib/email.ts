@@ -1,5 +1,6 @@
 import { Resend } from "resend";
-import type { Briefing } from "@/generated/prisma/client";
+import type { Briefing, Lead } from "@/generated/prisma/client";
+import { formatDateShort } from "@/lib/utils";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
@@ -65,5 +66,38 @@ export async function sendBriefingConfirmation(briefing: Briefing) {
     });
   } catch (error) {
     console.error("[email] Falha ao enviar confirmação ao cliente", error);
+  }
+}
+
+export async function sendStaleLeadReminder(leads: Lead[]) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, lembrete não enviado");
+    return;
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const itens = leads
+    .map(
+      (lead) =>
+        `<li><strong>${lead.nome}</strong>${lead.empresa ? ` (${lead.empresa})` : ""} — link enviado em ${formatDateShort(lead.linkCopiadoEm)}, sem resposta ao briefing</li>`,
+    )
+    .join("");
+
+  try {
+    await resend.emails.send({
+      from: "Espectra CRM <onboarding@resend.dev>",
+      to: NOTIFICATION_EMAIL,
+      subject: `${leads.length} lead${leads.length > 1 ? "s" : ""} sem resposta ao briefing`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <p>Esses leads ainda não responderam o formulário de briefing:</p>
+          <ul style="color: #555;">${itens}</ul>
+          <p><a href="${SITE_URL}/leads" style="color: #5483b3;">Ver leads no CRM →</a></p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar lembrete de leads parados", error);
   }
 }

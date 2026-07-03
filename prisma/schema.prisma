@@ -80,6 +80,7 @@ model Lead {
   etapa          EtapaLead @default(NOVO)
   clienteId      String?   @unique
   cliente        Cliente?  @relation(fields: [clienteId], references: [id])
+  linkCopiadoEm  DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 

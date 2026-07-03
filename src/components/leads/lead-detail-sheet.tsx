@@ -18,7 +18,7 @@ import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { ConvertLeadDialog } from "@/components/leads/convert-lead-dialog";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { deleteLead } from "@/lib/actions/lead-actions";
+import { deleteLead, registrarLinkCopiado } from "@/lib/actions/lead-actions";
 import type { Lead, MembroEquipe } from "@/generated/prisma/client";
 
 function InfoRow({
@@ -69,6 +69,7 @@ export function LeadDetailSheet({
     const url = `${window.location.origin}/formulario/lead/${leadId}`;
     navigator.clipboard.writeText(url);
     toast.success("Link do briefing copiado");
+    registrarLinkCopiado(leadId);
   }
 
   return (
