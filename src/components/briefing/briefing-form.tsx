@@ -7,7 +7,6 @@ import { createBriefing } from "@/lib/actions/briefing-actions";
 import { BriefingIdentificacaoSection } from "@/components/briefing/briefing-identificacao-section";
 import { BriefingPosicionamentoSection } from "@/components/briefing/briefing-posicionamento-section";
 import { BriefingDiferenciaisSection } from "@/components/briefing/briefing-diferenciais-section";
-import { BriefingObjetivoSection } from "@/components/briefing/briefing-objetivo-section";
 import { BriefingArquivosSection } from "@/components/briefing/briefing-arquivos-section";
 import { BriefingProgress } from "@/components/briefing/briefing-progress";
 import { BriefingSuccess } from "@/components/briefing/briefing-success";
@@ -39,8 +38,6 @@ export type BriefingFormState = {
   faqAntesConsulta: string;
   faqCancelamento: string;
   faqHorarios: string;
-  objetivo: string;
-  cta: string;
   depoimentosUrls: string[];
   fotosUrls: string[];
   arquivosGeraisUrls: string[];
@@ -86,39 +83,46 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     faqAntesConsulta: "",
     faqCancelamento: "",
     faqHorarios: "",
-    objetivo: "",
-    cta: "",
     depoimentosUrls: [],
     fotosUrls: [],
     arquivosGeraisUrls: [],
   };
 }
 
-const SECTIONS: { titulo: string; sub: string; campos: (keyof BriefingFormState)[] }[] = [
+type SectionProps = {
+  form: BriefingFormState;
+  set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
+};
+
+const SECTIONS: {
+  titulo: string;
+  sub: string;
+  campos: (keyof BriefingFormState)[];
+  Component: (props: SectionProps) => React.ReactElement;
+}[] = [
   {
     titulo: "Identificação",
     sub: "Quem é o profissional por trás da marca.",
     campos: ["nome", "profissao", "cidade", "email", "whatsapp"],
+    Component: BriefingIdentificacaoSection,
   },
   {
     titulo: "Como você quer ser percebido",
     sub: "A base do posicionamento: a história que sustenta a autoridade.",
     campos: ["apresentacao", "historia", "especialidades"],
+    Component: BriefingPosicionamentoSection,
   },
   {
     titulo: "Diferenciais e proposta de valor",
     sub: "O que faz o mercado escolher você — e não outro profissional.",
     campos: ["diferenciais", "motivoProcura", "servicos", "atendimento"],
-  },
-  {
-    titulo: "Objetivo da landing page",
-    sub: "Para onde queremos guiar quem visita a página.",
-    campos: ["objetivo", "cta"],
+    Component: BriefingDiferenciaisSection,
   },
   {
     titulo: "Materiais e arquivos",
     sub: "Tudo que dá corpo visual à sua autoridade.",
     campos: ["arquivosGeraisUrls"],
+    Component: BriefingArquivosSection,
   },
 ];
 
@@ -184,30 +188,16 @@ export function BriefingForm({ initialData }: { initialData?: BriefingInitialDat
         />
       </header>
 
-      <section className="mt-16">
-        <SectionHead numero="01" titulo={SECTIONS[0].titulo} sub={SECTIONS[0].sub} />
-        <BriefingIdentificacaoSection form={form} set={set} />
-      </section>
-
-      <section className="mt-16">
-        <SectionHead numero="02" titulo={SECTIONS[1].titulo} sub={SECTIONS[1].sub} />
-        <BriefingPosicionamentoSection form={form} set={set} />
-      </section>
-
-      <section className="mt-16">
-        <SectionHead numero="03" titulo={SECTIONS[2].titulo} sub={SECTIONS[2].sub} />
-        <BriefingDiferenciaisSection form={form} set={set} />
-      </section>
-
-      <section className="mt-16">
-        <SectionHead numero="04" titulo={SECTIONS[3].titulo} sub={SECTIONS[3].sub} />
-        <BriefingObjetivoSection form={form} set={set} />
-      </section>
-
-      <section className="mt-16">
-        <SectionHead numero="05" titulo={SECTIONS[4].titulo} sub={SECTIONS[4].sub} />
-        <BriefingArquivosSection form={form} set={set} />
-      </section>
+      {SECTIONS.map((section, i) => (
+        <section key={section.titulo} className="mt-16">
+          <SectionHead
+            numero={String(i + 1).padStart(2, "0")}
+            titulo={section.titulo}
+            sub={section.sub}
+          />
+          <section.Component form={form} set={set} />
+        </section>
+      ))}
 
       <footer className="mt-16 border-t border-border pt-6">
         <p className="mb-4 text-sm text-muted-foreground">

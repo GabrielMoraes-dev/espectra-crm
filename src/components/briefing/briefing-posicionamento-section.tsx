@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
@@ -66,8 +65,9 @@ export function BriefingPosicionamentoSection({
             Ex: anos de atuação, clientes atendidos, taxa de satisfação, prêmio
           </span>
         </Label>
-        <Input
+        <Textarea
           id="numeroDestaque"
+          rows={3}
           placeholder="Ex: 10 anos de experiência"
           value={form.numeroDestaque}
           onChange={(e) => set("numeroDestaque", e.target.value)}

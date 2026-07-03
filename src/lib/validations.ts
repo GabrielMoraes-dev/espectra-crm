@@ -152,9 +152,6 @@ export const briefingSchema = z.object({
   faqCancelamento: z.string().optional().or(z.literal("")),
   faqHorarios: z.string().optional().or(z.literal("")),
 
-  objetivo: z.string().min(1, "Selecione um objetivo"),
-  cta: z.string().min(1, "Informe o texto do botão"),
-
   depoimentosUrls: z.array(z.string()).optional(),
   fotosUrls: z.array(z.string()).optional(),
   arquivosGeraisUrls: z.array(z.string()).min(1, "Envie ao menos um arquivo"),

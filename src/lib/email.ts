@@ -23,8 +23,7 @@ export async function sendBriefingNotification(briefing: Briefing) {
         <div style="font-family: sans-serif; max-width: 480px;">
           <p><strong>${briefing.nome}</strong> (${briefing.profissao}) acabou de enviar o briefing.</p>
           <p style="color: #555;">
-            <strong>Cidade:</strong> ${briefing.cidade}${briefing.estado ? `/${briefing.estado}` : ""}<br/>
-            <strong>Objetivo da landing:</strong> ${briefing.objetivo}
+            <strong>Cidade:</strong> ${briefing.cidade}${briefing.estado ? `/${briefing.estado}` : ""}
           </p>
           ${
             link

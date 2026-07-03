@@ -103,8 +103,6 @@ export async function createBriefing(values: BriefingFormValues) {
         faqAntesConsulta: clean(data.faqAntesConsulta),
         faqCancelamento: clean(data.faqCancelamento),
         faqHorarios: clean(data.faqHorarios),
-        objetivo: data.objetivo,
-        cta: data.cta,
         depoimentosUrls: JSON.stringify(data.depoimentosUrls ?? []),
         fotosUrls: JSON.stringify(data.fotosUrls ?? []),
         arquivosGeraisUrls: JSON.stringify(data.arquivosGeraisUrls),

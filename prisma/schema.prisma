@@ -162,8 +162,8 @@ model Briefing {
   faqHorarios          String?
 
   // 4. Objetivo da landing page
-  objetivo             String
-  cta                  String
+  objetivo             String?
+  cta                  String?
 
   // 5. Materiais e arquivos — armazenados como JSON string de string[]
   depoimentosUrls      String?

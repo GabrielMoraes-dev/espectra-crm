@@ -96,10 +96,12 @@ export function ClienteBriefing({ briefings }: { briefings: Briefing[] }) {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <Campo label="Objetivo da landing" valor={b.objetivo} />
-                  <Campo label="Texto do botão" valor={b.cta} />
-                </div>
+                {(b.objetivo || b.cta) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {b.objetivo && <Campo label="Objetivo da landing" valor={b.objetivo} />}
+                    {b.cta && <Campo label="Texto do botão" valor={b.cta} />}
+                  </div>
+                )}
 
                 <Arquivos label="Depoimentos" urls={parseJsonArray(b.depoimentosUrls)} />
                 <Arquivos label="Fotos" urls={parseJsonArray(b.fotosUrls)} />
