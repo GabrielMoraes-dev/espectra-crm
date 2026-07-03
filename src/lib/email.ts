@@ -1,6 +1,6 @@
 import { Resend } from "resend";
-import type { Briefing, Lead } from "@/generated/prisma/client";
-import { formatDateShort } from "@/lib/utils";
+import type { Briefing, Lead, Projeto, Cliente } from "@/generated/prisma/client";
+import { formatDateShort, getPrazoUrgencia } from "@/lib/utils";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
@@ -99,5 +99,39 @@ export async function sendStaleLeadReminder(leads: Lead[]) {
     });
   } catch (error) {
     console.error("[email] Falha ao enviar lembrete de leads parados", error);
+  }
+}
+
+export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })[]) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, resumo de prazos não enviado");
+    return;
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const itens = projetos
+    .map((projeto) => {
+      const urgencia = getPrazoUrgencia(projeto.prazo);
+      const situacao = urgencia ? urgencia.label : `prazo em ${formatDateShort(projeto.prazo)}`;
+      return `<li><strong>${projeto.cliente.nome}</strong> — ${situacao}</li>`;
+    })
+    .join("");
+
+  try {
+    await resend.emails.send({
+      from: "Espectra CRM <onboarding@resend.dev>",
+      to: NOTIFICATION_EMAIL,
+      subject: `Resumo semanal: ${projetos.length} projeto${projetos.length > 1 ? "s" : ""} com prazo próximo`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <p>Projetos com prazo nos próximos 7 dias (ou já atrasados):</p>
+          <ul style="color: #555;">${itens}</ul>
+          <p><a href="${SITE_URL}/projetos" style="color: #5483b3;">Ver projetos no CRM →</a></p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar resumo de prazos", error);
   }
 }
