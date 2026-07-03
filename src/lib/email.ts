@@ -135,3 +135,40 @@ export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })
     console.error("[email] Falha ao enviar resumo de prazos", error);
   }
 }
+
+export async function sendPagamentoSemMatch(compra: {
+  nome: string;
+  email: string;
+  telefone: string;
+  valor: number;
+}) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, alerta de pagamento não enviado");
+    return;
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const valorFormatado = compra.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  try {
+    await resend.emails.send({
+      from: "Espectra CRM <onboarding@resend.dev>",
+      to: NOTIFICATION_EMAIL,
+      subject: `Pagamento recebido sem cliente correspondente — ${compra.nome}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <p>Chegou um pagamento aprovado na Cakto, mas não encontramos nenhum cliente com esse email ou telefone no CRM:</p>
+          <p style="color: #555;">
+            <strong>Nome:</strong> ${compra.nome}<br/>
+            <strong>Email:</strong> ${compra.email}<br/>
+            <strong>Telefone:</strong> ${compra.telefone}<br/>
+            <strong>Valor:</strong> ${valorFormatado}
+          </p>
+          <p style="color: #888;">Vincule manualmente ao cliente certo no CRM.</p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar alerta de pagamento sem match", error);
+  }
+}
