@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { leadSchema, convertLeadSchema, type LeadFormValues, type ConvertLeadValues } from "@/lib/validations";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
+import { requireAuth } from "@/lib/auth/session";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createLead(values: LeadFormValues) {
+  await requireAuth();
   const data = leadSchema.parse(values);
 
   const lead = await prisma.lead.create({
@@ -41,6 +43,7 @@ export async function createLead(values: LeadFormValues) {
 }
 
 export async function updateLead(id: string, values: LeadFormValues) {
+  await requireAuth();
   const data = leadSchema.parse(values);
 
   const before = await prisma.lead.findUniqueOrThrow({ where: { id } });
@@ -77,6 +80,7 @@ export async function updateLead(id: string, values: LeadFormValues) {
 }
 
 export async function moveLeadEtapa(id: string, etapa: LeadFormValues["etapa"]) {
+  await requireAuth();
   const lead = await prisma.lead.update({ where: { id }, data: { etapa } });
 
   await prisma.activityLog.create({
@@ -97,16 +101,19 @@ export async function moveLeadEtapa(id: string, etapa: LeadFormValues["etapa"]) 
 }
 
 export async function deleteLead(id: string) {
+  await requireAuth();
   await prisma.lead.delete({ where: { id } });
   revalidatePath("/leads");
   revalidatePath("/");
 }
 
 export async function registrarLinkCopiado(leadId: string) {
+  await requireAuth();
   await prisma.lead.update({ where: { id: leadId }, data: { linkCopiadoEm: new Date() } });
 }
 
 export async function convertLeadToCliente(leadId: string, values: ConvertLeadValues) {
+  await requireAuth();
   const data = convertLeadSchema.parse(values);
   const lead = await prisma.lead.findUniqueOrThrow({ where: { id: leadId } });
 

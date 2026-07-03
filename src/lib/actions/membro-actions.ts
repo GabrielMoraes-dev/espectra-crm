@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { membroSchema, type MembroFormValues } from "@/lib/validations";
+import { requireAuth } from "@/lib/auth/session";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createMembro(values: MembroFormValues) {
+  await requireAuth();
   const data = membroSchema.parse(values);
 
   const membro = await prisma.membroEquipe.create({
@@ -28,6 +30,7 @@ export async function createMembro(values: MembroFormValues) {
 }
 
 export async function updateMembro(id: string, values: MembroFormValues) {
+  await requireAuth();
   const data = membroSchema.parse(values);
 
   const membro = await prisma.membroEquipe.update({
@@ -48,6 +51,7 @@ export async function updateMembro(id: string, values: MembroFormValues) {
 }
 
 export async function deleteMembro(id: string) {
+  await requireAuth();
   await prisma.membroEquipe.delete({ where: { id } });
   revalidatePath("/equipe");
   revalidatePath("/estrutura-operacional");

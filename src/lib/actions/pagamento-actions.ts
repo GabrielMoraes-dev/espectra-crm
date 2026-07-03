@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { pagamentoSchema, type PagamentoFormValues } from "@/lib/validations";
 import { formatCurrency } from "@/lib/utils";
+import { requireAuth } from "@/lib/auth/session";
 
 export async function createPagamento(values: PagamentoFormValues) {
+  await requireAuth();
   const data = pagamentoSchema.parse(values);
 
   const pagamento = await prisma.pagamento.create({
@@ -37,6 +39,7 @@ export async function createPagamento(values: PagamentoFormValues) {
 }
 
 export async function updatePagamento(id: string, values: PagamentoFormValues) {
+  await requireAuth();
   const data = pagamentoSchema.parse(values);
   const before = await prisma.pagamento.findUniqueOrThrow({ where: { id } });
 
@@ -70,6 +73,7 @@ export async function updatePagamento(id: string, values: PagamentoFormValues) {
 }
 
 export async function togglePagamentoPago(id: string, pago: boolean) {
+  await requireAuth();
   const pagamento = await prisma.pagamento.update({
     where: { id },
     data: { pago },
@@ -94,6 +98,7 @@ export async function togglePagamentoPago(id: string, pago: boolean) {
 }
 
 export async function deletePagamento(id: string) {
+  await requireAuth();
   const pagamento = await prisma.pagamento.findUniqueOrThrow({ where: { id } });
   await prisma.pagamento.delete({ where: { id } });
   revalidatePath("/financeiro");

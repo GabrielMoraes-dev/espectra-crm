@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { tarefaSchema, type TarefaFormValues } from "@/lib/validations";
+import { requireAuth } from "@/lib/auth/session";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createTarefa(values: TarefaFormValues) {
+  await requireAuth();
   const data = tarefaSchema.parse(values);
 
   const tarefa = await prisma.tarefa.create({
@@ -36,6 +38,7 @@ export async function createTarefa(values: TarefaFormValues) {
 }
 
 export async function updateTarefa(id: string, values: TarefaFormValues) {
+  await requireAuth();
   const data = tarefaSchema.parse(values);
   const before = await prisma.tarefa.findUniqueOrThrow({ where: { id } });
 
@@ -67,6 +70,7 @@ export async function updateTarefa(id: string, values: TarefaFormValues) {
 }
 
 export async function moveTarefaStatus(id: string, status: TarefaFormValues["status"]) {
+  await requireAuth();
   const tarefa = await prisma.tarefa.update({ where: { id }, data: { status } });
 
   if (status === "CONCLUIDA") {
@@ -85,6 +89,7 @@ export async function moveTarefaStatus(id: string, status: TarefaFormValues["sta
 }
 
 export async function deleteTarefa(id: string) {
+  await requireAuth();
   await prisma.tarefa.delete({ where: { id } });
   revalidatePath("/tarefas");
 }

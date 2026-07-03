@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { projetoSchema, type ProjetoFormValues } from "@/lib/validations";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
+import { requireAuth } from "@/lib/auth/session";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createProjeto(values: ProjetoFormValues) {
+  await requireAuth();
   const data = projetoSchema.parse(values);
 
   const projeto = await prisma.projeto.create({
@@ -63,6 +65,7 @@ async function registerStatusChange(
 }
 
 export async function updateProjeto(id: string, values: ProjetoFormValues) {
+  await requireAuth();
   const data = projetoSchema.parse(values);
   const before = await prisma.projeto.findUniqueOrThrow({
     where: { id },
@@ -92,6 +95,7 @@ export async function updateProjeto(id: string, values: ProjetoFormValues) {
 }
 
 export async function moveProjetoEtapa(id: string, status: ProjetoFormValues["status"]) {
+  await requireAuth();
   const projeto = await prisma.projeto.update({
     where: { id },
     data: { status },
@@ -107,6 +111,7 @@ export async function moveProjetoEtapa(id: string, status: ProjetoFormValues["st
 }
 
 export async function deleteProjeto(id: string) {
+  await requireAuth();
   await prisma.projeto.delete({ where: { id } });
   revalidatePath("/projetos");
   revalidatePath("/");

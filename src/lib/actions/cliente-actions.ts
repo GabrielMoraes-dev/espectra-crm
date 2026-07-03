@@ -9,12 +9,14 @@ import {
   type TimelineEventValues,
 } from "@/lib/validations";
 import { STATUS_CLIENTE_CONFIG } from "@/lib/constants";
+import { requireAuth } from "@/lib/auth/session";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createCliente(values: ClienteFormValues) {
+  await requireAuth();
   const data = clienteSchema.parse(values);
 
   const cliente = await prisma.cliente.create({
@@ -56,6 +58,7 @@ export async function createCliente(values: ClienteFormValues) {
 }
 
 export async function updateCliente(id: string, values: ClienteFormValues) {
+  await requireAuth();
   const data = clienteSchema.parse(values);
   const before = await prisma.cliente.findUniqueOrThrow({ where: { id } });
 
@@ -126,17 +129,20 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
 }
 
 export async function deleteCliente(id: string) {
+  await requireAuth();
   await prisma.cliente.delete({ where: { id } });
   revalidatePath("/clientes");
   revalidatePath("/");
 }
 
 export async function updateClienteObservacoes(id: string, observacoes: string) {
+  await requireAuth();
   await prisma.cliente.update({ where: { id }, data: { observacoes: clean(observacoes) } });
   revalidatePath(`/clientes/${id}`);
 }
 
 export async function addTimelineEvent(clienteId: string, values: TimelineEventValues) {
+  await requireAuth();
   const data = timelineEventSchema.parse(values);
   const event = await prisma.timelineEvent.create({
     data: { clienteId, titulo: data.titulo, descricao: clean(data.descricao) },
@@ -146,11 +152,13 @@ export async function addTimelineEvent(clienteId: string, values: TimelineEventV
 }
 
 export async function deleteTimelineEvent(id: string, clienteId: string) {
+  await requireAuth();
   await prisma.timelineEvent.delete({ where: { id } });
   revalidatePath(`/clientes/${clienteId}`);
 }
 
 export async function addFotoCliente(clienteId: string, url: string) {
+  await requireAuth();
   const foto = await prisma.fotoCliente.create({ data: { clienteId, url } });
   revalidatePath(`/clientes/${clienteId}`);
   revalidatePath("/projetos");
@@ -158,6 +166,7 @@ export async function addFotoCliente(clienteId: string, url: string) {
 }
 
 export async function deleteFotoCliente(id: string, clienteId: string) {
+  await requireAuth();
   await prisma.fotoCliente.delete({ where: { id } });
   revalidatePath(`/clientes/${clienteId}`);
   revalidatePath("/projetos");

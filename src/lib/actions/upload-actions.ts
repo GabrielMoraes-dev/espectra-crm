@@ -2,10 +2,12 @@
 
 import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
+import { requireAuth } from "@/lib/auth/session";
 
 const MAX_DOCUMENTO_SIZE = 10 * 1024 * 1024;
 
 export async function uploadDocumento(formData: FormData) {
+  await requireAuth();
   const file = formData.get("file");
   if (!(file instanceof File)) throw new Error("Arquivo inválido");
   const isPdf =
