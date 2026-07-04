@@ -2,19 +2,22 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPagamentoSemMatch } from "@/lib/email";
 
+type CaktoWebhookItem = {
+  amount: number;
+  offer_type: string;
+  paymentMethodName: string;
+  paidAt: string;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+};
+
 type CaktoWebhookBody = {
   event: string;
   secret: string;
-  data: {
-    amount: number;
-    paymentMethodName: string;
-    paidAt: string;
-    customer: {
-      name: string;
-      email: string;
-      phone: string;
-    };
-  };
+  data: CaktoWebhookItem[];
 };
 
 function apenasDigitos(v: string | null | undefined) {
@@ -32,7 +35,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ignorado: body.event });
   }
 
-  const { customer, amount, paymentMethodName, paidAt } = body.data;
+  const itens = body.data;
+  const itemPrincipal = itens.find((i) => i.offer_type === "main") ?? itens[0];
+  const { customer, paymentMethodName, paidAt } = itemPrincipal;
+  const valorTotal = itens.reduce((soma, i) => soma + i.amount, 0);
+
   const telefoneDigitos = apenasDigitos(customer.phone);
   const sufixoTelefone = telefoneDigitos.slice(-8);
 
@@ -51,7 +58,7 @@ export async function POST(request: Request) {
       nome: customer.name,
       email: customer.email,
       telefone: customer.phone,
-      valor: amount,
+      valor: valorTotal,
     });
     await prisma.activityLog.create({
       data: {
@@ -71,13 +78,13 @@ export async function POST(request: Request) {
   if (pagamentoPendente) {
     await prisma.pagamento.update({
       where: { id: pagamentoPendente.id },
-      data: { pago: true, valor: amount, formaPagamento: paymentMethodName, data: new Date(paidAt) },
+      data: { pago: true, valor: valorTotal, formaPagamento: paymentMethodName, data: new Date(paidAt) },
     });
   } else {
     await prisma.pagamento.create({
       data: {
         clienteId: cliente.id,
-        valor: amount,
+        valor: valorTotal,
         pago: true,
         formaPagamento: paymentMethodName,
         data: new Date(paidAt),
