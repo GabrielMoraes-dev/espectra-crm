@@ -4,6 +4,7 @@ import { ClienteInfoGrid } from "@/components/cliente/cliente-info-grid";
 import { ClienteObservacoes } from "@/components/cliente/cliente-observacoes";
 import { ClienteTimeline } from "@/components/cliente/cliente-timeline";
 import { ClienteBriefing } from "@/components/cliente/cliente-briefing";
+import { ClientePesquisas } from "@/components/cliente/cliente-pesquisas";
 import { ClienteSideCards } from "@/components/cliente/cliente-side-cards";
 import { FadeIn } from "@/components/shared/fade-in";
 import { getClienteById } from "@/lib/data/clientes";
@@ -43,6 +44,9 @@ export default async function ClienteDetailPage({
           </FadeIn>
           <FadeIn delay={0.13}>
             <ClienteBriefing briefings={cliente.briefings} />
+          </FadeIn>
+          <FadeIn delay={0.15}>
+            <ClientePesquisas pesquisas={cliente.pesquisas} />
           </FadeIn>
         </div>
 

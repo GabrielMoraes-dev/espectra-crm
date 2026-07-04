@@ -14,17 +14,19 @@ import { SalesChart } from "@/components/dashboard/sales-chart";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { NicheChart } from "@/components/dashboard/niche-chart";
 import { GrowthChart } from "@/components/dashboard/growth-chart";
+import { SatisfacaoCard } from "@/components/dashboard/satisfacao-card";
 import { RecentClientsTable } from "@/components/dashboard/recent-clients-table";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { PrazoAlertBanner } from "@/components/shared/prazo-alert-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboardData } from "@/lib/data/dashboard";
+import { getPesquisaStats } from "@/lib/data/pesquisas";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const data = await getDashboardData();
+  const [data, pesquisaStats] = await Promise.all([getDashboardData(), getPesquisaStats()]);
   const { stats } = data;
 
   const cards = [
@@ -54,6 +56,10 @@ export default async function Home() {
           </FadeIn>
         ))}
       </div>
+
+      <FadeIn delay={0.08}>
+        <SatisfacaoCard porNota={pesquisaStats.porNota} />
+      </FadeIn>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <FadeIn delay={0.1}>
