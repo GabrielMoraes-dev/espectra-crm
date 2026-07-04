@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Uploads locais
 /public/uploads/
+
+.vercel
+.env*

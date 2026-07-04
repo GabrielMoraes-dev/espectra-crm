@@ -1,6 +1,6 @@
 import { Resend } from "resend";
-import type { Briefing, Lead, Projeto, Cliente } from "@/generated/prisma/client";
-import { formatDateShort, getPrazoUrgencia } from "@/lib/utils";
+import type { Briefing, Lead, Projeto, Cliente, Pagamento } from "@/generated/prisma/client";
+import { formatDateShort, formatCurrency, getPrazoUrgencia } from "@/lib/utils";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
@@ -133,6 +133,39 @@ export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })
     });
   } catch (error) {
     console.error("[email] Falha ao enviar resumo de prazos", error);
+  }
+}
+
+export async function sendPagamentoAtrasado(pagamentos: (Pagamento & { cliente: Cliente })[]) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, alerta de pagamento atrasado não enviado");
+    return;
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const itens = pagamentos
+    .map(
+      (pagamento) =>
+        `<li><strong>${pagamento.cliente.nome}</strong> — ${formatCurrency(pagamento.valor)}, previsto para ${formatDateShort(pagamento.data)}</li>`,
+    )
+    .join("");
+
+  try {
+    await resend.emails.send({
+      from: "Espectra CRM <onboarding@resend.dev>",
+      to: NOTIFICATION_EMAIL,
+      subject: `${pagamentos.length} pagamento${pagamentos.length > 1 ? "s" : ""} atrasado${pagamentos.length > 1 ? "s" : ""}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <p>Esses pagamentos já passaram da data prevista e ainda não foram confirmados:</p>
+          <ul style="color: #555;">${itens}</ul>
+          <p><a href="${SITE_URL}/financeiro" style="color: #5483b3;">Ver financeiro no CRM →</a></p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar alerta de pagamento atrasado", error);
   }
 }
 
