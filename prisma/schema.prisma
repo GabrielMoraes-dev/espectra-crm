@@ -125,6 +125,7 @@ model Cliente {
   pagamentos       Pagamento[]
   fotos            FotoCliente[]
   briefings        Briefing[]
+  pesquisas        PesquisaSatisfacao[]
 }
 
 model FotoCliente {
@@ -216,6 +217,19 @@ model Pagamento {
   formaPagamento String?
   data           DateTime @default(now())
   createdAt      DateTime @default(now())
+}
+
+model PesquisaSatisfacao {
+  id          String   @id @default(cuid())
+  clienteId   String
+  cliente     Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  qualidade   Int
+  comunicacao Int
+  prazos      Int
+  atendimento Int
+  nota        Int
+  comentario  String?
+  createdAt   DateTime @default(now())
 }
 
 model Tarefa {

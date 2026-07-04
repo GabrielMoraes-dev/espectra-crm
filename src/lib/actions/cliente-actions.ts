@@ -10,6 +10,9 @@ import {
 } from "@/lib/validations";
 import { STATUS_CLIENTE_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
+import { sendMensagemFixaWhatsApp } from "@/lib/whatsapp";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
@@ -118,6 +121,14 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
           },
         });
       }
+    }
+
+    if (cliente.status === "FINALIZADO" && cliente.whatsapp) {
+      const link = `${SITE_URL}/pesquisa/${cliente.id}`;
+      await sendMensagemFixaWhatsApp(
+        cliente.whatsapp,
+        `Olá, ${cliente.nome.split(" ")[0]}! Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou — leva menos de um minuto: ${link}`,
+      );
     }
   }
 

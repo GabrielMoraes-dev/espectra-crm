@@ -71,3 +71,10 @@ export async function getClienteForPrefill(clienteId: string) {
     },
   });
 }
+
+export async function getClienteForPesquisa(clienteId: string) {
+  return prisma.cliente.findUnique({
+    where: { id: clienteId },
+    select: { id: true, nome: true },
+  });
+}

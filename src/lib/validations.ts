@@ -158,3 +158,15 @@ export const briefingSchema = z.object({
 });
 
 export type BriefingFormValues = z.infer<typeof briefingSchema>;
+
+export const pesquisaSatisfacaoSchema = z.object({
+  clienteId: z.string().min(1),
+  qualidade: z.coerce.number().int().min(1).max(5),
+  comunicacao: z.coerce.number().int().min(1).max(5),
+  prazos: z.coerce.number().int().min(1).max(5),
+  atendimento: z.coerce.number().int().min(1).max(5),
+  nota: z.coerce.number().int().min(1).max(5),
+  comentario: z.string().optional().or(z.literal("")),
+});
+
+export type PesquisaSatisfacaoFormValues = z.infer<typeof pesquisaSatisfacaoSchema>;

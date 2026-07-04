@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-const PUBLIC_PREFIXES = ["/formulario", "/login"];
+const PUBLIC_PREFIXES = ["/formulario", "/login", "/pesquisa"];
 
 export function ChromeGate({
   shell,

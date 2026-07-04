@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { decrypt } from "@/lib/auth/session";
 
 const PUBLIC_EXACT = ["/login"];
-const PUBLIC_PREFIXES = ["/formulario", "/api/cron", "/api/webhooks", "/api/blob-upload"];
+const PUBLIC_PREFIXES = ["/formulario", "/pesquisa", "/api/cron", "/api/webhooks", "/api/blob-upload"];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_EXACT.includes(pathname)) return true;
