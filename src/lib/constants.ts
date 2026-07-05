@@ -125,8 +125,6 @@ export const NICHOS_CLIENTE = [
   "Outro",
 ];
 
-export const FORMAS_PAGAMENTO = ["Pix", "Cartão de crédito", "Boleto", "Transferência"];
-
 export const ESTADOS_BRASIL = [
   { uf: "AC", nome: "Acre" },
   { uf: "AL", nome: "Alagoas" },
