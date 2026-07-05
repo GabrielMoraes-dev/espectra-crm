@@ -125,6 +125,17 @@ export const NICHOS_CLIENTE = [
   "Outro",
 ];
 
+export const CAKTO_LINKS_POR_PRECO: Record<number, string> = {
+  297: "https://pay.cakto.com.br/3akkm9p_963891",
+  397: "https://pay.cakto.com.br/n86tfrx",
+  497: "https://pay.cakto.com.br/k98za5w",
+  597: "https://pay.cakto.com.br/fyhiwzc",
+  697: "https://pay.cakto.com.br/nzjpcpy",
+  797: "https://pay.cakto.com.br/37pf7ph",
+  897: "https://pay.cakto.com.br/36c5kpk",
+  997: "https://pay.cakto.com.br/ddefprf",
+};
+
 export const ESTADOS_BRASIL = [
   { uf: "AC", nome: "Acre" },
   { uf: "AL", nome: "Alagoas" },

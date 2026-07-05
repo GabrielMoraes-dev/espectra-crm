@@ -5,12 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { pagamentoSchema, type PagamentoFormValues } from "@/lib/validations";
 import { formatCurrency } from "@/lib/utils";
 import { requireAuth } from "@/lib/auth/session";
-import { criarLinkPagamento } from "@/lib/cakto";
+import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
 
-export async function gerarLinkPagamento(clienteId: string, valor: number) {
+export async function gerarLinkPagamento(clienteId: string, preco: number) {
   await requireAuth();
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
-  return criarLinkPagamento({ clienteId: cliente.id, clienteNome: cliente.nome, valor });
+  const linkBase = CAKTO_LINKS_POR_PRECO[preco];
+  if (!linkBase) throw new Error("Preço inválido");
+  return `${linkBase}?sck=${cliente.id}`;
 }
 
 export async function createPagamento(values: PagamentoFormValues) {

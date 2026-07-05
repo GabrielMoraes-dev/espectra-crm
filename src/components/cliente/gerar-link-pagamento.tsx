@@ -3,23 +3,34 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
 import { gerarLinkPagamento } from "@/lib/actions/pagamento-actions";
 
+const PRECOS = Object.keys(CAKTO_LINKS_POR_PRECO)
+  .map(Number)
+  .sort((a, b) => a - b);
+
 export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
-  const [valor, setValor] = useState("");
+  const [preco, setPreco] = useState("");
   const [link, setLink] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleGerar() {
-    const valorNum = Number(valor);
-    if (!valorNum || valorNum < 5) {
-      toast.error("Informe um valor válido (mínimo R$5)");
+    if (!preco) {
+      toast.error("Escolhe um preço antes de gerar o link");
       return;
     }
     startTransition(async () => {
       try {
-        const url = await gerarLinkPagamento(clienteId, valorNum);
+        const url = await gerarLinkPagamento(clienteId, Number(preco));
         setLink(url);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Não foi possível gerar o link");
@@ -37,14 +48,18 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
     <div className="space-y-2 border-t border-border pt-3">
       <p className="text-xs font-medium text-muted-foreground">Gerar link de pagamento</p>
       <div className="flex gap-2">
-        <Input
-          type="number"
-          min={5}
-          placeholder="Valor (R$)"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-          className="flex-1"
-        />
+        <Select value={preco} onValueChange={(v) => setPreco(v ?? "")}>
+          <SelectTrigger className="flex-1">
+            <SelectValue placeholder="Escolha o preço" />
+          </SelectTrigger>
+          <SelectContent>
+            {PRECOS.map((p) => (
+              <SelectItem key={p} value={String(p)}>
+                {formatCurrency(p)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button type="button" size="sm" onClick={handleGerar} disabled={pending}>
           {pending ? "Gerando..." : "Gerar"}
         </Button>
