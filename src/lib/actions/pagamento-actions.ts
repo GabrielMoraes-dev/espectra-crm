@@ -50,6 +50,16 @@ export async function createPagamento(values: PagamentoFormValues) {
     },
   });
 
+  if (data.pago) {
+    await prisma.timelineEvent.create({
+      data: {
+        clienteId: pagamento.clienteId,
+        titulo: "Pagamento concluído",
+        descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
+      },
+    });
+  }
+
   revalidatePath("/financeiro");
   revalidatePath("/");
   revalidatePath(`/clientes/${pagamento.clienteId}`);
@@ -82,6 +92,13 @@ export async function updatePagamento(id: string, values: PagamentoFormValues) {
         entidadeId: pagamento.id,
       },
     });
+    await prisma.timelineEvent.create({
+      data: {
+        clienteId: pagamento.clienteId,
+        titulo: "Pagamento concluído",
+        descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
+      },
+    });
   }
 
   revalidatePath("/financeiro");
@@ -105,6 +122,13 @@ export async function togglePagamentoPago(id: string, pago: boolean) {
         descricao: `Pagamento de ${formatCurrency(pagamento.valor)} confirmado por ${pagamento.cliente.nome}`,
         entidadeTipo: "pagamento",
         entidadeId: pagamento.id,
+      },
+    });
+    await prisma.timelineEvent.create({
+      data: {
+        clienteId: pagamento.clienteId,
+        titulo: "Pagamento concluído",
+        descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
       },
     });
   }

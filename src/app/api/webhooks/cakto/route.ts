@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPagamentoSemMatch } from "@/lib/email";
+import { formatCurrency } from "@/lib/utils";
 
 type CaktoWebhookItem = {
   amount: number;
@@ -103,6 +104,14 @@ export async function POST(request: Request) {
       descricao: `Pagamento de '${cliente.nome}' confirmado automaticamente via Cakto`,
       entidadeTipo: "cliente",
       entidadeId: cliente.id,
+    },
+  });
+
+  await prisma.timelineEvent.create({
+    data: {
+      clienteId: cliente.id,
+      titulo: "Pagamento concluído",
+      descricao: `${formatCurrency(valorTotal)} confirmado via Cakto (${paymentMethodName}).`,
     },
   });
 
