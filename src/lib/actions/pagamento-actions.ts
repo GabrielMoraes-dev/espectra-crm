@@ -12,6 +12,15 @@ export async function gerarLinkPagamento(clienteId: string, preco: number) {
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   const linkBase = CAKTO_LINKS_POR_PRECO[preco];
   if (!linkBase) throw new Error("Preço inválido");
+
+  await prisma.pagamento.create({
+    data: { clienteId: cliente.id, valor: preco, pago: false },
+  });
+
+  revalidatePath("/financeiro");
+  revalidatePath(`/clientes/${cliente.id}`);
+  revalidatePath("/");
+
   return `${linkBase}?sck=${cliente.id}`;
 }
 

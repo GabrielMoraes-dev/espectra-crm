@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
   const [preco, setPreco] = useState("");
   const [link, setLink] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   function handleGerar() {
     if (!preco) {
@@ -32,6 +34,8 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
       try {
         const url = await gerarLinkPagamento(clienteId, Number(preco));
         setLink(url);
+        toast.success("Link gerado e pagamento pendente criado no financeiro");
+        router.refresh();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Não foi possível gerar o link");
       }
