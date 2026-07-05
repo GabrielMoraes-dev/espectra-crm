@@ -7,6 +7,7 @@ type CaktoWebhookItem = {
   offer_type: string;
   paymentMethodName: string;
   paidAt: string;
+  sck: string | null;
   customer: {
     name: string;
     email: string;
@@ -37,21 +38,25 @@ export async function POST(request: Request) {
 
   const itens = body.data;
   const itemPrincipal = itens.find((i) => i.offer_type === "main") ?? itens[0];
-  const { customer, paymentMethodName, paidAt } = itemPrincipal;
+  const { customer, paymentMethodName, paidAt, sck } = itemPrincipal;
   const valorTotal = itens.reduce((soma, i) => soma + i.amount, 0);
 
-  const telefoneDigitos = apenasDigitos(customer.phone);
-  const sufixoTelefone = telefoneDigitos.slice(-8);
+  let cliente = sck ? await prisma.cliente.findUnique({ where: { id: sck } }) : null;
 
-  const clientes = await prisma.cliente.findMany({
-    where: {
-      OR: [
-        { email: customer.email || undefined },
-        sufixoTelefone ? { whatsapp: { contains: sufixoTelefone } } : undefined,
-      ].filter((c): c is NonNullable<typeof c> => Boolean(c)),
-    },
-  });
-  const cliente = clientes[0];
+  if (!cliente) {
+    const telefoneDigitos = apenasDigitos(customer.phone);
+    const sufixoTelefone = telefoneDigitos.slice(-8);
+
+    const clientes = await prisma.cliente.findMany({
+      where: {
+        OR: [
+          { email: customer.email || undefined },
+          sufixoTelefone ? { whatsapp: { contains: sufixoTelefone } } : undefined,
+        ].filter((c): c is NonNullable<typeof c> => Boolean(c)),
+      },
+    });
+    cliente = clientes[0] ?? null;
+  }
 
   if (!cliente) {
     await sendPagamentoSemMatch({

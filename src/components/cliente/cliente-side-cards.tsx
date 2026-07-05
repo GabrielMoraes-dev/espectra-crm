@@ -3,14 +3,17 @@ import { Rocket, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
+import { GerarLinkPagamento } from "@/components/cliente/gerar-link-pagamento";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Pagamento, Projeto } from "@/generated/prisma/client";
 
 export function ClienteSideCards({
+  clienteId,
   projetos,
   pagamentos,
 }: {
+  clienteId: string;
   projetos: Projeto[];
   pagamentos: Pagamento[];
 }) {
@@ -81,6 +84,7 @@ export function ClienteSideCards({
               </Link>
             </ul>
           )}
+          <GerarLinkPagamento clienteId={clienteId} />
         </CardContent>
       </Card>
     </div>

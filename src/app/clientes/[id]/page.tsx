@@ -51,7 +51,11 @@ export default async function ClienteDetailPage({
         </div>
 
         <FadeIn delay={0.16}>
-          <ClienteSideCards projetos={cliente.projetos} pagamentos={cliente.pagamentos} />
+          <ClienteSideCards
+            clienteId={cliente.id}
+            projetos={cliente.projetos}
+            pagamentos={cliente.pagamentos}
+          />
         </FadeIn>
       </div>
     </div>
