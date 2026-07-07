@@ -7,9 +7,11 @@ import { PesquisaForm } from "@/components/pesquisa/pesquisa-form";
 export function PesquisaPageContent({
   clienteId,
   nome,
+  demo,
 }: {
   clienteId: string;
   nome: string;
+  demo?: boolean;
 }) {
   const [enviado, setEnviado] = useState(false);
 
@@ -36,13 +38,13 @@ export function PesquisaPageContent({
         <Image src="/logo-espectra.png" alt="Espectra" fill className="object-contain" />
       </div>
       <h1 className="font-heading text-center text-2xl font-semibold text-foreground">
-        Seu projeto foi entregue, {nome.split(" ")[0]}!
+        {nome ? `Seu projeto foi entregue, ${nome.split(" ")[0]}!` : "Seu projeto foi entregue!"}
       </h1>
       <p className="mx-auto mt-2 max-w-sm text-center text-sm text-muted-foreground">
         Sua opinião é muito importante pra gente. Leva menos de um minuto.
       </p>
       <div className="mt-10">
-        <PesquisaForm clienteId={clienteId} onEnviado={() => setEnviado(true)} />
+        <PesquisaForm clienteId={clienteId} onEnviado={() => setEnviado(true)} demo={demo} />
       </div>
     </div>
   );

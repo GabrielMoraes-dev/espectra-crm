@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 export function BriefingInicialForm({
   leadId,
   nomeInicial,
+  demo,
 }: {
   leadId: string;
   nomeInicial: string;
+  demo?: boolean;
 }) {
   const [nome, setNome] = useState(nomeInicial);
   const [profissao, setProfissao] = useState("");
@@ -29,6 +31,11 @@ export function BriefingInicialForm({
     e.preventDefault();
     if (fotosUrls.length === 0) {
       toast.error("Envie ao menos uma foto ou sua logo antes de continuar.");
+      return;
+    }
+    if (demo) {
+      toast.message("Isso é só uma demonstração — nada foi enviado de verdade.");
+      setEnviado(true);
       return;
     }
     startTransition(async () => {

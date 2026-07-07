@@ -138,7 +138,13 @@ function isFilled(form: BriefingFormState, campo: keyof BriefingFormState) {
   return v.trim() !== "";
 }
 
-export function BriefingForm({ initialData }: { initialData?: BriefingInitialData }) {
+export function BriefingForm({
+  initialData,
+  demo,
+}: {
+  initialData?: BriefingInitialData;
+  demo?: boolean;
+}) {
   const [form, setForm] = useState<BriefingFormState>(() => emptyState(initialData));
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -153,6 +159,11 @@ export function BriefingForm({ initialData }: { initialData?: BriefingInitialDat
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (demo) {
+      toast.message("Isso é só uma demonstração — nada foi enviado de verdade.");
+      setDone(true);
+      return;
+    }
     startTransition(async () => {
       try {
         await createBriefing(form);

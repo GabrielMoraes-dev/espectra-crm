@@ -7,6 +7,7 @@ import {
   CheckSquare,
   Map,
   Network,
+  FileText,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -26,8 +27,12 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Tarefas", href: "/tarefas", icon: CheckSquare },
   { label: "Mapa", href: "/mapa", icon: Map },
   { label: "Estrutura Operacional", href: "/estrutura-operacional", icon: Network },
+  { label: "Modelos", href: "/modelos", icon: FileText },
   { label: "Configurações", href: "/configuracoes", icon: Settings },
 ];
+
+// Reserved id used by the read-only "Modelos" preview pages — never a real Lead/Cliente id.
+export const DEMO_ID = "modelo";
 
 // ---------- Leads ----------
 

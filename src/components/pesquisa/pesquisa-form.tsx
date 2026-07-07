@@ -54,9 +54,11 @@ function RatingButtons({
 export function PesquisaForm({
   clienteId,
   onEnviado,
+  demo,
 }: {
   clienteId: string;
   onEnviado: () => void;
+  demo?: boolean;
 }) {
   const [respostas, setRespostas] = useState<Respostas>({
     qualidade: null,
@@ -77,6 +79,12 @@ export function PesquisaForm({
     }
     if (!nota) {
       toast.error("Escolhe uma nota antes de enviar.");
+      return;
+    }
+
+    if (demo) {
+      toast.message("Isso é só uma demonstração — nada foi enviado de verdade.");
+      onEnviado();
       return;
     }
 
