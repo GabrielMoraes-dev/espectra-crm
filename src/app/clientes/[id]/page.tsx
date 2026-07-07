@@ -27,7 +27,7 @@ export default async function ClienteDetailPage({
   return (
     <div className="space-y-6">
       <FadeIn>
-        <ClienteHeader cliente={cliente} membros={membros} />
+        <ClienteHeader cliente={cliente} membros={membros} leadId={cliente.lead?.id} />
       </FadeIn>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

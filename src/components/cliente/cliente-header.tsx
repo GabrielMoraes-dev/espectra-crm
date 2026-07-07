@@ -7,6 +7,12 @@ import { toast } from "sonner";
 import { ArrowLeft, Pencil, Trash2, Link2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ClienteFormDialog } from "@/components/clientes/cliente-form-dialog";
@@ -18,19 +24,21 @@ import type { Cliente, MembroEquipe } from "@/generated/prisma/client";
 export function ClienteHeader({
   cliente,
   membros,
+  leadId,
 }: {
   cliente: Cliente;
   membros: MembroEquipe[];
+  leadId?: string | null;
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const router = useRouter();
   const statusConfig = STATUS_CLIENTE_CONFIG[cliente.status];
 
-  function copiarLinkBriefing() {
-    const url = `${window.location.origin}/formulario/cliente/${cliente.id}`;
+  function copiarLink(path: string, mensagem: string) {
+    const url = `${window.location.origin}${path}`;
     navigator.clipboard.writeText(url);
-    toast.success("Link do briefing copiado");
+    toast.success(mensagem);
   }
 
   return (
@@ -59,9 +67,29 @@ export function ClienteHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={copiarLinkBriefing}>
-            <Link2 className="size-4" /> Copiar link do briefing
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="outline" />}>
+              <Link2 className="size-4" /> Copiar link do briefing
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {leadId && (
+                <DropdownMenuItem
+                  onClick={() =>
+                    copiarLink(`/formulario/inicial/${leadId}`, "Link do briefing inicial copiado")
+                  }
+                >
+                  Briefing inicial (amostra)
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={() =>
+                  copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado")
+                }
+              >
+                Briefing completo
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="outline" onClick={() => setOpenEdit(true)}>
             <Pencil className="size-4" /> Editar cliente
           </Button>
