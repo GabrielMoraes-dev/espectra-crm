@@ -126,7 +126,9 @@ export function TarefaFormDialog({
                 <Label>Responsável</Label>
                 <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue placeholder="Selecione">
+                      {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {membros.map((m) => (
@@ -146,7 +148,9 @@ export function TarefaFormDialog({
                 <Label>Prioridade</Label>
                 <Select value={form.prioridade} onValueChange={(v) => set("prioridade", v ?? "MEDIA")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {(value: keyof typeof PRIORIDADE_TAREFA_CONFIG) => PRIORIDADE_TAREFA_CONFIG[value]?.label}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(PRIORIDADE_TAREFA_CONFIG).map(([key, cfg]) => (
@@ -159,7 +163,9 @@ export function TarefaFormDialog({
                 <Label>Status</Label>
                 <Select value={form.status} onValueChange={(v) => set("status", v ?? "A_FAZER")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {(value: (typeof STATUS_TAREFA_ORDEM)[number]) => STATUS_TAREFA_CONFIG[value]?.label}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_TAREFA_ORDEM.map((status) => (

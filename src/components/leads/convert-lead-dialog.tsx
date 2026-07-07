@@ -97,7 +97,9 @@ export function ConvertLeadDialog({
                 <Label>Responsável</Label>
                 <Select value={responsavelId} onValueChange={(v) => setResponsavelId(v ?? "")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue placeholder="Selecione">
+                      {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {membros.map((m) => (

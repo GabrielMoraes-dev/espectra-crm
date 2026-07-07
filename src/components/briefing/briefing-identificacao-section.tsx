@@ -58,7 +58,9 @@ export function BriefingIdentificacaoSection({
           <Label>Estado</Label>
           <Select value={form.estado} onValueChange={(v) => set("estado", v ?? "")}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione" />
+              <SelectValue placeholder="Selecione">
+                {(value: string) => ESTADOS_BRASIL.find((e) => e.uf === value)?.nome ?? "Selecione"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {ESTADOS_BRASIL.map((e) => (

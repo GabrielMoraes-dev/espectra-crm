@@ -105,7 +105,12 @@ export function ProjetoFormDialog({
               <Label>Cliente *</Label>
               <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o cliente" />
+                  <SelectValue placeholder="Selecione o cliente">
+                    {(value: string) => {
+                      const c = clientes.find((c) => c.id === value);
+                      return c ? `${c.nome} ${c.empresa ? `· ${c.empresa}` : ""}` : "Selecione o cliente";
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {clientes.map((c) => (
@@ -126,7 +131,9 @@ export function ProjetoFormDialog({
                 <Label>Responsável</Label>
                 <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione" />
+                    <SelectValue placeholder="Selecione">
+                      {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {membros.map((m) => (
@@ -141,7 +148,9 @@ export function ProjetoFormDialog({
               <Label>Etapa</Label>
               <Select value={form.status} onValueChange={(v) => set("status", v ?? "BRIEFING")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: keyof typeof ETAPA_PROJETO_CONFIG) => ETAPA_PROJETO_CONFIG[value]?.label}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {ETAPA_PROJETO_ORDEM.map((etapa) => (

@@ -108,7 +108,12 @@ export function PagamentoFormDialog({
               <Label>Cliente *</Label>
               <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o cliente" />
+                  <SelectValue placeholder="Selecione o cliente">
+                    {(value: string) => {
+                      const c = clientes.find((c) => c.id === value);
+                      return c ? `${c.nome} ${c.empresa ? `· ${c.empresa}` : ""}` : "Selecione o cliente";
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {clientes.map((c) => (

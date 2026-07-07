@@ -79,7 +79,9 @@ export function EnviarContrato({
               <Label>Preço do contrato</Label>
               <Select value={preco} onValueChange={(v) => setPreco(v ?? "")}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Escolha o preço" />
+                  <SelectValue placeholder="Escolha o preço">
+                    {(value: string) => (value ? formatCurrency(Number(value)) : "Escolha o preço")}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {PRECOS.map((p) => (

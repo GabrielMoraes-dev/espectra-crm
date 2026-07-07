@@ -67,7 +67,13 @@ export function ProjetosToolbar({
 
           <Select value={status || "todas"} onValueChange={(v) => updateParam("status", v ?? "")}>
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Etapa" />
+              <SelectValue placeholder="Etapa">
+                {(value: string) =>
+                  value === "todas"
+                    ? "Todas as etapas"
+                    : (ETAPA_PROJETO_CONFIG[value as keyof typeof ETAPA_PROJETO_CONFIG]?.label ?? "Etapa")
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todas">Todas as etapas</SelectItem>

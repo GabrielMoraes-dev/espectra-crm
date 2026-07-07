@@ -66,7 +66,9 @@ export function LeadsToolbar({
 
           <Select value={origem || "todas"} onValueChange={(v) => updateParam("origem", v ?? "")}>
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Origem" />
+              <SelectValue placeholder="Origem">
+                {(value: string) => (value === "todas" ? "Todas as origens" : value)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todas">Todas as origens</SelectItem>
@@ -80,7 +82,16 @@ export function LeadsToolbar({
 
           <Select value={sort || "recentes"} onValueChange={(v) => updateParam("sort", v ?? "")}>
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Ordenar" />
+              <SelectValue placeholder="Ordenar">
+                {(value: string) =>
+                  ({
+                    recentes: "Mais recentes",
+                    antigos: "Mais antigos",
+                    "maior-valor": "Maior valor",
+                    "menor-valor": "Menor valor",
+                  })[value] ?? "Ordenar"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recentes">Mais recentes</SelectItem>

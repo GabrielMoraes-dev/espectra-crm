@@ -236,7 +236,9 @@ export function LeadFormDialog({
                         <Label>Etapa</Label>
                         <Select value={form.etapa} onValueChange={(v) => set("etapa", v ?? "NOVO")}>
                           <SelectTrigger className="w-full">
-                            <SelectValue />
+                            <SelectValue>
+                              {(value: keyof typeof ETAPA_LEAD_CONFIG) => ETAPA_LEAD_CONFIG[value]?.label}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {ETAPA_LEAD_ORDEM.map((etapa) => (

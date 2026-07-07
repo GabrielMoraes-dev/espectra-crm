@@ -216,7 +216,12 @@ export function ClienteFormDialog({
                         <Label>Estado</Label>
                         <Select value={form.estado} onValueChange={(v) => set("estado", v ?? "")}>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione o UF" />
+                            <SelectValue placeholder="Selecione o UF">
+                              {(value: string) => {
+                                const e = ESTADOS_BRASIL.find((e) => e.uf === value);
+                                return e ? `${e.uf} — ${e.nome}` : "Selecione o UF";
+                              }}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {ESTADOS_BRASIL.map((e) => (
@@ -247,7 +252,9 @@ export function ClienteFormDialog({
                         <Label>Responsável</Label>
                         <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione" />
+                            <SelectValue placeholder="Selecione">
+                              {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {membros.map((m) => (
@@ -260,7 +267,11 @@ export function ClienteFormDialog({
                         <Label>Status</Label>
                         <Select value={form.status} onValueChange={(v) => set("status", v ?? "EM_PRODUCAO")}>
                           <SelectTrigger className="w-full">
-                            <SelectValue />
+                            <SelectValue>
+                              {(value: string) =>
+                                STATUS_CLIENTE_CONFIG[value as keyof typeof STATUS_CLIENTE_CONFIG]?.label
+                              }
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {Object.entries(STATUS_CLIENTE_CONFIG).map(([key, cfg]) => (

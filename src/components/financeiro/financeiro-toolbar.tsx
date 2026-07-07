@@ -63,7 +63,11 @@ export function FinanceiroToolbar({
 
           <Select value={status || "todos"} onValueChange={(v) => updateParam("status", v ?? "")}>
             <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Status">
+                {(value: string) =>
+                  ({ todos: "Todos", pago: "Pago", pendente: "Pendente" })[value] ?? "Status"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos</SelectItem>
@@ -74,7 +78,16 @@ export function FinanceiroToolbar({
 
           <Select value={sort || "recentes"} onValueChange={(v) => updateParam("sort", v ?? "")}>
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Ordenar" />
+              <SelectValue placeholder="Ordenar">
+                {(value: string) =>
+                  ({
+                    recentes: "Mais recentes",
+                    antigos: "Mais antigos",
+                    "maior-valor": "Maior valor",
+                    "menor-valor": "Menor valor",
+                  })[value] ?? "Ordenar"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recentes">Mais recentes</SelectItem>

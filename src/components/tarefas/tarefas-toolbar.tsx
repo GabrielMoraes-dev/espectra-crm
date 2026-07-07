@@ -64,7 +64,13 @@ export function TarefasToolbar({
 
           <Select value={responsavelId || "todos"} onValueChange={(v) => updateParam("responsavel", v ?? "")}>
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Responsável" />
+              <SelectValue placeholder="Responsável">
+                {(value: string) =>
+                  value === "todos"
+                    ? "Todos os responsáveis"
+                    : (membros.find((m) => m.id === value)?.nome ?? "Responsável")
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos os responsáveis</SelectItem>
@@ -76,7 +82,14 @@ export function TarefasToolbar({
 
           <Select value={prioridade || "todas"} onValueChange={(v) => updateParam("prioridade", v ?? "")}>
             <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Prioridade" />
+              <SelectValue placeholder="Prioridade">
+                {(value: string) =>
+                  value === "todas"
+                    ? "Todas as prioridades"
+                    : (PRIORIDADE_TAREFA_CONFIG[value as keyof typeof PRIORIDADE_TAREFA_CONFIG]?.label ??
+                      "Prioridade")
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todas">Todas as prioridades</SelectItem>

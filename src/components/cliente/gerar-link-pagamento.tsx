@@ -54,7 +54,9 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
       <div className="flex gap-2">
         <Select value={preco} onValueChange={(v) => setPreco(v ?? "")}>
           <SelectTrigger className="flex-1">
-            <SelectValue placeholder="Escolha o preço" />
+            <SelectValue placeholder="Escolha o preço">
+              {(value: string) => (value ? formatCurrency(Number(value)) : "Escolha o preço")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {PRECOS.map((p) => (

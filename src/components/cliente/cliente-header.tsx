@@ -79,7 +79,11 @@ export function ClienteHeader({
         <div className="flex items-center gap-2">
           <Select value={tipoLink} onValueChange={(v) => setTipoLink(v as "inicial" | "completo")}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Escolha o link" />
+              <SelectValue placeholder="Escolha o link">
+                {(value: string) =>
+                  value === "inicial" ? "Briefing inicial (amostra)" : "Briefing completo"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {leadId && <SelectItem value="inicial">Briefing inicial (amostra)</SelectItem>}
