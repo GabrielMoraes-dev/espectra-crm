@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import type { Briefing, Lead, Projeto, Cliente, Pagamento } from "@/generated/prisma/client";
+import type { Briefing, BriefingInicial, Lead, Projeto, Cliente, Pagamento } from "@/generated/prisma/client";
 import { formatDateShort, formatCurrency, getPrazoUrgencia } from "@/lib/utils";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
@@ -36,6 +36,34 @@ export async function sendBriefingNotification(briefing: Briefing) {
     });
   } catch (error) {
     console.error("[email] Falha ao enviar notificação de briefing", error);
+  }
+}
+
+export async function sendBriefingInicialNotification(
+  briefingInicial: BriefingInicial & { leadId: string },
+) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[email] RESEND_API_KEY não configurado, notificação não enviada");
+    return;
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const link = `${SITE_URL}/leads`;
+
+  try {
+    await resend.emails.send({
+      from: "Espectra CRM <onboarding@resend.dev>",
+      to: NOTIFICATION_EMAIL,
+      subject: `Briefing inicial recebido — ${briefingInicial.nome}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px;">
+          <p><strong>${briefingInicial.nome}</strong> (${briefingInicial.profissao}) preencheu o briefing inicial — pronto pra montar a amostra gratuita.</p>
+          <p><a href="${link}" style="color: #5483b3;">Ver lead no CRM →</a></p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("[email] Falha ao enviar notificação de briefing inicial", error);
   }
 }
 

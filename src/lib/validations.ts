@@ -133,6 +133,7 @@ export const briefingSchema = z.object({
   email: z.string().email("Email inválido"),
   whatsapp: z.string().min(8, "Informe o WhatsApp"),
   instagram: z.string().optional().or(z.literal("")),
+  cpfCnpj: z.string().min(1, "Informe o CPF/CNPJ"),
   registroProfissional: z.string().optional().or(z.literal("")),
 
   apresentacao: z.string().min(1, "Campo obrigatório"),
@@ -158,6 +159,16 @@ export const briefingSchema = z.object({
 });
 
 export type BriefingFormValues = z.infer<typeof briefingSchema>;
+
+export const briefingInicialSchema = z.object({
+  leadId: z.string().min(1),
+  nome: z.string().min(2, "Informe o nome"),
+  profissao: z.string().min(2, "Informe a profissão"),
+  apresentacao: z.string().min(1, "Campo obrigatório"),
+  fotosUrls: z.array(z.string()).min(1, "Envie ao menos uma foto ou logo"),
+});
+
+export type BriefingInicialFormValues = z.infer<typeof briefingInicialSchema>;
 
 export const pesquisaSatisfacaoSchema = z.object({
   clienteId: z.string().min(1),

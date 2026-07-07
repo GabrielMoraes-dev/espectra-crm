@@ -58,7 +58,7 @@ export async function getClienteById(id: string) {
 }
 
 export async function getClienteForPrefill(clienteId: string) {
-  return prisma.cliente.findUnique({
+  const cliente = await prisma.cliente.findUnique({
     where: { id: clienteId },
     select: {
       id: true,
@@ -69,8 +69,32 @@ export async function getClienteForPrefill(clienteId: string) {
       cidade: true,
       estado: true,
       nicho: true,
+      lead: {
+        select: {
+          briefingsIniciais: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { apresentacao: true, fotosUrls: true },
+          },
+        },
+      },
     },
   });
+  if (!cliente) return null;
+
+  const briefingInicial = cliente.lead?.briefingsIniciais[0];
+  return {
+    id: cliente.id,
+    nome: cliente.nome,
+    whatsapp: cliente.whatsapp,
+    instagram: cliente.instagram,
+    email: cliente.email,
+    cidade: cliente.cidade,
+    estado: cliente.estado,
+    nicho: cliente.nicho,
+    apresentacaoInicial: briefingInicial?.apresentacao ?? null,
+    fotosUrlsIniciais: briefingInicial ? (JSON.parse(briefingInicial.fotosUrls) as string[]) : [],
+  };
 }
 
 export async function getClienteForPesquisa(clienteId: string) {

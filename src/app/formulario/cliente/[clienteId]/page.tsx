@@ -26,6 +26,8 @@ export default async function FormularioClientePage({
                   cidade: cliente.cidade,
                   estado: cliente.estado,
                   nicho: cliente.nicho,
+                  apresentacao: cliente.apresentacaoInicial,
+                  fotosUrls: cliente.fotosUrlsIniciais,
                 }
               : undefined
           }

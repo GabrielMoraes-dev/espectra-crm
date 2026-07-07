@@ -4,18 +4,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { GerarLinkPagamento } from "@/components/cliente/gerar-link-pagamento";
+import { EnviarContrato } from "@/components/cliente/enviar-contrato";
+import { ClientePesquisas } from "@/components/cliente/cliente-pesquisas";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import type { Pagamento, Projeto } from "@/generated/prisma/client";
+import type { Pagamento, PesquisaSatisfacao, Projeto } from "@/generated/prisma/client";
 
 export function ClienteSideCards({
   clienteId,
   projetos,
   pagamentos,
+  pesquisas,
+  cpfCnpj,
+  contratoAutentiqueId,
+  contratoUrl,
 }: {
   clienteId: string;
   projetos: Projeto[];
   pagamentos: Pagamento[];
+  pesquisas: PesquisaSatisfacao[];
+  cpfCnpj: string | null;
+  contratoAutentiqueId: string | null;
+  contratoUrl: string | null;
 }) {
   return (
     <div className="space-y-4">
@@ -87,6 +97,15 @@ export function ClienteSideCards({
           <GerarLinkPagamento clienteId={clienteId} />
         </CardContent>
       </Card>
+
+      <EnviarContrato
+        clienteId={clienteId}
+        cpfCnpj={cpfCnpj}
+        contratoAutentiqueId={contratoAutentiqueId}
+        contratoUrl={contratoUrl}
+      />
+
+      <ClientePesquisas pesquisas={pesquisas} />
     </div>
   );
 }

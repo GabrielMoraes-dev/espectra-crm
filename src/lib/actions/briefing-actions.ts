@@ -36,6 +36,7 @@ export async function createBriefing(values: BriefingFormValues) {
             cidade: data.cidade,
             estado: clean(data.estado),
             nicho: data.profissao,
+            cpfCnpj: data.cpfCnpj,
             valor: lead.valorEstimado ?? null,
             status: "EM_PRODUCAO",
           },
@@ -87,6 +88,7 @@ export async function createBriefing(values: BriefingFormValues) {
         email: data.email,
         whatsapp: data.whatsapp,
         instagram: clean(data.instagram),
+        cpfCnpj: clean(data.cpfCnpj),
         registroProfissional: clean(data.registroProfissional),
         apresentacao: data.apresentacao,
         historia: data.historia,
@@ -110,6 +112,11 @@ export async function createBriefing(values: BriefingFormValues) {
     });
 
     if (clienteId) {
+      await tx.cliente.update({
+        where: { id: clienteId },
+        data: { cpfCnpj: data.cpfCnpj },
+      });
+
       await tx.timelineEvent.create({
         data: {
           clienteId,

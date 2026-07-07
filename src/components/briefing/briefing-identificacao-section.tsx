@@ -111,15 +111,30 @@ export function BriefingIdentificacaoSection({
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="instagram">Instagram</Label>
-        <Input
-          id="instagram"
-          placeholder="@seuusuario"
-          value={form.instagram}
-          onChange={(e) => set("instagram", e.target.value)}
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="instagram">Instagram</Label>
+          <Input
+            id="instagram"
+            placeholder="@seuusuario"
+            value={form.instagram}
+            onChange={(e) => set("instagram", e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cpfCnpj">CPF/CNPJ *</Label>
+          <Input
+            id="cpfCnpj"
+            required
+            placeholder="000.000.000-00"
+            value={form.cpfCnpj}
+            onChange={(e) => set("cpfCnpj", e.target.value)}
+          />
+        </div>
       </div>
+      <p className="-mt-2 text-xs text-muted-foreground">
+        Usamos isso só para gerar o contrato de prestação de serviço.
+      </p>
     </div>
   );
 }

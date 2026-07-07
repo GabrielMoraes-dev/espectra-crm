@@ -107,7 +107,12 @@
       "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Organiza��o Espectra\\\\public\\\\uploads\")",
       "Bash(gh auth *)",
       "PowerShell(gh --version 2>&1)",
-      "PowerShell(winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements 2>&1)"
+      "PowerShell(winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements 2>&1)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh auth status 2>&1)",
+      "PowerShell(& \"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" auth status)",
+      "PowerShell(Copy-Item \"c:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Organiza��o Espectra\\\\public\\\\uploads\\\\logo-espectra.png\" \"c:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Organiza��o Espectra\\\\public\\\\logo-espectra.png\" -Force)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Icone Espectra.jpeg\" \"c:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Organiza��o Espectra\\\\src\\\\app\\\\icon.jpg\" -Force)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\IconeEspectraSite.png\" \"c:\\\\Users\\\\ricar\\\\OneDrive\\\\Desktop\\\\Espectra\\\\Organiza��o Espectra\\\\src\\\\app\\\\icon.png\" -Force)"
     ]
   }
 }

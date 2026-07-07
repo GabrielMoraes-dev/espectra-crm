@@ -22,6 +22,7 @@ export type BriefingFormState = {
   email: string;
   whatsapp: string;
   instagram: string;
+  cpfCnpj: string;
   registroProfissional: string;
   apresentacao: string;
   historia: string;
@@ -54,6 +55,8 @@ export type BriefingInitialData = {
   cidade?: string | null;
   estado?: string | null;
   nicho?: string | null;
+  apresentacao?: string | null;
+  fotosUrls?: string[];
 };
 
 function emptyState(initialData?: BriefingInitialData): BriefingFormState {
@@ -67,8 +70,9 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     email: initialData?.email ?? "",
     whatsapp: initialData?.whatsapp ?? "",
     instagram: initialData?.instagram ?? "",
+    cpfCnpj: "",
     registroProfissional: "",
-    apresentacao: "",
+    apresentacao: initialData?.apresentacao ?? "",
     historia: "",
     especialidades: "",
     numeroDestaque: "",
@@ -84,7 +88,7 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     faqCancelamento: "",
     faqHorarios: "",
     depoimentosUrls: [],
-    fotosUrls: [],
+    fotosUrls: initialData?.fotosUrls ?? [],
     arquivosGeraisUrls: [],
   };
 }
@@ -103,7 +107,7 @@ const SECTIONS: {
   {
     titulo: "Identificação",
     sub: "Quem é o profissional por trás da marca.",
-    campos: ["nome", "profissao", "cidade", "email", "whatsapp"],
+    campos: ["nome", "profissao", "cidade", "email", "whatsapp", "cpfCnpj"],
     Component: BriefingIdentificacaoSection,
   },
   {

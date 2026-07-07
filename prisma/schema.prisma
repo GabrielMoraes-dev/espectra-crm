@@ -94,6 +94,18 @@ model Lead {
   updatedAt      DateTime  @updatedAt
 
   briefings      Briefing[]
+  briefingsIniciais BriefingInicial[]
+}
+
+model BriefingInicial {
+  id           String   @id @default(cuid())
+  leadId       String
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  nome         String
+  profissao    String
+  apresentacao String
+  fotosUrls    String
+  createdAt    DateTime @default(now())
 }
 
 model Cliente {
@@ -110,6 +122,8 @@ model Cliente {
   planoContratado  String?
   valor            Float?
   contratoUrl      String?
+  contratoAutentiqueId String?
+  cpfCnpj          String?
   responsavelId    String?
   responsavel      MembroEquipe? @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
   dataEntrada      DateTime      @default(now())
@@ -151,6 +165,7 @@ model Briefing {
   email                String
   whatsapp             String
   instagram            String?
+  cpfCnpj              String?
   registroProfissional String?
 
   // 2. Como você quer ser percebido

@@ -72,6 +72,12 @@ export function LeadDetailSheet({
     registrarLinkCopiado(leadId);
   }
 
+  function copiarLinkBriefingInicial() {
+    const url = `${window.location.origin}/formulario/inicial/${leadId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link do briefing inicial copiado");
+  }
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -92,9 +98,14 @@ export function LeadDetailSheet({
             <InfoRow icon={Wallet} label="Valor estimado" value={formatCurrency(lead.valorEstimado)} />
 
             {podeEnviarBriefing && (
-              <Button variant="outline" className="w-full" onClick={copiarLinkBriefing}>
-                <Link2 className="size-4" /> Copiar link do briefing
-              </Button>
+              <div className="grid gap-2">
+                <Button variant="outline" className="w-full" onClick={copiarLinkBriefingInicial}>
+                  <Link2 className="size-4" /> Copiar link do briefing inicial (amostra)
+                </Button>
+                <Button variant="outline" className="w-full" onClick={copiarLinkBriefing}>
+                  <Link2 className="size-4" /> Copiar link do briefing completo
+                </Button>
+              </div>
             )}
 
             {lead.observacoes && (
