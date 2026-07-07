@@ -8,11 +8,12 @@ import { ArrowLeft, Pencil, Trash2, Link2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ClienteFormDialog } from "@/components/clientes/cliente-form-dialog";
@@ -32,6 +33,7 @@ export function ClienteHeader({
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [tipoLink, setTipoLink] = useState<"inicial" | "completo">("completo");
   const router = useRouter();
   const statusConfig = STATUS_CLIENTE_CONFIG[cliente.status];
 
@@ -39,6 +41,14 @@ export function ClienteHeader({
     const url = `${window.location.origin}${path}`;
     navigator.clipboard.writeText(url);
     toast.success(mensagem);
+  }
+
+  function copiarLinkSelecionado() {
+    if (tipoLink === "inicial" && leadId) {
+      copiarLink(`/formulario/inicial/${leadId}`, "Link do briefing inicial copiado");
+    } else {
+      copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado");
+    }
   }
 
   return (
@@ -67,29 +77,18 @@ export function ClienteHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="outline" />}>
-              <Link2 className="size-4" /> Copiar link do briefing
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {leadId && (
-                <DropdownMenuItem
-                  onClick={() =>
-                    copiarLink(`/formulario/inicial/${leadId}`, "Link do briefing inicial copiado")
-                  }
-                >
-                  Briefing inicial (amostra)
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                onClick={() =>
-                  copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado")
-                }
-              >
-                Briefing completo
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select value={tipoLink} onValueChange={(v) => setTipoLink(v as "inicial" | "completo")}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Escolha o link" />
+            </SelectTrigger>
+            <SelectContent>
+              {leadId && <SelectItem value="inicial">Briefing inicial (amostra)</SelectItem>}
+              <SelectItem value="completo">Briefing completo</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={copiarLinkSelecionado}>
+            <Link2 className="size-4" /> Copiar link
+          </Button>
           <Button variant="outline" onClick={() => setOpenEdit(true)}>
             <Pencil className="size-4" /> Editar cliente
           </Button>
