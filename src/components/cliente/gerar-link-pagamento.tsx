@@ -58,7 +58,7 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
               {(value: string) => (value ? formatCurrency(Number(value)) : "Escolha o preço")}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent alignItemWithTrigger={false}>
             {PRECOS.map((p) => (
               <SelectItem key={p} value={String(p)}>
                 {formatCurrency(p)}
