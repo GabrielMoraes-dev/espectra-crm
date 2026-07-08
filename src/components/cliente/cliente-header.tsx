@@ -4,16 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil, Trash2, Link2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Link2, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ClienteFormDialog } from "@/components/clientes/cliente-form-dialog";
@@ -33,7 +27,7 @@ export function ClienteHeader({
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [tipoLink, setTipoLink] = useState<"inicial" | "completo">("completo");
+  const [openLinks, setOpenLinks] = useState(false);
   const router = useRouter();
   const statusConfig = STATUS_CLIENTE_CONFIG[cliente.status];
 
@@ -41,14 +35,7 @@ export function ClienteHeader({
     const url = `${window.location.origin}${path}`;
     navigator.clipboard.writeText(url);
     toast.success(mensagem);
-  }
-
-  function copiarLinkSelecionado() {
-    if (tipoLink === "inicial" && leadId) {
-      copiarLink(`/formulario/inicial/${leadId}`, "Link do briefing inicial copiado");
-    } else {
-      copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado");
-    }
+    setOpenLinks(false);
   }
 
   return (
@@ -77,22 +64,56 @@ export function ClienteHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Select value={tipoLink} onValueChange={(v) => setTipoLink(v as "inicial" | "completo")}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Escolha o link">
-                {(value: string) =>
-                  value === "inicial" ? "Briefing inicial (amostra)" : "Briefing completo"
+          {leadId ? (
+            <Popover open={openLinks} onOpenChange={setOpenLinks}>
+              <PopoverTrigger
+                render={
+                  <button
+                    type="button"
+                    className="flex h-9 w-[220px] items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent px-3 text-sm text-foreground transition-colors hover:bg-accent"
+                  />
                 }
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {leadId && <SelectItem value="inicial">Briefing inicial (amostra)</SelectItem>}
-              <SelectItem value="completo">Briefing completo</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={copiarLinkSelecionado}>
-            <Link2 className="size-4" /> Copiar link
-          </Button>
+              >
+                Escolha o briefing
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[280px]">
+                <div className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1">
+                  <span className="text-sm text-foreground">Briefing inicial (amostra)</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      copiarLink(`/formulario/inicial/${leadId}`, "Link do briefing inicial copiado")
+                    }
+                  >
+                    <Link2 className="size-3.5" /> Copiar link
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1">
+                  <span className="text-sm text-foreground">Briefing completo</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado")
+                    }
+                  >
+                    <Link2 className="size-3.5" /> Copiar link
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() =>
+                copiarLink(`/formulario/cliente/${cliente.id}`, "Link do briefing completo copiado")
+              }
+            >
+              <Link2 className="size-4" /> Copiar link do briefing
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setOpenEdit(true)}>
             <Pencil className="size-4" /> Editar cliente
           </Button>
