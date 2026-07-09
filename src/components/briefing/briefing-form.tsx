@@ -55,6 +55,8 @@ export type BriefingInitialData = {
   cidade?: string | null;
   estado?: string | null;
   nicho?: string | null;
+  nomeInicial?: string | null;
+  profissaoInicial?: string | null;
   apresentacao?: string | null;
   fotosUrls?: string[];
 };
@@ -63,8 +65,8 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
   return {
     leadId: initialData?.leadId ?? "",
     clienteId: initialData?.clienteId ?? "",
-    nome: initialData?.nome ?? "",
-    profissao: initialData?.nicho ?? "",
+    nome: initialData?.nomeInicial ?? initialData?.nome ?? "",
+    profissao: initialData?.profissaoInicial ?? initialData?.nicho ?? "",
     cidade: initialData?.cidade ?? "",
     estado: initialData?.estado ?? "",
     email: initialData?.email ?? "",
@@ -96,6 +98,8 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
 type SectionProps = {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
+  identificacaoLocked?: boolean;
+  fotosLocked?: string[];
 };
 
 const SECTIONS: {
@@ -156,6 +160,8 @@ export function BriefingForm({
   const answered = SECTIONS.flatMap((s) => s.campos).filter((c) => isFilled(form, c)).length;
   const currentStepIndex = SECTIONS.findIndex((s) => s.campos.some((c) => !isFilled(form, c)));
   const step = currentStepIndex === -1 ? SECTIONS.length : currentStepIndex + 1;
+  const identificacaoLocked = Boolean(initialData?.profissaoInicial);
+  const fotosLocked = initialData?.fotosUrls ?? [];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -210,7 +216,12 @@ export function BriefingForm({
             titulo={section.titulo}
             sub={section.sub}
           />
-          <section.Component form={form} set={set} />
+          <section.Component
+            form={form}
+            set={set}
+            identificacaoLocked={identificacaoLocked}
+            fotosLocked={fotosLocked}
+          />
         </section>
       ))}
 

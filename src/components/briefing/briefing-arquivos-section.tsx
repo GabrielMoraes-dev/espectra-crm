@@ -6,9 +6,11 @@ import type { BriefingFormState } from "@/components/briefing/briefing-form";
 export function BriefingArquivosSection({
   form,
   set,
+  fotosLocked,
 }: {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
+  fotosLocked?: string[];
 }) {
   return (
     <div className="space-y-5">
@@ -25,6 +27,7 @@ export function BriefingArquivosSection({
         accept="image/*"
         urls={form.fotosUrls}
         onChange={(urls) => set("fotosUrls", urls)}
+        lockedUrls={fotosLocked}
       />
 
       <FileField

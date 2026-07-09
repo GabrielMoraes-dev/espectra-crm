@@ -75,7 +75,7 @@ export async function getClienteForPrefill(clienteId: string) {
           briefingsIniciais: {
             orderBy: { createdAt: "desc" },
             take: 1,
-            select: { apresentacao: true, fotosUrls: true },
+            select: { nome: true, profissao: true, apresentacao: true, fotosUrls: true },
           },
         },
       },
@@ -93,6 +93,8 @@ export async function getClienteForPrefill(clienteId: string) {
     cidade: cliente.cidade,
     estado: cliente.estado,
     nicho: cliente.nicho,
+    nomeInicial: briefingInicial?.nome ?? null,
+    profissaoInicial: briefingInicial?.profissao ?? null,
     apresentacaoInicial: briefingInicial?.apresentacao ?? null,
     fotosUrlsIniciais: briefingInicial ? (JSON.parse(briefingInicial.fotosUrls) as string[]) : [],
   };

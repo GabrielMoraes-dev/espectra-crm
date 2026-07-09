@@ -13,9 +13,11 @@ import type { BriefingFormState } from "@/components/briefing/briefing-form";
 export function BriefingIdentificacaoSection({
   form,
   set,
+  identificacaoLocked,
 }: {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
+  identificacaoLocked?: boolean;
 }) {
   return (
     <div className="space-y-4">
@@ -24,10 +26,14 @@ export function BriefingIdentificacaoSection({
         <Input
           id="nome"
           required
+          disabled={identificacaoLocked}
           placeholder="Como você se chama"
           value={form.nome}
           onChange={(e) => set("nome", e.target.value)}
         />
+        {identificacaoLocked && (
+          <p className="text-xs text-muted-foreground">Você já enviou isso no formulário anterior.</p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -36,10 +42,14 @@ export function BriefingIdentificacaoSection({
           <Input
             id="profissao"
             required
+            disabled={identificacaoLocked}
             placeholder="Ex: Nutricionista, Advogado..."
             value={form.profissao}
             onChange={(e) => set("profissao", e.target.value)}
           />
+          {identificacaoLocked && (
+            <p className="text-xs text-muted-foreground">Você já enviou isso no formulário anterior.</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cidade">Cidade *</Label>

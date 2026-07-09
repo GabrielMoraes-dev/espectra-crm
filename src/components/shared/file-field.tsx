@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { upload } from "@vercel/blob/client";
 import Image from "next/image";
-import { Upload, Loader2, X, File as FileIcon } from "lucide-react";
+import { Upload, Loader2, X, Lock, File as FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
@@ -15,6 +15,7 @@ export function FileField({
   accept,
   urls,
   onChange,
+  lockedUrls,
 }: {
   label: string;
   hint?: string;
@@ -22,6 +23,7 @@ export function FileField({
   accept?: string;
   urls: string[];
   onChange: (urls: string[]) => void;
+  lockedUrls?: string[];
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -83,42 +85,58 @@ export function FileField({
 
       {urls.length > 0 && isImageField && (
         <div className="mt-1 grid grid-cols-3 gap-2 sm:grid-cols-4">
-          {urls.map((url) => (
-            <div
-              key={url}
-              className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card/50"
-            >
-              <Image src={url} alt="" fill sizes="120px" className="object-cover" />
-              <button
-                type="button"
-                onClick={() => remove(url)}
-                className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-background/80 text-foreground"
+          {urls.map((url) => {
+            const locked = lockedUrls?.includes(url) ?? false;
+            return (
+              <div
+                key={url}
+                className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card/50"
               >
-                <X className="size-3" />
-              </button>
-            </div>
-          ))}
+                <Image src={url} alt="" fill sizes="120px" className="object-cover" />
+                {locked ? (
+                  <div className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground">
+                    <Lock className="size-3" />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => remove(url)}
+                    className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-background/80 text-foreground"
+                  >
+                    <X className="size-3" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
       {urls.length > 0 && !isImageField && (
         <ul className="mt-1 space-y-1">
-          {urls.map((url) => (
-            <li
-              key={url}
-              className="flex items-center gap-2 rounded-md border border-border bg-card/50 px-2.5 py-1.5 text-xs text-muted-foreground"
-            >
-              <FileIcon className="size-3.5 shrink-0" />
-              <span className="truncate">{url.split("/").pop()}</span>
-              <button
-                type="button"
-                onClick={() => remove(url)}
-                className="ml-auto shrink-0 rounded p-0.5 hover:text-danger"
+          {urls.map((url) => {
+            const locked = lockedUrls?.includes(url) ?? false;
+            return (
+              <li
+                key={url}
+                className="flex items-center gap-2 rounded-md border border-border bg-card/50 px-2.5 py-1.5 text-xs text-muted-foreground"
               >
-                <X className="size-3.5" />
-              </button>
-            </li>
-          ))}
+                <FileIcon className="size-3.5 shrink-0" />
+                <span className="truncate">{url.split("/").pop()}</span>
+                {locked ? (
+                  <Lock className="ml-auto size-3.5 shrink-0" />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => remove(url)}
+                    className="ml-auto shrink-0 rounded p-0.5 hover:text-danger"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

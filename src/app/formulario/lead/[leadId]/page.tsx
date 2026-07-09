@@ -36,6 +36,10 @@ export default async function FormularioLeadPage({
                   whatsapp: lead.whatsapp,
                   instagram: lead.instagram,
                   email: lead.email,
+                  nomeInicial: lead.nomeInicial,
+                  profissaoInicial: lead.profissaoInicial,
+                  apresentacao: lead.apresentacaoInicial,
+                  fotosUrls: lead.fotosUrlsIniciais,
                 }
               : undefined
           }

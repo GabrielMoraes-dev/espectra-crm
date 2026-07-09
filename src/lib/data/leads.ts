@@ -44,7 +44,7 @@ export async function getAllLeadsForKanban() {
 }
 
 export async function getLeadForPrefill(leadId: string) {
-  return prisma.lead.findUnique({
+  const lead = await prisma.lead.findUnique({
     where: { id: leadId },
     select: {
       id: true,
@@ -54,6 +54,27 @@ export async function getLeadForPrefill(leadId: string) {
       instagram: true,
       email: true,
       clienteId: true,
+      briefingsIniciais: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { nome: true, profissao: true, apresentacao: true, fotosUrls: true },
+      },
     },
   });
+  if (!lead) return null;
+
+  const briefingInicial = lead.briefingsIniciais[0];
+  return {
+    id: lead.id,
+    nome: lead.nome,
+    empresa: lead.empresa,
+    whatsapp: lead.whatsapp,
+    instagram: lead.instagram,
+    email: lead.email,
+    clienteId: lead.clienteId,
+    nomeInicial: briefingInicial?.nome ?? null,
+    profissaoInicial: briefingInicial?.profissao ?? null,
+    apresentacaoInicial: briefingInicial?.apresentacao ?? null,
+    fotosUrlsIniciais: briefingInicial ? (JSON.parse(briefingInicial.fotosUrls) as string[]) : [],
+  };
 }
