@@ -53,7 +53,12 @@ export async function getClienteById(id: string) {
       pagamentos: { orderBy: { data: "desc" } },
       briefings: { orderBy: { createdAt: "desc" } },
       pesquisas: { orderBy: { createdAt: "desc" } },
-      lead: { select: { id: true } },
+      lead: {
+        select: {
+          id: true,
+          briefingsIniciais: { orderBy: { createdAt: "desc" }, take: 1 },
+        },
+      },
     },
   });
 }

@@ -19,7 +19,9 @@ import { ConvertLeadDialog } from "@/components/leads/convert-lead-dialog";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { deleteLead, registrarLinkCopiado } from "@/lib/actions/lead-actions";
-import type { Lead, MembroEquipe } from "@/generated/prisma/client";
+import { BriefingInicialView } from "@/components/shared/briefing-inicial-view";
+import type { MembroEquipe } from "@/generated/prisma/client";
+import type { LeadComBriefing } from "@/lib/data/leads";
 
 function InfoRow({
   icon: Icon,
@@ -49,7 +51,7 @@ export function LeadDetailSheet({
   onOpenChange,
   membros,
 }: {
-  lead: Lead | null;
+  lead: LeadComBriefing | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   membros: MembroEquipe[];
@@ -106,6 +108,10 @@ export function LeadDetailSheet({
                   <Link2 className="size-4" /> Copiar link do briefing completo
                 </Button>
               </div>
+            )}
+
+            {lead.briefingsIniciais[0] && (
+              <BriefingInicialView briefingInicial={lead.briefingsIniciais[0]} />
             )}
 
             {lead.observacoes && (

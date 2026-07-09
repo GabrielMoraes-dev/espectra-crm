@@ -1,8 +1,9 @@
 import { FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
+import { BriefingInicialView } from "@/components/shared/briefing-inicial-view";
 import { formatDateLong, parseResponsabilidades as parseJsonArray } from "@/lib/utils";
-import type { Briefing } from "@/generated/prisma/client";
+import type { Briefing, BriefingInicial } from "@/generated/prisma/client";
 
 function Campo({ label, valor }: { label: string; valor: string }) {
   return (
@@ -34,13 +35,21 @@ function Arquivos({ label, urls }: { label: string; urls: string[] }) {
   );
 }
 
-export function ClienteBriefing({ briefings }: { briefings: Briefing[] }) {
+export function ClienteBriefing({
+  briefings,
+  briefingInicial,
+}: {
+  briefings: Briefing[];
+  briefingInicial?: BriefingInicial | null;
+}) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-sm font-medium">Briefing</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
+        {briefingInicial && <BriefingInicialView briefingInicial={briefingInicial} />}
+
         {briefings.length === 0 ? (
           <EmptyState
             icon={FileText}

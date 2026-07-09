@@ -19,8 +19,9 @@ import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { moveLeadEtapa } from "@/lib/actions/lead-actions";
 import type { Lead, MembroEquipe } from "@/generated/prisma/client";
+import type { LeadComBriefing } from "@/lib/data/leads";
 
-function LeadCard({ lead, onOpen }: { lead: Lead; onOpen: () => void }) {
+function LeadCard({ lead, onOpen }: { lead: LeadComBriefing; onOpen: () => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: lead.id,
   });
@@ -57,7 +58,7 @@ function KanbanColumn({
   children,
 }: {
   etapa: string;
-  leads: Lead[];
+  leads: LeadComBriefing[];
   children: React.ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: etapa });
@@ -88,12 +89,12 @@ export function LeadsKanban({
   leads: initialLeads,
   membros,
 }: {
-  leads: Lead[];
+  leads: LeadComBriefing[];
   membros: MembroEquipe[];
 }) {
   const [leads, setLeads] = useState(initialLeads);
-  const [activeLead, setActiveLead] = useState<Lead | null>(null);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [activeLead, setActiveLead] = useState<LeadComBriefing | null>(null);
+  const [selectedLead, setSelectedLead] = useState<LeadComBriefing | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- resyncs optimistic local state when the server-fetched list changes

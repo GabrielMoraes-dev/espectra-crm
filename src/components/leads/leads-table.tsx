@@ -15,16 +15,17 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { LeadDetailSheet } from "@/components/leads/lead-detail-sheet";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import type { Lead, MembroEquipe } from "@/generated/prisma/client";
+import type { MembroEquipe } from "@/generated/prisma/client";
+import type { LeadComBriefing } from "@/lib/data/leads";
 
 export function LeadsTable({
   leads,
   membros,
 }: {
-  leads: Lead[];
+  leads: LeadComBriefing[];
   membros: MembroEquipe[];
 }) {
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLead, setSelectedLead] = useState<LeadComBriefing | null>(null);
 
   if (leads.length === 0) {
     return (

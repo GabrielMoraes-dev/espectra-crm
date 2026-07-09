@@ -42,7 +42,10 @@ export default async function ClienteDetailPage({
             <ClienteTimeline clienteId={cliente.id} events={cliente.timeline} />
           </FadeIn>
           <FadeIn delay={0.13}>
-            <ClienteBriefing briefings={cliente.briefings} />
+            <ClienteBriefing
+              briefings={cliente.briefings}
+              briefingInicial={cliente.lead?.briefingsIniciais[0]}
+            />
           </FadeIn>
         </div>
 

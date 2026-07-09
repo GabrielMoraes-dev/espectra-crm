@@ -36,8 +36,16 @@ export async function getLeads(filter: LeadsFilter) {
           ? { valorEstimado: "asc" }
           : { createdAt: "desc" };
 
-  return prisma.lead.findMany({ where, orderBy });
+  return prisma.lead.findMany({
+    where,
+    orderBy,
+    include: {
+      briefingsIniciais: { orderBy: { createdAt: "desc" }, take: 1 },
+    },
+  });
 }
+
+export type LeadComBriefing = Awaited<ReturnType<typeof getLeads>>[number];
 
 export async function getAllLeadsForKanban() {
   return prisma.lead.findMany({ orderBy: { createdAt: "desc" } });
