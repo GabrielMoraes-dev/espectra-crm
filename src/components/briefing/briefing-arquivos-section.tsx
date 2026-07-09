@@ -23,7 +23,7 @@ export function BriefingArquivosSection({
 
       <FileField
         label="Fotos profissionais"
-        hint="JPG ou PNG, alta resolução"
+        hint="JPG ou PNG, alta resolução — pode adicionar quantas fotos novas quiser"
         accept="image/*"
         urls={form.fotosUrls}
         onChange={(urls) => set("fotosUrls", urls)}
@@ -33,7 +33,6 @@ export function BriefingArquivosSection({
       <FileField
         label="Demais arquivos"
         hint="Logo, identidade visual, vídeos, depoimentos e outros materiais"
-        required
         urls={form.arquivosGeraisUrls}
         onChange={(urls) => set("arquivosGeraisUrls", urls)}
       />

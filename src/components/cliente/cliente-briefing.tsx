@@ -1,8 +1,13 @@
-import { FileText } from "lucide-react";
+import Image from "next/image";
+import { FileText, Download, File as FileIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { BriefingInicialView } from "@/components/shared/briefing-inicial-view";
-import { formatDateLong, parseResponsabilidades as parseJsonArray } from "@/lib/utils";
+import {
+  formatDateLong,
+  parseResponsabilidades as parseJsonArray,
+  isImagemUrl,
+} from "@/lib/utils";
 import type { Briefing, BriefingInicial } from "@/generated/prisma/client";
 
 function Campo({ label, valor }: { label: string; valor: string }) {
@@ -16,21 +21,53 @@ function Campo({ label, valor }: { label: string; valor: string }) {
 
 function Arquivos({ label, urls }: { label: string; urls: string[] }) {
   if (urls.length === 0) return null;
+  const imagens = urls.filter((url) => isImagemUrl(url));
+  const outros = urls.filter((url) => !isImagemUrl(url));
+
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <ul className="mt-1 space-y-1">
-        {urls.map((url) => (
-          <li key={url}>
-            <a
-              href={`${url}?download=1`}
-              className="text-sm text-brand-300 underline underline-offset-2 hover:text-brand-100"
+
+      {imagens.length > 0 && (
+        <div className="mt-1 grid grid-cols-4 gap-2">
+          {imagens.map((url) => (
+            <div
+              key={url}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-border"
             >
-              {url.split("/").pop()}
-            </a>
-          </li>
-        ))}
-      </ul>
+              <Image src={url} alt="" fill sizes="80px" className="object-cover" />
+              <a
+                href={`${url}?download=1`}
+                className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                aria-label="Baixar foto"
+              >
+                <Download className="size-3" />
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {outros.length > 0 && (
+        <ul className="mt-1 space-y-1">
+          {outros.map((url) => (
+            <li
+              key={url}
+              className="flex items-center gap-2 rounded-md border border-border bg-card/50 px-2.5 py-1.5 text-xs"
+            >
+              <FileIcon className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="truncate text-foreground">{url.split("/").pop()}</span>
+              <a
+                href={`${url}?download=1`}
+                className="ml-auto shrink-0 text-brand-300 hover:text-brand-100"
+                aria-label="Baixar arquivo"
+              >
+                <Download className="size-3.5" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -68,6 +105,8 @@ export function ClienteBriefing({
                   className="space-y-3 border-b border-border pb-6 last:border-0 last:pb-0"
                 >
                   <p className="text-xs text-muted-foreground">{formatDateLong(b.createdAt)}</p>
+
+                  <Campo label="Nome completo" valor={b.nome} />
 
                   <div className="grid grid-cols-2 gap-3">
                     <Campo label="Profissão" valor={b.profissao} />

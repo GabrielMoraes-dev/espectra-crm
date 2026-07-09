@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ESTADOS_BRASIL } from "@/lib/constants";
-import { formatTelefone } from "@/lib/utils";
+import { formatTelefone, formatCpfCnpj } from "@/lib/utils";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
 
 export function BriefingIdentificacaoSection({
@@ -141,7 +141,7 @@ export function BriefingIdentificacaoSection({
             required
             placeholder="000.000.000-00"
             value={form.cpfCnpj}
-            onChange={(e) => set("cpfCnpj", e.target.value)}
+            onChange={(e) => set("cpfCnpj", formatCpfCnpj(e.target.value))}
           />
         </div>
       </div>

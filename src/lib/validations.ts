@@ -131,7 +131,9 @@ export const briefingSchema = z.object({
   cidade: z.string().min(1, "Informe a cidade"),
   estado: z.string().optional().or(z.literal("")),
   email: z.string().email("Email inválido"),
-  whatsapp: z.string().min(8, "Informe o WhatsApp"),
+  whatsapp: z
+    .string()
+    .refine((v) => v.replace(/\D/g, "").length >= 10, "Informe um WhatsApp válido, com DDD"),
   instagram: z.string().optional().or(z.literal("")),
   cpfCnpj: z.string().min(1, "Informe o CPF/CNPJ"),
   registroProfissional: z.string().optional().or(z.literal("")),
@@ -155,7 +157,7 @@ export const briefingSchema = z.object({
 
   depoimentosUrls: z.array(z.string()).optional(),
   fotosUrls: z.array(z.string()).optional(),
-  arquivosGeraisUrls: z.array(z.string()).min(1, "Envie ao menos um arquivo"),
+  arquivosGeraisUrls: z.array(z.string()).optional(),
 });
 
 export type BriefingFormValues = z.infer<typeof briefingSchema>;
@@ -165,7 +167,10 @@ export const briefingInicialSchema = z.object({
   nome: z.string().min(2, "Informe o nome"),
   profissao: z.string().min(2, "Informe a profissão"),
   apresentacao: z.string().min(1, "Campo obrigatório"),
-  fotosUrls: z.array(z.string()).min(1, "Envie ao menos uma foto ou logo"),
+  fotosUrls: z
+    .array(z.string())
+    .min(1, "Envie ao menos uma foto ou logo")
+    .max(6, "Envie no máximo 6 fotos"),
 });
 
 export type BriefingInicialFormValues = z.infer<typeof briefingInicialSchema>;

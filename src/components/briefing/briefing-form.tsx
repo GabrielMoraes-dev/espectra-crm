@@ -11,6 +11,14 @@ import { BriefingArquivosSection } from "@/components/briefing/briefing-arquivos
 import { BriefingProgress } from "@/components/briefing/briefing-progress";
 import { BriefingSuccess } from "@/components/briefing/briefing-success";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type BriefingFormState = {
   leadId: string;
@@ -129,7 +137,7 @@ const SECTIONS: {
   {
     titulo: "Materiais e arquivos",
     sub: "Tudo que dá corpo visual à sua autoridade.",
-    campos: ["arquivosGeraisUrls"],
+    campos: [],
     Component: BriefingArquivosSection,
   },
 ];
@@ -151,6 +159,7 @@ export function BriefingForm({
 }) {
   const [form, setForm] = useState<BriefingFormState>(() => emptyState(initialData));
   const [done, setDone] = useState(false);
+  const [openSemArquivos, setOpenSemArquivos] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function set<K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) {
@@ -163,8 +172,22 @@ export function BriefingForm({
   const identificacaoLocked = Boolean(initialData?.profissaoInicial);
   const fotosLocked = initialData?.fotosUrls ?? [];
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function focarPrimeiroCampoInvalido() {
+    for (const section of SECTIONS) {
+      for (const campo of section.campos) {
+        if (!isFilled(form, campo)) {
+          const el = document.getElementById(campo);
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+          (el as HTMLElement | null)?.focus();
+          toast.error("Preencha os campos obrigatórios antes de enviar.");
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function enviarBriefing() {
     if (demo) {
       toast.message("Isso é só uma demonstração — nada foi enviado de verdade.");
       setDone(true);
@@ -180,10 +203,25 @@ export function BriefingForm({
     });
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (focarPrimeiroCampoInvalido()) return;
+
+    const semArquivos =
+      form.depoimentosUrls.length === 0 &&
+      form.fotosUrls.length === 0 &&
+      form.arquivosGeraisUrls.length === 0;
+    if (semArquivos) {
+      setOpenSemArquivos(true);
+      return;
+    }
+    enviarBriefing();
+  }
+
   if (done) return <BriefingSuccess />;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} noValidate>
       <header>
         <div className="relative mb-8 h-9 w-36">
           <Image src="/logo-espectra.png" alt="Espectra" fill className="object-contain object-left" />
@@ -234,6 +272,33 @@ export function BriefingForm({
           {pending ? "Enviando..." : "Enviar briefing"}
         </Button>
       </footer>
+
+      <Dialog open={openSemArquivos} onOpenChange={setOpenSemArquivos}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Tem certeza que não quer adicionar mais nada?</DialogTitle>
+            <DialogDescription>
+              Quanto mais fotos, depoimentos e materiais você enviar, melhor fica o resultado da
+              sua página.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpenSemArquivos(false)}>
+              Voltar e adicionar
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                setOpenSemArquivos(false);
+                enviarBriefing();
+              }}
+              disabled={pending}
+            >
+              {pending ? "Enviando..." : "Enviar mesmo assim"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

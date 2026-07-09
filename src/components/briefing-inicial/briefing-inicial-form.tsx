@@ -27,8 +27,27 @@ export function BriefingInicialForm({
   const [enviado, setEnviado] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  function focarCampoInvalido(id: string, mensagem: string) {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus();
+    toast.error(mensagem);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!nome.trim()) {
+      focarCampoInvalido("nome", "Preencha seu nome completo.");
+      return;
+    }
+    if (!profissao.trim()) {
+      focarCampoInvalido("profissao", "Preencha sua profissão.");
+      return;
+    }
+    if (!apresentacao.trim()) {
+      focarCampoInvalido("apresentacao", "Conte como você quer ser apresentado(a).");
+      return;
+    }
     if (fotosUrls.length === 0) {
       toast.error("Envie ao menos uma foto ou sua logo antes de continuar.");
       return;
@@ -64,7 +83,7 @@ export function BriefingInicialForm({
         Só precisamos de algumas informações básicas pra criar uma prévia da sua página.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-10 grid gap-5">
+      <form onSubmit={handleSubmit} noValidate className="mt-10 grid gap-5">
         <div className="space-y-1.5">
           <Label htmlFor="nome">Nome completo *</Label>
           <Input id="nome" required value={nome} onChange={(e) => setNome(e.target.value)} />
@@ -100,9 +119,10 @@ export function BriefingInicialForm({
 
         <FileField
           label="Fotos, logo e identidade visual"
-          hint="Envie quantas quiser: fotos suas, do seu local de trabalho, sua logo e identidade visual, se tiver"
+          hint="Envie no máximo 6 arquivos ao todo: fotos profissionais suas, fotos do lugar onde você trabalha, sua logo e identidade visual, se tiver."
           required
           accept="image/*"
+          max={6}
           urls={fotosUrls}
           onChange={setFotosUrls}
         />

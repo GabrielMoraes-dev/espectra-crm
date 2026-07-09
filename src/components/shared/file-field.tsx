@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Upload, Loader2, X, Lock, File as FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { isImagemUrl } from "@/lib/utils";
 
 export function FileField({
   label,
@@ -16,6 +17,7 @@ export function FileField({
   urls,
   onChange,
   lockedUrls,
+  max,
 }: {
   label: string;
   hint?: string;
@@ -24,13 +26,20 @@ export function FileField({
   urls: string[];
   onChange: (urls: string[]) => void;
   lockedUrls?: string[];
+  max?: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const atingiuLimite = max !== undefined && urls.length >= max;
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
+    if (max !== undefined && urls.length + files.length > max) {
+      toast.error(`Envie no máximo ${max} arquivos.`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
     setUploading(true);
     try {
       const novasUrls: string[] = [];
@@ -54,7 +63,8 @@ export function FileField({
     onChange(urls.filter((u) => u !== url));
   }
 
-  const isImageField = accept?.startsWith("image/") ?? false;
+  const imagens = urls.filter((url) => isImagemUrl(url));
+  const outros = urls.filter((url) => !isImagemUrl(url));
 
   return (
     <div className="space-y-1.5">
@@ -68,11 +78,11 @@ export function FileField({
         type="button"
         variant="outline"
         size="sm"
-        disabled={uploading}
+        disabled={uploading || atingiuLimite}
         onClick={() => inputRef.current?.click()}
       >
         {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
-        {uploading ? "Enviando..." : "Escolher arquivos"}
+        {uploading ? "Enviando..." : atingiuLimite ? `Limite de ${max} atingido` : "Escolher arquivos"}
       </Button>
       <input
         ref={inputRef}
@@ -83,9 +93,9 @@ export function FileField({
         onChange={handleFiles}
       />
 
-      {urls.length > 0 && isImageField && (
+      {imagens.length > 0 && (
         <div className="mt-1 grid grid-cols-3 gap-2 sm:grid-cols-4">
-          {urls.map((url) => {
+          {imagens.map((url) => {
             const locked = lockedUrls?.includes(url) ?? false;
             return (
               <div
@@ -112,9 +122,9 @@ export function FileField({
         </div>
       )}
 
-      {urls.length > 0 && !isImageField && (
+      {outros.length > 0 && (
         <ul className="mt-1 space-y-1">
-          {urls.map((url) => {
+          {outros.map((url) => {
             const locked = lockedUrls?.includes(url) ?? false;
             return (
               <li

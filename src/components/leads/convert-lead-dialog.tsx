@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/select";
 import { NichoField } from "@/components/shared/nicho-field";
 import { convertLeadToCliente } from "@/lib/actions/lead-actions";
-import type { Lead, MembroEquipe } from "@/generated/prisma/client";
+import type { MembroEquipe } from "@/generated/prisma/client";
+import type { LeadComBriefing } from "@/lib/data/leads";
 
 export function ConvertLeadDialog({
   open,
@@ -33,7 +34,7 @@ export function ConvertLeadDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  lead: Lead | null;
+  lead: LeadComBriefing | null;
   membros: MembroEquipe[];
 }) {
   const [nicho, setNicho] = useState("");
@@ -42,6 +43,16 @@ export function ConvertLeadDialog({
   const [responsavelId, setResponsavelId] = useState("");
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+
+  useEffect(() => {
+    if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resets the form whenever the dialog opens for a different lead
+      setNicho(lead?.briefingsIniciais[0]?.profissao ?? "");
+      setPlanoContratado("Landing Page");
+      setValor("");
+      setResponsavelId("");
+    }
+  }, [open, lead]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

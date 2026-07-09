@@ -21,6 +21,22 @@ export function formatTelefone(value: string) {
   return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`
 }
 
+export function formatCpfCnpj(value: string) {
+  const digitos = value.replace(/\D/g, "").slice(0, 14)
+  if (digitos.length <= 11) {
+    if (digitos.length <= 3) return digitos
+    if (digitos.length <= 6) return `${digitos.slice(0, 3)}.${digitos.slice(3)}`
+    if (digitos.length <= 9) return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`
+    return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9)}`
+  }
+  if (digitos.length <= 5) return `${digitos.slice(0, 2)}.${digitos.slice(2)}`
+  if (digitos.length <= 8) return `${digitos.slice(0, 2)}.${digitos.slice(2, 5)}.${digitos.slice(5)}`
+  if (digitos.length <= 12) {
+    return `${digitos.slice(0, 2)}.${digitos.slice(2, 5)}.${digitos.slice(5, 8)}/${digitos.slice(8)}`
+  }
+  return `${digitos.slice(0, 2)}.${digitos.slice(2, 5)}.${digitos.slice(5, 8)}/${digitos.slice(8, 12)}-${digitos.slice(12)}`
+}
+
 export function formatDate(date: Date | string | null | undefined) {
   if (!date) return "—"
   const d = typeof date === "string" ? new Date(date) : date
@@ -57,6 +73,10 @@ export function initials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("")
+}
+
+export function isImagemUrl(url: string) {
+  return /\.(jpe?g|png|gif|webp|avif|heic|svg)(\?.*)?$/i.test(url)
 }
 
 export function parseResponsabilidades(json: string | null | undefined): string[] {
