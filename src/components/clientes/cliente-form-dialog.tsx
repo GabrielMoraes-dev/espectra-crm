@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, formatTelefone } from "@/lib/utils";
 import { ESTADOS_BRASIL, STATUS_CLIENTE_CONFIG } from "@/lib/constants";
 import { NichoField } from "@/components/shared/nicho-field";
 import { FileUpload } from "@/components/shared/file-upload";
@@ -160,7 +160,13 @@ export function ClienteFormDialog({
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="whatsapp">WhatsApp *</Label>
-                <Input id="whatsapp" required={!cliente} value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
+                <Input
+                  id="whatsapp"
+                  required={!cliente}
+                  placeholder="(00) 00000-0000"
+                  value={form.whatsapp}
+                  onChange={(e) => set("whatsapp", formatTelefone(e.target.value))}
+                />
               </div>
             </div>
 

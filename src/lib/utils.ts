@@ -13,6 +13,14 @@ export function formatCurrency(value: number | null | undefined) {
   }).format(value)
 }
 
+export function formatTelefone(value: string) {
+  const digitos = value.replace(/\D/g, "").slice(0, 11)
+  if (digitos.length <= 2) return digitos.length ? `(${digitos}` : ""
+  if (digitos.length <= 6) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`
+  if (digitos.length <= 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`
+  return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`
+}
+
 export function formatDate(date: Date | string | null | undefined) {
   if (!date) return "—"
   const d = typeof date === "string" ? new Date(date) : date

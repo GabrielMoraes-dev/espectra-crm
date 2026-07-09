@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ESTADOS_BRASIL } from "@/lib/constants";
+import { formatTelefone } from "@/lib/utils";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
 
 export function BriefingIdentificacaoSection({
@@ -118,7 +119,7 @@ export function BriefingIdentificacaoSection({
             required
             placeholder="(00) 00000-0000"
             value={form.whatsapp}
-            onChange={(e) => set("whatsapp", e.target.value)}
+            onChange={(e) => set("whatsapp", formatTelefone(e.target.value))}
           />
         </div>
       </div>

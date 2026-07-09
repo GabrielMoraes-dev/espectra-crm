@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, formatTelefone } from "@/lib/utils";
 import { ETAPA_LEAD_CONFIG, ETAPA_LEAD_ORDEM, ORIGENS_LEAD } from "@/lib/constants";
 import { createLead, updateLead } from "@/lib/actions/lead-actions";
 import type { Lead } from "@/generated/prisma/client";
@@ -148,8 +148,9 @@ export function LeadFormDialog({
                 <Input
                   id="whatsapp"
                   required={!lead}
+                  placeholder="(00) 00000-0000"
                   value={form.whatsapp}
-                  onChange={(e) => set("whatsapp", e.target.value)}
+                  onChange={(e) => set("whatsapp", formatTelefone(e.target.value))}
                 />
               </div>
             </div>
