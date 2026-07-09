@@ -1,8 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { briefingInicialSchema, type BriefingInicialFormValues } from "@/lib/validations";
 import { sendBriefingInicialNotification } from "@/lib/email";
+import { requireAuth } from "@/lib/auth/session";
 
 export async function createBriefingInicial(values: BriefingInicialFormValues) {
   const data = briefingInicialSchema.parse(values);
@@ -27,6 +29,33 @@ export async function createBriefingInicial(values: BriefingInicialFormValues) {
   });
 
   await sendBriefingInicialNotification(briefingInicial);
+
+  return briefingInicial;
+}
+
+export async function updateBriefingInicial(
+  id: string,
+  values: {
+    nome: string;
+    profissao: string;
+    apresentacao: string;
+    fotosUrls: string[];
+  },
+) {
+  await requireAuth();
+
+  const briefingInicial = await prisma.briefingInicial.update({
+    where: { id },
+    data: {
+      nome: values.nome,
+      profissao: values.profissao,
+      apresentacao: values.apresentacao,
+      fotosUrls: JSON.stringify(values.fotosUrls),
+    },
+  });
+
+  revalidatePath("/leads");
+  revalidatePath("/clientes");
 
   return briefingInicial;
 }
