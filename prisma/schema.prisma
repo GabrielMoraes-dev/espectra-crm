@@ -103,6 +103,7 @@ model BriefingInicial {
   lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   nome         String
   profissao    String
+  email        String
   apresentacao String
   fotosUrls    String
   createdAt    DateTime @default(now())

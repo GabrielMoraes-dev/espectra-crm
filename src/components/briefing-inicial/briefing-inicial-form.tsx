@@ -14,14 +14,17 @@ import { Button } from "@/components/ui/button";
 export function BriefingInicialForm({
   leadId,
   nomeInicial,
+  emailInicial,
   demo,
 }: {
   leadId: string;
   nomeInicial: string;
+  emailInicial: string;
   demo?: boolean;
 }) {
   const [nome, setNome] = useState(nomeInicial);
   const [profissao, setProfissao] = useState("");
+  const [email, setEmail] = useState(emailInicial);
   const [apresentacao, setApresentacao] = useState("");
   const [fotosUrls, setFotosUrls] = useState<string[]>([]);
   const [enviado, setEnviado] = useState(false);
@@ -44,6 +47,10 @@ export function BriefingInicialForm({
       focarCampoInvalido("profissao", "Preencha sua profissão.");
       return;
     }
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      focarCampoInvalido("email", "Informe um email válido.");
+      return;
+    }
     if (!apresentacao.trim()) {
       focarCampoInvalido("apresentacao", "Conte como você quer ser apresentado(a).");
       return;
@@ -59,7 +66,7 @@ export function BriefingInicialForm({
     }
     startTransition(async () => {
       try {
-        await createBriefingInicial({ leadId, nome, profissao, apresentacao, fotosUrls });
+        await createBriefingInicial({ leadId, nome, profissao, email, apresentacao, fotosUrls });
         setEnviado(true);
       } catch {
         toast.error("Não foi possível enviar. Confira os campos e tente de novo.");
@@ -102,6 +109,23 @@ export function BriefingInicialForm({
             placeholder="Ex: Nutricionista - Especialista em emagrecimento"
             value={profissao}
             onChange={(e) => setProfissao(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="email">
+            Email *
+            <span className="ml-1 font-normal text-muted-foreground">
+              (vamos usar pra te avisar sobre o andamento do seu projeto)
+            </span>
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            required
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 

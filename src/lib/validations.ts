@@ -179,6 +179,7 @@ export const briefingInicialSchema = z.object({
   leadId: z.string().min(1),
   nome: z.string().min(2, "Informe o nome"),
   profissao: z.string().min(2, "Informe a profissão"),
+  email: z.string().email("Email inválido"),
   apresentacao: z.string().min(1, "Campo obrigatório"),
   fotosUrls: z
     .array(z.string())

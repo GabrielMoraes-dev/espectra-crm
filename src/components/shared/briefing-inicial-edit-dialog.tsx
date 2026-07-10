@@ -30,6 +30,7 @@ export function BriefingInicialEditDialog({
 }) {
   const [nome, setNome] = useState(briefingInicial.nome);
   const [profissao, setProfissao] = useState(briefingInicial.profissao);
+  const [email, setEmail] = useState(briefingInicial.email);
   const [apresentacao, setApresentacao] = useState(briefingInicial.apresentacao);
   const [fotosUrls, setFotosUrls] = useState<string[]>(JSON.parse(briefingInicial.fotosUrls));
   const [pending, startTransition] = useTransition();
@@ -39,7 +40,7 @@ export function BriefingInicialEditDialog({
     e.preventDefault();
     startTransition(async () => {
       try {
-        await updateBriefingInicial(briefingInicial.id, { nome, profissao, apresentacao, fotosUrls });
+        await updateBriefingInicial(briefingInicial.id, { nome, profissao, email, apresentacao, fotosUrls });
         toast.success("Briefing inicial atualizado");
         onOpenChange(false);
         router.refresh();
@@ -72,6 +73,10 @@ export function BriefingInicialEditDialog({
                 value={profissao}
                 onChange={(e) => setProfissao(e.target.value)}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bi-email">Email</Label>
+              <Input id="bi-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="bi-apresentacao">Como quer ser apresentado(a)</Label>

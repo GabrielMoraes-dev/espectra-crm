@@ -41,6 +41,11 @@ export function BriefingInicialView({ briefingInicial }: { briefingInicial: Brie
       </div>
 
       <div>
+        <p className="text-xs font-medium text-muted-foreground">Email</p>
+        <p className="text-sm text-foreground">{briefingInicial.email}</p>
+      </div>
+
+      <div>
         <p className="text-xs font-medium text-muted-foreground">Como quer ser apresentado(a)</p>
         <p className="text-sm whitespace-pre-line text-foreground">{briefingInicial.apresentacao}</p>
       </div>

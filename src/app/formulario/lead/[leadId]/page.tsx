@@ -38,6 +38,7 @@ export default async function FormularioLeadPage({
                   email: lead.email,
                   nomeInicial: lead.nomeInicial,
                   profissaoInicial: lead.profissaoInicial,
+                  emailInicial: lead.emailInicial,
                   apresentacao: lead.apresentacaoInicial,
                   fotosUrls: lead.fotosUrlsIniciais,
                 }

@@ -14,6 +14,7 @@ export async function createBriefingInicial(values: BriefingInicialFormValues) {
       leadId: data.leadId,
       nome: data.nome,
       profissao: data.profissao,
+      email: data.email,
       apresentacao: data.apresentacao,
       fotosUrls: JSON.stringify(data.fotosUrls),
     },
@@ -38,6 +39,7 @@ export async function updateBriefingInicial(
   values: {
     nome: string;
     profissao: string;
+    email: string;
     apresentacao: string;
     fotosUrls: string[];
   },
@@ -49,6 +51,7 @@ export async function updateBriefingInicial(
     data: {
       nome: values.nome,
       profissao: values.profissao,
+      email: values.email,
       apresentacao: values.apresentacao,
       fotosUrls: JSON.stringify(values.fotosUrls),
     },

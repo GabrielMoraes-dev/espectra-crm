@@ -16,7 +16,7 @@ export default async function FormularioInicialPage({
     return (
       <main className="min-h-screen bg-background px-4 py-16 sm:px-6">
         <div className="mx-auto w-full max-w-lg">
-          <BriefingInicialForm leadId={DEMO_ID} nomeInicial="" demo />
+          <BriefingInicialForm leadId={DEMO_ID} nomeInicial="" emailInicial="" demo />
         </div>
       </main>
     );
@@ -28,7 +28,7 @@ export default async function FormularioInicialPage({
   return (
     <main className="min-h-screen bg-background px-4 py-16 sm:px-6">
       <div className="mx-auto w-full max-w-lg">
-        <BriefingInicialForm leadId={lead.id} nomeInicial={lead.nome} />
+        <BriefingInicialForm leadId={lead.id} nomeInicial={lead.nome} emailInicial={lead.email ?? ""} />
       </div>
     </main>
   );

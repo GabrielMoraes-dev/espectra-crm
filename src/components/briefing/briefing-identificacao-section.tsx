@@ -15,10 +15,12 @@ export function BriefingIdentificacaoSection({
   form,
   set,
   identificacaoLocked,
+  emailLocked,
 }: {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
   identificacaoLocked?: boolean;
+  emailLocked?: boolean;
 }) {
   return (
     <div className="space-y-4">
@@ -106,10 +108,14 @@ export function BriefingIdentificacaoSection({
             id="email"
             type="email"
             required
+            disabled={emailLocked}
             placeholder="seu@email.com"
             value={form.email}
             onChange={(e) => set("email", e.target.value)}
           />
+          {emailLocked && (
+            <p className="text-xs text-muted-foreground">Você já enviou isso no formulário anterior.</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="whatsapp">WhatsApp *</Label>

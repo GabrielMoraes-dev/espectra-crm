@@ -28,6 +28,7 @@ export default async function FormularioClientePage({
                   nicho: cliente.nicho,
                   nomeInicial: cliente.nomeInicial,
                   profissaoInicial: cliente.profissaoInicial,
+                  emailInicial: cliente.emailInicial,
                   apresentacao: cliente.apresentacaoInicial,
                   fotosUrls: cliente.fotosUrlsIniciais,
                 }

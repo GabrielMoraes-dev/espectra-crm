@@ -66,6 +66,7 @@ export type BriefingInitialData = {
   nicho?: string | null;
   nomeInicial?: string | null;
   profissaoInicial?: string | null;
+  emailInicial?: string | null;
   apresentacao?: string | null;
   fotosUrls?: string[];
 };
@@ -78,7 +79,7 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     profissao: initialData?.profissaoInicial ?? initialData?.nicho ?? "",
     cidade: initialData?.cidade ?? "",
     estado: initialData?.estado ?? "",
-    email: initialData?.email ?? "",
+    email: initialData?.emailInicial ?? initialData?.email ?? "",
     whatsapp: initialData?.whatsapp ?? "",
     instagram: initialData?.instagram ?? "",
     cpfCnpj: "",
@@ -109,6 +110,7 @@ type SectionProps = {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
   identificacaoLocked?: boolean;
+  emailLocked?: boolean;
   fotosLocked?: string[];
 };
 
@@ -172,6 +174,7 @@ export function BriefingForm({
   const currentStepIndex = SECTIONS.findIndex((s) => s.campos.some((c) => !isFilled(form, c)));
   const step = currentStepIndex === -1 ? SECTIONS.length : currentStepIndex + 1;
   const identificacaoLocked = Boolean(initialData?.profissaoInicial);
+  const emailLocked = Boolean(initialData?.emailInicial);
   const fotosLocked = initialData?.fotosUrls ?? [];
 
   function focarPrimeiroCampoInvalido() {
@@ -260,6 +263,7 @@ export function BriefingForm({
             form={form}
             set={set}
             identificacaoLocked={identificacaoLocked}
+            emailLocked={emailLocked}
             fotosLocked={fotosLocked}
           />
         </section>
