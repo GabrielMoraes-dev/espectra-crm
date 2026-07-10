@@ -10,9 +10,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUpload } from "@/components/shared/image-upload";
 import { createLinkInterno, updateLinkInterno } from "@/lib/actions/link-actions";
 import type { LinkInterno } from "@/generated/prisma/client";
 
@@ -27,6 +29,7 @@ export function LinkFormDialog({
 }) {
   const [nome, setNome] = useState("");
   const [url, setUrl] = useState("");
+  const [icone, setIcone] = useState("");
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -34,6 +37,7 @@ export function LinkFormDialog({
       // eslint-disable-next-line react-hooks/set-state-in-effect -- resets the form whenever the dialog opens for a different record
       setNome(link?.nome ?? "");
       setUrl(link?.url ?? "");
+      setIcone(link?.icone ?? "");
     }
   }, [open, link]);
 
@@ -42,10 +46,10 @@ export function LinkFormDialog({
     startTransition(async () => {
       try {
         if (link) {
-          await updateLinkInterno(link.id, { nome, url });
+          await updateLinkInterno(link.id, { nome, url, icone });
           toast.success("Link atualizado");
         } else {
-          await createLinkInterno({ nome, url });
+          await createLinkInterno({ nome, url, icone });
           toast.success("Link adicionado");
         }
         onOpenChange(false);
@@ -72,6 +76,10 @@ export function LinkFormDialog({
             <div className="space-y-1.5">
               <Label htmlFor="url">URL *</Label>
               <Input id="url" required placeholder="https://" value={url} onChange={(e) => setUrl(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Ícone (opcional)</Label>
+              <ImageUpload value={icone} onChange={setIcone} fallback={<Link2 className="size-5" />} shape="square" />
             </div>
           </div>
 

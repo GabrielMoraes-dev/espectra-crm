@@ -10,7 +10,7 @@ export async function createLinkInterno(values: LinkInternoFormValues) {
   const data = linkInternoSchema.parse(values);
   const count = await prisma.linkInterno.count();
   const link = await prisma.linkInterno.create({
-    data: { nome: data.nome, url: data.url, ordem: count },
+    data: { nome: data.nome, url: data.url, icone: data.icone || null, ordem: count },
   });
   revalidatePath("/estrutura-operacional");
   return link;
@@ -21,7 +21,7 @@ export async function updateLinkInterno(id: string, values: LinkInternoFormValue
   const data = linkInternoSchema.parse(values);
   const link = await prisma.linkInterno.update({
     where: { id },
-    data: { nome: data.nome, url: data.url },
+    data: { nome: data.nome, url: data.url, icone: data.icone || null },
   });
   revalidatePath("/estrutura-operacional");
   return link;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import Image from "next/image";
 import * as Icons from "lucide-react";
 import { ExternalLink, Link2, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,13 @@ import { deleteLinkInterno } from "@/lib/actions/link-actions";
 import type { LinkInterno } from "@/generated/prisma/client";
 
 function LinkIcon({ icone }: { icone: string | null }) {
+  if (icone?.startsWith("http")) {
+    return (
+      <div className="relative size-5 shrink-0">
+        <Image src={icone} alt="" fill sizes="20px" className="object-contain" />
+      </div>
+    );
+  }
   const name = icone ? LINK_ICON_MAP[icone] : null;
   const Comp = name ? (Icons as unknown as Record<string, Icons.LucideIcon>)[name] : Link2;
   return <Comp className="size-4" />;

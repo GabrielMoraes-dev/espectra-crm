@@ -104,7 +104,8 @@ export type SOPFormValues = z.infer<typeof sopSchema>;
 
 export const linkInternoSchema = z.object({
   nome: z.string().min(1, "Informe o nome"),
-  url: z.string().min(1, "Informe a URL"),
+  url: z.string().min(1, "Informe a URL").url("Informe uma URL válida (com https://)"),
+  icone: z.string().optional().or(z.literal("")),
 });
 
 export type LinkInternoFormValues = z.infer<typeof linkInternoSchema>;
