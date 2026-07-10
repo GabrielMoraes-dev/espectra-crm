@@ -182,6 +182,7 @@ model Briefing {
   ondeAtende           String?
   enderecoFisico       String?
   valoresServicos      String?
+  dominio              String?
   faqAgendamento       String?
   faqAntesConsulta     String?
   faqCancelamento      String?

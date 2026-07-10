@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -5,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { BriefingFormState } from "@/components/briefing/briefing-form";
 
 const ONDE_ATENDE_OPCOES = ["Presencial", "Online", "Presencial e online"];
+const TEM_DOMINIO_OPCOES = ["Sim", "Não"];
 
 export function BriefingDiferenciaisSection({
   form,
@@ -13,6 +15,7 @@ export function BriefingDiferenciaisSection({
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
 }) {
+  const [temDominio, setTemDominio] = useState(form.dominio ? "Sim" : "");
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
@@ -130,6 +133,46 @@ export function BriefingDiferenciaisSection({
           onChange={(e) => set("valoresServicos", e.target.value)}
         />
       </div>
+
+      <div className="space-y-2">
+        <Label>
+          Você já tem um domínio registrado?
+          <span className="ml-1 font-normal text-muted-foreground">(opcional)</span>
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {TEM_DOMINIO_OPCOES.map((opcao) => (
+            <button
+              key={opcao}
+              type="button"
+              aria-pressed={temDominio === opcao}
+              onClick={() => {
+                setTemDominio(opcao);
+                if (opcao === "Não") set("dominio", "");
+              }}
+              className={cn(
+                "rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors",
+                temDominio === opcao
+                  ? "border-brand-500 bg-accent text-brand-100"
+                  : "border-border bg-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {opcao}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {temDominio === "Sim" && (
+        <div className="space-y-1.5">
+          <Label htmlFor="dominio">Qual é o domínio?</Label>
+          <Input
+            id="dominio"
+            placeholder="Ex: seusite.com.br"
+            value={form.dominio}
+            onChange={(e) => set("dominio", e.target.value)}
+          />
+        </div>
+      )}
 
       <div className="border-t border-border pt-4">
         <p className="mb-3 text-[13px] font-medium text-foreground">

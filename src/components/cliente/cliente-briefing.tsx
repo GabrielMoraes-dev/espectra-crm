@@ -122,11 +122,12 @@ export function ClienteBriefing({
                   <Campo label="Serviços" valor={b.servicos} />
                   <Campo label="Atendimento" valor={b.atendimento} />
 
-                  {(b.ondeAtende || b.enderecoFisico || b.valoresServicos) && (
+                  {(b.ondeAtende || b.enderecoFisico || b.valoresServicos || b.dominio) && (
                     <div className="grid grid-cols-2 gap-3">
                       {b.ondeAtende && <Campo label="Onde atende" valor={b.ondeAtende} />}
                       {b.enderecoFisico && <Campo label="Endereço físico" valor={b.enderecoFisico} />}
                       {b.valoresServicos && <Campo label="Valores" valor={b.valoresServicos} />}
+                      {b.dominio && <Campo label="Domínio" valor={b.dominio} />}
                     </div>
                   )}
 

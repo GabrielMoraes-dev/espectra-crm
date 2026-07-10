@@ -43,6 +43,7 @@ export type BriefingFormState = {
   ondeAtende: string;
   enderecoFisico: string;
   valoresServicos: string;
+  dominio: string;
   faqAgendamento: string;
   faqAntesConsulta: string;
   faqCancelamento: string;
@@ -93,6 +94,7 @@ function emptyState(initialData?: BriefingInitialData): BriefingFormState {
     ondeAtende: "",
     enderecoFisico: "",
     valoresServicos: "",
+    dominio: "",
     faqAgendamento: "",
     faqAntesConsulta: "",
     faqCancelamento: "",

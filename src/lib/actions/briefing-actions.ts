@@ -101,6 +101,7 @@ export async function createBriefing(values: BriefingFormValues) {
         ondeAtende: clean(data.ondeAtende),
         enderecoFisico: clean(data.enderecoFisico),
         valoresServicos: clean(data.valoresServicos),
+        dominio: clean(data.dominio),
         faqAgendamento: clean(data.faqAgendamento),
         faqAntesConsulta: clean(data.faqAntesConsulta),
         faqCancelamento: clean(data.faqCancelamento),

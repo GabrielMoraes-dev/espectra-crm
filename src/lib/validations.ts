@@ -162,6 +162,7 @@ export const briefingSchema = z.object({
   ondeAtende: z.string().optional().or(z.literal("")),
   enderecoFisico: z.string().optional().or(z.literal("")),
   valoresServicos: z.string().optional().or(z.literal("")),
+  dominio: z.string().optional().or(z.literal("")),
   faqAgendamento: z.string().optional().or(z.literal("")),
   faqAntesConsulta: z.string().optional().or(z.literal("")),
   faqCancelamento: z.string().optional().or(z.literal("")),
