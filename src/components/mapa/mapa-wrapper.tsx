@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { Precisao } from "@/lib/geo";
 
 type ClientePin = {
   id: string;
@@ -9,6 +10,7 @@ type ClientePin = {
   cidade: string | null;
   estado: string | null;
   coords: [number, number];
+  precisao: Precisao;
 };
 
 const BrasilMap = dynamic(() => import("./brasil-map"), {

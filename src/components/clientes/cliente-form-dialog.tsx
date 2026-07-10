@@ -92,13 +92,11 @@ export function ClienteFormDialog({
   onOpenChange,
   cliente,
   membros,
-  onSaved,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   cliente?: Cliente | null;
   membros: MembroEquipe[];
-  onSaved?: (cliente: Cliente) => void;
 }) {
   const [form, setForm] = useState<FormState>(emptyState());
   const [expandido, setExpandido] = useState(false);
@@ -125,12 +123,13 @@ export function ClienteFormDialog({
           valor: form.valor ? Number(form.valor) : null,
           status: form.status as never,
         };
-        const saved = cliente
-          ? await updateCliente(cliente.id, payload)
-          : await createCliente(payload);
+        if (cliente) {
+          await updateCliente(cliente.id, payload);
+        } else {
+          await createCliente(payload);
+        }
         toast.success(cliente ? "Cliente atualizado" : "Cliente criado");
         onOpenChange(false);
-        onSaved?.(saved);
       } catch (err) {
         toast.error(String(err));
       }

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { ESPECTRA_COORDS } from "@/lib/geo";
+import { ESPECTRA_COORDS, type Precisao } from "@/lib/geo";
 
 type ClientePin = {
   id: string;
@@ -13,6 +13,7 @@ type ClientePin = {
   cidade: string | null;
   estado: string | null;
   coords: [number, number];
+  precisao: Precisao;
 };
 
 const espectraIcon = L.divIcon({
@@ -36,6 +37,20 @@ const clienteIcon = L.divIcon({
     border:1.5px solid #67e8f9;
     border-radius:50%;
     box-shadow:0 0 8px 3px rgba(34,211,238,0.5),0 0 16px 6px rgba(34,211,238,0.2);
+  "></div>`,
+  className: "",
+  iconSize: [10, 10],
+  iconAnchor: [5, 5],
+  popupAnchor: [0, -8],
+});
+
+const clienteIconAproximado = L.divIcon({
+  html: `<div style="
+    width:10px;height:10px;
+    background:rgba(245,158,11,0.35);
+    border:1.5px dashed #fbbf24;
+    border-radius:50%;
+    box-shadow:0 0 8px 3px rgba(245,158,11,0.35);
   "></div>`,
   className: "",
   iconSize: [10, 10],
@@ -98,7 +113,11 @@ export default function BrasilMap({ clientes }: { clientes: ClientePin[] }) {
 
         {/* Marcadores dos clientes */}
         {clientes.map((c) => (
-          <Marker key={c.id} position={c.coords} icon={clienteIcon}>
+          <Marker
+            key={c.id}
+            position={c.coords}
+            icon={c.precisao === "aproximada" ? clienteIconAproximado : clienteIcon}
+          >
             <Popup>
               <p className="font-semibold" style={{ color: "#67e8f9", marginBottom: 2 }}>
                 {c.nome}
@@ -109,6 +128,11 @@ export default function BrasilMap({ clientes }: { clientes: ClientePin[] }) {
               {(c.cidade || c.estado) && (
                 <p style={{ color: "#64748b", fontSize: 11, marginTop: 4 }}>
                   {[c.cidade, c.estado].filter(Boolean).join(", ")}
+                </p>
+              )}
+              {c.precisao === "aproximada" && (
+                <p style={{ color: "#fbbf24", fontSize: 11, marginTop: 4 }}>
+                  Localização aproximada
                 </p>
               )}
             </Popup>

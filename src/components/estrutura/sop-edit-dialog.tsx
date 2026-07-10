@@ -35,9 +35,13 @@ export function SOPEditDialog({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     startTransition(async () => {
-      await updateSOP(sop.id, { conteudo });
-      toast.success("Procedimento salvo");
-      onOpenChange(false);
+      try {
+        await updateSOP(sop.id, { conteudo });
+        toast.success("Procedimento salvo");
+        onOpenChange(false);
+      } catch {
+        toast.error("Não foi possível salvar o procedimento");
+      }
     });
   }
 

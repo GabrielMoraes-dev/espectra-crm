@@ -242,22 +242,28 @@ const STATE_COORDS: Record<string, [number, number]> = {
   TO: [-10.1753, -48.2982],
 };
 
-export function getCoords(cidade: string | null, estado: string | null): [number, number] | null {
+export type Precisao = "exata" | "aproximada";
+
+export function getCoords(
+  cidade: string | null,
+  estado: string | null,
+): { coords: [number, number]; precisao: Precisao } | null {
   if (!cidade && !estado) return null;
   if (cidade) {
     const key = cidade.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
     for (const [k, coords] of Object.entries(CITY_COORDS)) {
       const normalized = k.normalize("NFD").replace(/\p{Diacritic}/gu, "");
-      if (normalized === key) return coords;
+      if (normalized === key) return { coords, precisao: "exata" };
     }
-    // Partial match
+    // Partial match — pode acertar uma cidade parecida mas errada, então conta como aproximado
     for (const [k, coords] of Object.entries(CITY_COORDS)) {
       const normalized = k.normalize("NFD").replace(/\p{Diacritic}/gu, "");
-      if (normalized.includes(key) || key.includes(normalized)) return coords;
+      if (normalized.includes(key) || key.includes(normalized)) return { coords, precisao: "aproximada" };
     }
   }
   if (estado) {
-    return STATE_COORDS[estado.toUpperCase()] ?? null;
+    const coords = STATE_COORDS[estado.toUpperCase()];
+    if (coords) return { coords, precisao: "aproximada" };
   }
   return null;
 }
