@@ -162,7 +162,7 @@ export function ClienteFormDialog({
                 <Label htmlFor="whatsapp">WhatsApp *</Label>
                 <Input
                   id="whatsapp"
-                  required={!cliente}
+                  required
                   placeholder="(00) 00000-0000"
                   value={form.whatsapp}
                   onChange={(e) => set("whatsapp", formatTelefone(e.target.value))}

@@ -11,7 +11,7 @@ export async function getTarefas(filter: TarefasFilter) {
   const where: Prisma.TarefaWhereInput = {};
 
   if (filter.search) {
-    where.titulo = { contains: filter.search };
+    where.titulo = { contains: filter.search, mode: "insensitive" };
   }
   if (filter.responsavelId && filter.responsavelId !== "todos") {
     where.responsavelId = filter.responsavelId;

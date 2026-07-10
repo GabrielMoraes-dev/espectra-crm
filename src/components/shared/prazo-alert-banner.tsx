@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatDate, getPrazoUrgencia } from "@/lib/utils";
+import { formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import type { Cliente } from "@/generated/prisma/client";
 
 export function PrazoAlertBanner({ clientes }: { clientes: Cliente[] }) {
@@ -35,7 +35,7 @@ export function PrazoAlertBanner({ clientes }: { clientes: Cliente[] }) {
                 {cliente.empresa ?? cliente.nome}
               </Link>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="text-xs text-muted-foreground">{formatDate(cliente.prazo)}</span>
+                <span className="text-xs text-muted-foreground">{formatDataPrazo(cliente.prazo)}</span>
                 <StatusBadge label={urgencia.label} className={urgencia.className} />
               </div>
             </li>

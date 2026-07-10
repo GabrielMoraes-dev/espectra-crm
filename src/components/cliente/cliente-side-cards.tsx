@@ -7,7 +7,7 @@ import { GerarLinkPagamento } from "@/components/cliente/gerar-link-pagamento";
 import { EnviarContrato } from "@/components/cliente/enviar-contrato";
 import { ClientePesquisas } from "@/components/cliente/cliente-pesquisas";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDataPrazo } from "@/lib/utils";
 import type { Pagamento, PesquisaSatisfacao, Projeto } from "@/generated/prisma/client";
 
 export function ClienteSideCards({
@@ -44,7 +44,7 @@ export function ClienteSideCards({
                   <div key={projeto.id} className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-xs text-muted-foreground">Prazo</p>
-                      <p className="text-sm font-medium text-foreground">{formatDate(projeto.prazo)}</p>
+                      <p className="text-sm font-medium text-foreground">{formatDataPrazo(projeto.prazo)}</p>
                     </div>
                     <StatusBadge label={config.label} className={config.className} />
                   </div>

@@ -13,8 +13,8 @@ export async function getProjetos(filter: ProjetosFilter) {
   if (filter.search) {
     where.cliente = {
       OR: [
-        { nome: { contains: filter.search } },
-        { empresa: { contains: filter.search } },
+        { nome: { contains: filter.search, mode: "insensitive" } },
+        { empresa: { contains: filter.search, mode: "insensitive" } },
       ],
     };
   }

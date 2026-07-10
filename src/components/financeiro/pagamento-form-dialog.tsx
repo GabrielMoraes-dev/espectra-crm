@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createPagamento, updatePagamento } from "@/lib/actions/pagamento-actions";
+import { FORMAS_PAGAMENTO } from "@/lib/constants";
 import type { Cliente, Pagamento } from "@/generated/prisma/client";
 
 type FormState = {
@@ -142,6 +143,27 @@ export function PagamentoFormDialog({
                 <Label htmlFor="data">Data</Label>
                 <Input id="data" type="date" value={form.data} onChange={(e) => set("data", e.target.value)} />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Forma de pagamento</Label>
+              <Select
+                value={form.formaPagamento}
+                onValueChange={(v) => set("formaPagamento", v ?? "")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione">
+                    {(value: string) => value || "Selecione"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {FORMAS_PAGAMENTO.map((forma) => (
+                    <SelectItem key={forma} value={forma}>
+                      {forma}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5">

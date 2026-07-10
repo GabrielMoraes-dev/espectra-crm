@@ -16,7 +16,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { TarefaFormDialog } from "@/components/tarefas/tarefa-form-dialog";
 import { PRIORIDADE_TAREFA_CONFIG, STATUS_TAREFA_CONFIG } from "@/lib/constants";
-import { formatDate, getPrazoUrgencia } from "@/lib/utils";
+import { formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import { deleteTarefa } from "@/lib/actions/tarefa-actions";
 import type { MembroEquipe, Tarefa } from "@/generated/prisma/client";
 
@@ -92,7 +92,7 @@ export function TarefaDetailSheet({
             <InfoRow
               icon={CalendarClock}
               label="Prazo"
-              value={formatDate(tarefa.prazo)}
+              value={formatDataPrazo(tarefa.prazo)}
               badge={urgencia}
             />
             <InfoRow

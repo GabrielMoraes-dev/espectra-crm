@@ -17,7 +17,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FotoGallery } from "@/components/shared/foto-gallery";
 import { ProjetoFormDialog } from "@/components/projetos/projeto-form-dialog";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
-import { formatDate, getPrazoUrgencia } from "@/lib/utils";
+import { formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import { deleteProjeto } from "@/lib/actions/projeto-actions";
 import type { Cliente, FotoCliente, MembroEquipe, Projeto } from "@/generated/prisma/client";
 
@@ -87,7 +87,7 @@ export function ProjetoDetailSheet({
             <InfoRow
               icon={CalendarClock}
               label="Prazo"
-              value={formatDate(projeto.prazo)}
+              value={formatDataPrazo(projeto.prazo)}
               badge={urgencia}
             />
             <InfoRow icon={UserSquare2} label="Responsável" value={projeto.responsavel?.nome ?? "—"} />

@@ -37,6 +37,8 @@ export function formatCpfCnpj(value: string) {
   return `${digitos.slice(0, 2)}.${digitos.slice(2, 5)}.${digitos.slice(5, 8)}/${digitos.slice(8, 12)}-${digitos.slice(12)}`
 }
 
+const FUSO_BRASIL = "America/Sao_Paulo"
+
 export function formatDate(date: Date | string | null | undefined) {
   if (!date) return "—"
   const d = typeof date === "string" ? new Date(date) : date
@@ -44,6 +46,7 @@ export function formatDate(date: Date | string | null | undefined) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: FUSO_BRASIL,
   }).format(d)
 }
 
@@ -54,6 +57,7 @@ export function formatDateLong(date: Date | string | null | undefined) {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: FUSO_BRASIL,
   }).format(d)
 }
 
@@ -63,6 +67,21 @@ export function formatDateShort(date: Date | string | null | undefined) {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
+    timeZone: FUSO_BRASIL,
+  }).format(d)
+}
+
+// Para campos "só data" (ex: prazo), salvos como meia-noite UTC a partir de um
+// input tipo "YYYY-MM-DD" — usa o fuso UTC pra ler de volta o mesmo dia que foi
+// digitado, em vez do fuso do Brasil (que jogaria a exibição um dia pra trás).
+export function formatDataPrazo(date: Date | string | null | undefined) {
+  if (!date) return "—"
+  const d = typeof date === "string" ? new Date(date) : date
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
   }).format(d)
 }
 
@@ -89,13 +108,23 @@ export function parseResponsabilidades(json: string | null | undefined): string[
   }
 }
 
+function dataEmDiasBrasil(date: Date) {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: FUSO_BRASIL,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date)
+  const obter = (tipo: string) => Number(partes.find((p) => p.type === tipo)?.value)
+  return Date.UTC(obter("year"), obter("month") - 1, obter("day"))
+}
+
 export function getPrazoUrgencia(date: Date | string | null | undefined) {
   if (!date) return null
-  const prazo = typeof date === "string" ? new Date(date) : new Date(date)
-  prazo.setHours(0, 0, 0, 0)
-  const hoje = new Date()
-  hoje.setHours(0, 0, 0, 0)
-  const diffDias = Math.round((prazo.getTime() - hoje.getTime()) / 86_400_000)
+  const prazo = typeof date === "string" ? new Date(date) : date
+  const prazoDias = Date.UTC(prazo.getUTCFullYear(), prazo.getUTCMonth(), prazo.getUTCDate())
+  const hojeDias = dataEmDiasBrasil(new Date())
+  const diffDias = Math.round((prazoDias - hojeDias) / 86_400_000)
 
   if (diffDias > 2) return null
   if (diffDias === 2) {

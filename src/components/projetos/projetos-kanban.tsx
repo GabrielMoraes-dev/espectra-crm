@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ProjetoDetailSheet } from "@/components/projetos/projeto-detail-sheet";
 import { ETAPA_PROJETO_CONFIG, ETAPA_PROJETO_ORDEM } from "@/lib/constants";
-import { formatDate, getPrazoUrgencia, initials, cn } from "@/lib/utils";
+import { formatDataPrazo, getPrazoUrgencia, initials, cn } from "@/lib/utils";
 import { moveProjetoEtapa } from "@/lib/actions/projeto-actions";
 import type { Cliente, FotoCliente, MembroEquipe, Projeto } from "@/generated/prisma/client";
 
@@ -53,7 +53,7 @@ function ProjetoCard({ projeto, onOpen }: { projeto: ProjetoCompleto; onOpen: ()
       {projeto.prazo && (
         <div className="mt-2 flex items-center justify-between gap-2">
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <CalendarClock className="size-3" /> {formatDate(projeto.prazo)}
+            <CalendarClock className="size-3" /> {formatDataPrazo(projeto.prazo)}
           </p>
           {urgencia && <StatusBadge label={urgencia.label} className={urgencia.className} />}
         </div>

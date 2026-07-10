@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatCurrency, formatDate, getPrazoUrgencia } from "@/lib/utils";
+import { formatCurrency, formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import type { Cliente, MembroEquipe } from "@/generated/prisma/client";
 
 function InfoItem({
@@ -92,7 +92,7 @@ export function ClienteInfoGrid({
         <InfoItem
           icon={CalendarClock}
           label="Prazo"
-          value={formatDate(cliente.prazo)}
+          value={formatDataPrazo(cliente.prazo)}
           badge={getPrazoUrgencia(cliente.prazo)}
         />
         <InfoItem

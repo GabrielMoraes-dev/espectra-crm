@@ -147,7 +147,7 @@ export function LeadFormDialog({
                 <Label htmlFor="whatsapp">WhatsApp *</Label>
                 <Input
                   id="whatsapp"
-                  required={!lead}
+                  required
                   placeholder="(00) 00000-0000"
                   value={form.whatsapp}
                   onChange={(e) => set("whatsapp", formatTelefone(e.target.value))}

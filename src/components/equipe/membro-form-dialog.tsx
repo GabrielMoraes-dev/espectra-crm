@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/shared/image-upload";
 import { createMembro, updateMembro } from "@/lib/actions/membro-actions";
-import { parseResponsabilidades } from "@/lib/utils";
+import { parseResponsabilidades, formatTelefone } from "@/lib/utils";
 import type { MembroEquipe } from "@/generated/prisma/client";
 
 type FormState = {
@@ -120,7 +120,12 @@ export function MembroFormDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone</Label>
-                <Input id="telefone" value={form.telefone} onChange={(e) => set("telefone", e.target.value)} />
+                <Input
+                  id="telefone"
+                  placeholder="(00) 00000-0000"
+                  value={form.telefone}
+                  onChange={(e) => set("telefone", formatTelefone(e.target.value))}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>

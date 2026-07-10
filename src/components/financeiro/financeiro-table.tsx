@@ -80,8 +80,12 @@ export function FinanceiroTable({
                   <Switch
                     checked={pagamento.pago}
                     onCheckedChange={async (checked) => {
-                      await togglePagamentoPago(pagamento.id, checked);
-                      toast.success(checked ? "Marcado como pago" : "Marcado como pendente");
+                      try {
+                        await togglePagamentoPago(pagamento.id, checked);
+                        toast.success(checked ? "Marcado como pago" : "Marcado como pendente");
+                      } catch {
+                        toast.error("Não foi possível atualizar o pagamento.");
+                      }
                     }}
                   />
                 </TableCell>

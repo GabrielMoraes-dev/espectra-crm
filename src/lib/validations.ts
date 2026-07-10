@@ -3,7 +3,9 @@ import { z } from "zod";
 export const leadSchema = z.object({
   nome: z.string().min(2, "Informe o nome"),
   empresa: z.string().optional().or(z.literal("")),
-  whatsapp: z.string().optional().or(z.literal("")),
+  whatsapp: z
+    .string()
+    .refine((v) => v.replace(/\D/g, "").length >= 10, "Informe um WhatsApp válido, com DDD"),
   instagram: z.string().optional().or(z.literal("")),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   origem: z.string().optional().or(z.literal("")),
@@ -26,7 +28,9 @@ export type LeadFormValues = z.infer<typeof leadSchema>;
 export const clienteSchema = z.object({
   nome: z.string().min(2, "Informe o nome"),
   empresa: z.string().optional().or(z.literal("")),
-  whatsapp: z.string().optional().or(z.literal("")),
+  whatsapp: z
+    .string()
+    .refine((v) => v.replace(/\D/g, "").length >= 10, "Informe um WhatsApp válido, com DDD"),
   instagram: z.string().optional().or(z.literal("")),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   site: z.string().optional().or(z.literal("")),
@@ -77,7 +81,14 @@ export type TarefaFormValues = z.infer<typeof tarefaSchema>;
 export const membroSchema = z.object({
   nome: z.string().min(2, "Informe o nome"),
   cargo: z.string().min(2, "Informe o cargo"),
-  telefone: z.string().optional().or(z.literal("")),
+  telefone: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (v) => !v || v.replace(/\D/g, "").length >= 10,
+      "Informe um telefone válido, com DDD",
+    ),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   foto: z.string().optional().or(z.literal("")),
   responsabilidades: z.array(z.string()),

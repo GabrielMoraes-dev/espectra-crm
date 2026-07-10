@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -30,8 +31,12 @@ export function ConfirmDialog({
 
   function handleConfirm() {
     startTransition(async () => {
-      await onConfirm();
-      onOpenChange(false);
+      try {
+        await onConfirm();
+        onOpenChange(false);
+      } catch {
+        toast.error("Não foi possível concluir a ação. Tente de novo.");
+      }
     });
   }
 

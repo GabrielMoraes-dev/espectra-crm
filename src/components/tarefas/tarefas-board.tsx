@@ -17,7 +17,7 @@ import { CalendarClock } from "lucide-react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TarefaDetailSheet } from "@/components/tarefas/tarefa-detail-sheet";
 import { PRIORIDADE_TAREFA_CONFIG, STATUS_TAREFA_CONFIG, STATUS_TAREFA_ORDEM } from "@/lib/constants";
-import { formatDate, getPrazoUrgencia, initials, cn } from "@/lib/utils";
+import { formatDataPrazo, getPrazoUrgencia, initials, cn } from "@/lib/utils";
 import { moveTarefaStatus } from "@/lib/actions/tarefa-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { MembroEquipe, Tarefa } from "@/generated/prisma/client";
@@ -71,7 +71,7 @@ function TarefaCard({
       {tarefa.prazo && (
         <div className="mt-2 flex items-center justify-between gap-2">
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <CalendarClock className="size-3" /> {formatDate(tarefa.prazo)}
+            <CalendarClock className="size-3" /> {formatDataPrazo(tarefa.prazo)}
           </p>
           {urgencia && <StatusBadge label={urgencia.label} className={urgencia.className} />}
         </div>

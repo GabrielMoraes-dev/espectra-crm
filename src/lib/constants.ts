@@ -70,6 +70,18 @@ export const STATUS_CLIENTE_CONFIG = {
   FINALIZADO: { label: "Finalizado", className: "bg-secondary text-secondary-foreground" },
 } as const;
 
+// ---------- Financeiro ----------
+
+export const FORMAS_PAGAMENTO = [
+  "Pix",
+  "Cartão de crédito",
+  "Cartão de débito",
+  "Boleto",
+  "Transferência",
+  "Dinheiro",
+  "Outro",
+] as const;
+
 // ---------- Projetos ----------
 
 export const ETAPA_PROJETO_ORDEM = [
