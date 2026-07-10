@@ -1,6 +1,17 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
+const TIPOS_IMAGEM = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
+// Padrão (sem clientPayload "geral"): fotos, logo e PDFs — cobre os uploads de
+// imagem/documento avulsos do CRM (foto de perfil, contrato, etc.).
+const TIPOS_PADRAO = [...TIPOS_IMAGEM, "application/pdf"];
+// Só quando o campo explicitamente permite vídeo (Depoimentos, Demais arquivos
+// no briefing completo) — arquivo pode ser bem maior.
+const TIPOS_GERAL = [...TIPOS_PADRAO, "video/mp4", "video/quicktime", "video/webm"];
+
+const LIMITE_PADRAO = 20 * 1024 * 1024;
+const LIMITE_GERAL = 1024 * 1024 * 1024;
+
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
 
@@ -8,10 +19,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async () => ({
-        addRandomSuffix: false,
-        maximumSizeInBytes: 200 * 1024 * 1024,
-      }),
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
+        let permiteVideo = false;
+        try {
+          permiteVideo = clientPayload ? JSON.parse(clientPayload).tipo === "geral" : false;
+        } catch {
+          permiteVideo = false;
+        }
+
+        return {
+          addRandomSuffix: false,
+          allowedContentTypes: permiteVideo ? TIPOS_GERAL : TIPOS_PADRAO,
+          maximumSizeInBytes: permiteVideo ? LIMITE_GERAL : LIMITE_PADRAO,
+        };
+      },
       onUploadCompleted: async () => {},
     });
 

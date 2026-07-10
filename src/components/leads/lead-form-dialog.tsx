@@ -138,6 +138,7 @@ export function LeadFormDialog({
                 <Input
                   id="nome"
                   required
+                  minLength={2}
                   autoFocus
                   value={form.nome}
                   onChange={(e) => set("nome", e.target.value)}

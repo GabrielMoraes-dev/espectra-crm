@@ -58,7 +58,7 @@ export function AddTimelineEventDialog({
           <div className="grid gap-4 py-4">
             <div className="space-y-1.5">
               <Label htmlFor="titulo">Título *</Label>
-              <Input id="titulo" required value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+              <Input id="titulo" required minLength={2} value={titulo} onChange={(e) => setTitulo(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="descricao">Descrição</Label>

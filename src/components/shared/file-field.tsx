@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { isImagemUrl } from "@/lib/utils";
 
+const LIMITE_PADRAO_MB = 20;
+const LIMITE_GERAL_MB = 1024;
+
 export function FileField({
   label,
   hint,
@@ -18,6 +21,7 @@ export function FileField({
   onChange,
   lockedUrls,
   max,
+  permiteVideo,
 }: {
   label: string;
   hint?: string;
@@ -27,16 +31,27 @@ export function FileField({
   onChange: (urls: string[]) => void;
   lockedUrls?: string[];
   max?: number;
+  /** Permite vídeo e arquivos maiores (até 1GB) — sem isso, só imagem/PDF até 20MB. */
+  permiteVideo?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const atingiuLimite = max !== undefined && urls.length >= max;
+  const limiteMb = permiteVideo ? LIMITE_GERAL_MB : LIMITE_PADRAO_MB;
+  const limiteLabel = limiteMb >= 1024 ? `${limiteMb / 1024}GB` : `${limiteMb}MB`;
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
     if (max !== undefined && urls.length + files.length > max) {
       toast.error(`Envie no máximo ${max} arquivos.`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+    const limiteBytes = limiteMb * 1024 * 1024;
+    const grandeDemais = files.find((f) => f.size > limiteBytes);
+    if (grandeDemais) {
+      toast.error(`"${grandeDemais.name}" é maior que o limite de ${limiteLabel}.`);
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
@@ -47,6 +62,7 @@ export function FileField({
         const blob = await upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
           access: "public",
           handleUploadUrl: "/api/blob-upload",
+          clientPayload: JSON.stringify({ tipo: permiteVideo ? "geral" : "padrao" }),
         });
         novasUrls.push(blob.url);
       }

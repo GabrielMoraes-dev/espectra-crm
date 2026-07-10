@@ -16,7 +16,8 @@ export function BriefingArquivosSection({
     <div className="space-y-5">
       <FileField
         label="Depoimentos ou resultados"
-        hint="Prints, vídeos ou textos"
+        hint="Prints, vídeos ou textos — até 1GB por arquivo"
+        permiteVideo
         urls={form.depoimentosUrls}
         onChange={(urls) => set("depoimentosUrls", urls)}
       />
@@ -32,7 +33,8 @@ export function BriefingArquivosSection({
 
       <FileField
         label="Demais arquivos"
-        hint="Logo, identidade visual, vídeos, depoimentos e outros materiais"
+        hint="Logo, identidade visual, vídeos, depoimentos e outros materiais — até 1GB por arquivo"
+        permiteVideo
         urls={form.arquivosGeraisUrls}
         onChange={(urls) => set("arquivosGeraisUrls", urls)}
       />

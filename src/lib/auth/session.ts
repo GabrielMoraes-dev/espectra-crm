@@ -5,6 +5,9 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 
 const secretKey = process.env.SESSION_SECRET;
+if (!secretKey) {
+  throw new Error("SESSION_SECRET não configurado — defina essa variável de ambiente.");
+}
 const encodedKey = new TextEncoder().encode(secretKey);
 
 const COOKIE_NAME = "espectra_session";

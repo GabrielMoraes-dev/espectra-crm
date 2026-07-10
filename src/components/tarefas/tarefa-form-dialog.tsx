@@ -107,7 +107,7 @@ export function TarefaFormDialog({
           <div className="grid gap-4 py-4">
             <div className="space-y-1.5">
               <Label htmlFor="titulo">Título *</Label>
-              <Input id="titulo" required value={form.titulo} onChange={(e) => set("titulo", e.target.value)} />
+              <Input id="titulo" required minLength={2} value={form.titulo} onChange={(e) => set("titulo", e.target.value)} />
             </div>
 
             <div className="space-y-1.5">

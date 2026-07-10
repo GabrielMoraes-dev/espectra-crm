@@ -109,11 +109,11 @@ export function MembroFormDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="nome">Nome *</Label>
-                <Input id="nome" required value={form.nome} onChange={(e) => set("nome", e.target.value)} />
+                <Input id="nome" required minLength={2} value={form.nome} onChange={(e) => set("nome", e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="cargo">Cargo *</Label>
-                <Input id="cargo" required value={form.cargo} onChange={(e) => set("cargo", e.target.value)} />
+                <Input id="cargo" required minLength={2} value={form.cargo} onChange={(e) => set("cargo", e.target.value)} />
               </div>
             </div>
 

@@ -156,7 +156,7 @@ export function ClienteFormDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="nome">Nome *</Label>
-                <Input id="nome" required autoFocus value={form.nome} onChange={(e) => set("nome", e.target.value)} />
+                <Input id="nome" required minLength={2} autoFocus value={form.nome} onChange={(e) => set("nome", e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="whatsapp">WhatsApp *</Label>
