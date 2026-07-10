@@ -105,7 +105,7 @@ export function ClienteSideCards({
         contratoUrl={contratoUrl}
       />
 
-      <ClientePesquisas pesquisas={pesquisas} />
+      <ClientePesquisas clienteId={clienteId} pesquisas={pesquisas} />
     </div>
   );
 }

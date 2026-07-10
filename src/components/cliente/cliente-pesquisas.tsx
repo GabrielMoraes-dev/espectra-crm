@@ -1,8 +1,14 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { formatDate } from "@/lib/utils";
 import type { PesquisaSatisfacao } from "@/generated/prisma/client";
+
+const SITE_URL = "https://espectra-crm.vercel.app";
 
 const LABELS = ["Ruim", "Regular", "Bom", "Muito bom", "Excelente"];
 
@@ -13,13 +19,24 @@ const PERGUNTAS = [
   { key: "atendimento" as const, label: "Atendimento" },
 ];
 
-export function ClientePesquisas({ pesquisas }: { pesquisas: PesquisaSatisfacao[] }) {
+export function ClientePesquisas({
+  clienteId,
+  pesquisas,
+}: {
+  clienteId: string;
+  pesquisas: PesquisaSatisfacao[];
+}) {
+  function copiarLink() {
+    navigator.clipboard.writeText(`${SITE_URL}/pesquisa/${clienteId}`);
+    toast.success("Link copiado!");
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-sm font-medium">Pesquisa de satisfação</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         {pesquisas.length === 0 ? (
           <EmptyState icon={Star} title="Nenhuma avaliação recebida ainda" />
         ) : (
@@ -53,6 +70,11 @@ export function ClientePesquisas({ pesquisas }: { pesquisas: PesquisaSatisfacao[
             ))}
           </ul>
         )}
+        <div className="border-t border-border pt-3">
+          <Button type="button" size="sm" variant="outline" onClick={copiarLink} className="w-full">
+            Copiar link da pesquisa
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
