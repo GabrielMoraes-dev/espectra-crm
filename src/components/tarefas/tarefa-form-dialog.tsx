@@ -27,19 +27,20 @@ import {
   STATUS_TAREFA_ORDEM,
 } from "@/lib/constants";
 import { createTarefa, updateTarefa } from "@/lib/actions/tarefa-actions";
-import type { MembroEquipe, Tarefa } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe, Tarefa } from "@/generated/prisma/client";
 
 type FormState = {
   titulo: string;
   descricao: string;
   responsavelId: string;
+  clienteId: string;
   prazo: string;
   prioridade: string;
   status: string;
 };
 
 function emptyState(): FormState {
-  return { titulo: "", descricao: "", responsavelId: "", prazo: "", prioridade: "MEDIA", status: "A_FAZER" };
+  return { titulo: "", descricao: "", responsavelId: "", clienteId: "", prazo: "", prioridade: "MEDIA", status: "A_FAZER" };
 }
 
 function fromTarefa(t: Tarefa): FormState {
@@ -47,6 +48,7 @@ function fromTarefa(t: Tarefa): FormState {
     titulo: t.titulo,
     descricao: t.descricao ?? "",
     responsavelId: t.responsavelId ?? "",
+    clienteId: t.clienteId ?? "",
     prazo: t.prazo ? new Date(t.prazo).toISOString().slice(0, 10) : "",
     prioridade: t.prioridade,
     status: t.status,
@@ -58,19 +60,23 @@ export function TarefaFormDialog({
   onOpenChange,
   tarefa,
   membros,
+  clientes,
+  clienteIdFixo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tarefa?: Tarefa | null;
   membros: MembroEquipe[];
+  clientes: Cliente[];
+  clienteIdFixo?: string;
 }) {
   const [form, setForm] = useState<FormState>(emptyState());
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- resets the form whenever the dialog opens for a different record
-    if (open) setForm(tarefa ? fromTarefa(tarefa) : emptyState());
-  }, [open, tarefa]);
+    if (open) setForm(tarefa ? fromTarefa(tarefa) : { ...emptyState(), clienteId: clienteIdFixo ?? "" });
+  }, [open, tarefa, clienteIdFixo]);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -120,6 +126,28 @@ export function TarefaFormDialog({
                 onChange={(e) => set("descricao", e.target.value)}
               />
             </div>
+
+            {!clienteIdFixo && (
+              <div className="space-y-1.5">
+                <Label>Cliente</Label>
+                <Select
+                  value={form.clienteId || "nenhum"}
+                  onValueChange={(v) => set("clienteId", v === "nenhum" ? "" : (v ?? ""))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Nenhum">
+                      {(value: string) => (value === "nenhum" ? "Nenhum" : (clientes.find((c) => c.id === value)?.nome ?? "Nenhum"))}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nenhum">Nenhum</SelectItem>
+                    {clientes.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

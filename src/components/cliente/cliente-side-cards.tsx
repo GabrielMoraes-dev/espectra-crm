@@ -6,15 +6,19 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { GerarLinkPagamento } from "@/components/cliente/gerar-link-pagamento";
 import { EnviarContrato } from "@/components/cliente/enviar-contrato";
 import { ClientePesquisas } from "@/components/cliente/cliente-pesquisas";
+import { ClienteTarefas } from "@/components/cliente/cliente-tarefas";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { formatCurrency, formatDate, formatDataPrazo } from "@/lib/utils";
-import type { Pagamento, PesquisaSatisfacao, Projeto } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe, Pagamento, PesquisaSatisfacao, Projeto, Tarefa } from "@/generated/prisma/client";
 
 export function ClienteSideCards({
   clienteId,
   projetos,
   pagamentos,
   pesquisas,
+  tarefas,
+  membros,
+  clientes,
   cpfCnpj,
   contratoAutentiqueId,
   contratoUrl,
@@ -23,6 +27,9 @@ export function ClienteSideCards({
   projetos: Projeto[];
   pagamentos: Pagamento[];
   pesquisas: PesquisaSatisfacao[];
+  tarefas: (Tarefa & { responsavel: MembroEquipe | null })[];
+  membros: MembroEquipe[];
+  clientes: Cliente[];
   cpfCnpj: string | null;
   contratoAutentiqueId: string | null;
   contratoUrl: string | null;
@@ -104,6 +111,8 @@ export function ClienteSideCards({
         contratoAutentiqueId={contratoAutentiqueId}
         contratoUrl={contratoUrl}
       />
+
+      <ClienteTarefas clienteId={clienteId} tarefas={tarefas} membros={membros} clientes={clientes} />
 
       <ClientePesquisas clienteId={clienteId} pesquisas={pesquisas} />
     </div>

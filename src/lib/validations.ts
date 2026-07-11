@@ -71,6 +71,7 @@ export const tarefaSchema = z.object({
   titulo: z.string().min(2, "Informe o título"),
   descricao: z.string().optional().or(z.literal("")),
   responsavelId: z.string().optional().or(z.literal("")),
+  clienteId: z.string().optional().or(z.literal("")),
   prazo: z.string().optional().or(z.literal("")),
   prioridade: z.enum(["BAIXA", "MEDIA", "ALTA"]),
   status: z.enum(["A_FAZER", "EM_ANDAMENTO", "CONCLUIDA"]),

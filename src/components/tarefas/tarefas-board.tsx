@@ -13,16 +13,16 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Building2 } from "lucide-react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TarefaDetailSheet } from "@/components/tarefas/tarefa-detail-sheet";
 import { PRIORIDADE_TAREFA_CONFIG, STATUS_TAREFA_CONFIG, STATUS_TAREFA_ORDEM } from "@/lib/constants";
 import { formatDataPrazo, getPrazoUrgencia, initials, cn } from "@/lib/utils";
 import { moveTarefaStatus } from "@/lib/actions/tarefa-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import type { MembroEquipe, Tarefa } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe, Tarefa } from "@/generated/prisma/client";
 
-type TarefaCompleta = Tarefa & { responsavel: MembroEquipe | null };
+type TarefaCompleta = Tarefa & { responsavel: MembroEquipe | null; cliente: Cliente | null };
 
 function TarefaCard({
   tarefa,
@@ -56,6 +56,12 @@ function TarefaCard({
       )}
     >
       <p className="min-w-0 truncate text-sm font-medium text-foreground">{tarefa.titulo}</p>
+
+      {tarefa.cliente && (
+        <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground">
+          <Building2 className="size-3 shrink-0" /> {tarefa.cliente.nome}
+        </p>
+      )}
 
       <div className="mt-3 flex items-center justify-between gap-2">
         <StatusBadge label={prioridadeConfig.label} className={prioridadeConfig.className} />
@@ -114,9 +120,11 @@ function KanbanColumn({
 export function TarefasBoard({
   tarefas: initialTarefas,
   membros,
+  clientes,
 }: {
   tarefas: TarefaCompleta[];
   membros: MembroEquipe[];
+  clientes: Cliente[];
 }) {
   const [tarefas, setTarefas] = useState(initialTarefas);
   const [activeTarefa, setActiveTarefa] = useState<TarefaCompleta | null>(null);
@@ -189,6 +197,7 @@ export function TarefasBoard({
         open={!!selected}
         onOpenChange={(o) => !o && setSelected(null)}
         membros={membros}
+        clientes={clientes}
       />
     </>
   );

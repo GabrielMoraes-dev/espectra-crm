@@ -18,6 +18,7 @@ export async function createTarefa(values: TarefaFormValues) {
       titulo: data.titulo,
       descricao: clean(data.descricao),
       responsavelId: clean(data.responsavelId),
+      clienteId: clean(data.clienteId),
       prazo: data.prazo ? new Date(data.prazo) : null,
       prioridade: data.prioridade,
       status: data.status,
@@ -34,6 +35,7 @@ export async function createTarefa(values: TarefaFormValues) {
   });
 
   revalidatePath("/tarefas");
+  if (tarefa.clienteId) revalidatePath(`/clientes/${tarefa.clienteId}`);
   return tarefa;
 }
 
@@ -48,6 +50,7 @@ export async function updateTarefa(id: string, values: TarefaFormValues) {
       titulo: data.titulo,
       descricao: clean(data.descricao),
       responsavelId: clean(data.responsavelId),
+      clienteId: clean(data.clienteId),
       prazo: data.prazo ? new Date(data.prazo) : null,
       prioridade: data.prioridade,
       status: data.status,
@@ -66,6 +69,8 @@ export async function updateTarefa(id: string, values: TarefaFormValues) {
   }
 
   revalidatePath("/tarefas");
+  if (tarefa.clienteId) revalidatePath(`/clientes/${tarefa.clienteId}`);
+  if (before.clienteId && before.clienteId !== tarefa.clienteId) revalidatePath(`/clientes/${before.clienteId}`);
   return tarefa;
 }
 

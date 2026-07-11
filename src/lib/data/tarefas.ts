@@ -23,6 +23,6 @@ export async function getTarefas(filter: TarefasFilter) {
   return prisma.tarefa.findMany({
     where,
     orderBy: [{ prazo: "asc" }, { createdAt: "desc" }],
-    include: { responsavel: true },
+    include: { responsavel: true, cliente: true },
   });
 }

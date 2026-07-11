@@ -68,12 +68,14 @@ model MembroEquipe {
 }
 
 model Usuario {
-  id           String   @id @default(cuid())
-  nome         String
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String    @id @default(cuid())
+  nome             String
+  email            String    @unique
+  passwordHash     String
+  tentativasFalhas Int       @default(0)
+  bloqueadoAte     DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Lead {
@@ -141,6 +143,7 @@ model Cliente {
   fotos            FotoCliente[]
   briefings        Briefing[]
   pesquisas        PesquisaSatisfacao[]
+  tarefas          Tarefa[]
 }
 
 model FotoCliente {
@@ -266,6 +269,8 @@ model Tarefa {
   descricao     String?
   responsavelId String?
   responsavel   MembroEquipe?     @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
+  clienteId     String?
+  cliente       Cliente?          @relation(fields: [clienteId], references: [id], onDelete: SetNull)
   prazo         DateTime?
   prioridade    PrioridadeTarefa  @default(MEDIA)
   status        StatusTarefa      @default(A_FAZER)

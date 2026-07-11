@@ -17,9 +17,10 @@ export default async function ClienteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [cliente, membros] = await Promise.all([
+  const [cliente, membros, clientes] = await Promise.all([
     getClienteById(id),
     prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
+    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
   ]);
 
   if (!cliente) notFound();
@@ -55,6 +56,9 @@ export default async function ClienteDetailPage({
             projetos={cliente.projetos}
             pagamentos={cliente.pagamentos}
             pesquisas={cliente.pesquisas}
+            tarefas={cliente.tarefas}
+            membros={membros}
+            clientes={clientes}
             cpfCnpj={cliente.cpfCnpj}
             contratoAutentiqueId={cliente.contratoAutentiqueId}
             contratoUrl={cliente.contratoUrl}

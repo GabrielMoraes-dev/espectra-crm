@@ -9,7 +9,13 @@ import { UserSquare2 } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function EquipePage() {
-  const membros = await prisma.membroEquipe.findMany({ orderBy: { createdAt: "asc" } });
+  const [membros, projetosAtivos] = await Promise.all([
+    prisma.membroEquipe.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.projeto.findMany({
+      where: { status: { not: "PUBLICADO" }, responsavelId: { not: null } },
+      include: { cliente: true },
+    }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -24,7 +30,11 @@ export default async function EquipePage() {
       ) : (
         <FadeInStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {membros.map((membro) => (
-            <MembroCard key={membro.id} membro={membro} />
+            <MembroCard
+              key={membro.id}
+              membro={membro}
+              projetosAtivos={projetosAtivos.filter((p) => p.responsavelId === membro.id)}
+            />
           ))}
         </FadeInStagger>
       )}

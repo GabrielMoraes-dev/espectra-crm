@@ -51,8 +51,8 @@ export function LoginForm() {
         toast.custom(() => <WelcomeToast />);
         router.push("/");
         router.refresh();
-      } catch {
-        toast.error("Email ou senha inválidos");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Email ou senha inválidos");
       }
     });
   }

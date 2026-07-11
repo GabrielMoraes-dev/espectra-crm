@@ -7,6 +7,8 @@ import {
   XCircle,
   Users,
   MailWarning,
+  LogIn,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import { timeAgo } from "@/lib/utils";
@@ -22,6 +24,8 @@ const ICONS: Record<string, LucideIcon> = {
   cliente_criado: Users,
   lead_perdido: XCircle,
   email_falhou: MailWarning,
+  login: LogIn,
+  logout: LogOut,
 };
 
 export function ActivityFeed({

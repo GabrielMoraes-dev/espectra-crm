@@ -32,3 +32,11 @@ export async function deleteLinkInterno(id: string) {
   await prisma.linkInterno.delete({ where: { id } });
   revalidatePath("/estrutura-operacional");
 }
+
+export async function reordenarLinksInternos(ids: string[]) {
+  await requireAuth();
+  await prisma.$transaction(
+    ids.map((id, ordem) => prisma.linkInterno.update({ where: { id }, data: { ordem } })),
+  );
+  revalidatePath("/estrutura-operacional");
+}

@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { FadeIn } from "@/components/shared/fade-in";
 import { MapaWrapper } from "@/components/mapa/mapa-wrapper";
+import { NaoMapeadosAviso } from "@/components/mapa/nao-mapeados-aviso";
 import { prisma } from "@/lib/prisma";
 import { getCoords, type Precisao } from "@/lib/geo";
 
@@ -28,13 +29,15 @@ export default async function MapaPage() {
     precisao: Precisao;
   }[];
 
-  const naoMapeados = clientes.length - clientesComCoords.length;
+  const idsComCoords = new Set(clientesComCoords.map((c) => c.id));
+  const naoMapeados = clientes.filter((c) => !idsComCoords.has(c.id));
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Mapa de clientes"
-        description={`${clientesComCoords.length} cliente${clientesComCoords.length !== 1 ? "s" : ""} mapeado${clientesComCoords.length !== 1 ? "s" : ""} — todos conectados à Espectra em Pelotas.${naoMapeados > 0 ? ` ${naoMapeados} sem cidade/estado reconhecido não aparece${naoMapeados !== 1 ? "m" : ""} no mapa.` : ""}`}
+        description={`${clientesComCoords.length} cliente${clientesComCoords.length !== 1 ? "s" : ""} mapeado${clientesComCoords.length !== 1 ? "s" : ""} — todos conectados à Espectra em Pelotas.`}
+        actions={<NaoMapeadosAviso clientes={naoMapeados} />}
       />
       <FadeIn>
         <MapaWrapper clientes={clientesComCoords} />

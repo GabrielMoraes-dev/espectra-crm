@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Pencil, Trash2, UserSquare2, CalendarClock, Flag, AlignLeft } from "lucide-react";
+import { Pencil, Trash2, UserSquare2, CalendarClock, Flag, AlignLeft, Building2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -18,20 +19,22 @@ import { TarefaFormDialog } from "@/components/tarefas/tarefa-form-dialog";
 import { PRIORIDADE_TAREFA_CONFIG, STATUS_TAREFA_CONFIG } from "@/lib/constants";
 import { formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import { deleteTarefa } from "@/lib/actions/tarefa-actions";
-import type { MembroEquipe, Tarefa } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe, Tarefa } from "@/generated/prisma/client";
 
-type TarefaCompleta = Tarefa & { responsavel: MembroEquipe | null };
+type TarefaCompleta = Tarefa & { responsavel: MembroEquipe | null; cliente: Cliente | null };
 
 function InfoRow({
   icon: Icon,
   label,
   value,
   badge,
+  href,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
   badge?: { label: string; className: string } | null;
+  href?: string;
 }) {
   return (
     <div className="flex items-start gap-3">
@@ -41,7 +44,13 @@ function InfoRow({
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-medium text-foreground">{value}</p>
+          {href ? (
+            <Link href={href} className="truncate text-sm font-medium text-brand-100 hover:underline">
+              {value}
+            </Link>
+          ) : (
+            <p className="truncate text-sm font-medium text-foreground">{value}</p>
+          )}
           {badge && <StatusBadge label={badge.label} className={badge.className} />}
         </div>
       </div>
@@ -54,11 +63,13 @@ export function TarefaDetailSheet({
   open,
   onOpenChange,
   membros,
+  clientes,
 }: {
   tarefa: TarefaCompleta | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   membros: MembroEquipe[];
+  clientes: Cliente[];
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -89,6 +100,14 @@ export function TarefaDetailSheet({
               label="Responsável"
               value={tarefa.responsavel?.nome ?? "—"}
             />
+            {tarefa.cliente && (
+              <InfoRow
+                icon={Building2}
+                label="Cliente"
+                value={tarefa.cliente.nome}
+                href={`/clientes/${tarefa.cliente.id}`}
+              />
+            )}
             <InfoRow
               icon={CalendarClock}
               label="Prazo"
@@ -130,6 +149,7 @@ export function TarefaDetailSheet({
         onOpenChange={setOpenEdit}
         tarefa={tarefa}
         membros={membros}
+        clientes={clientes}
       />
       <ConfirmDialog
         open={openDelete}

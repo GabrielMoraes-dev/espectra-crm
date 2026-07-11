@@ -14,18 +14,20 @@ import {
 } from "@/components/ui/select";
 import { PRIORIDADE_TAREFA_CONFIG } from "@/lib/constants";
 import { TarefaFormDialog } from "@/components/tarefas/tarefa-form-dialog";
-import type { MembroEquipe } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe } from "@/generated/prisma/client";
 
 export function TarefasToolbar({
   search,
   responsavelId,
   prioridade,
   membros,
+  clientes,
 }: {
   search: string;
   responsavelId: string;
   prioridade: string;
   membros: MembroEquipe[];
+  clientes: Cliente[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -106,7 +108,7 @@ export function TarefasToolbar({
         </Button>
       </div>
 
-      <TarefaFormDialog open={openCreate} onOpenChange={setOpenCreate} membros={membros} />
+      <TarefaFormDialog open={openCreate} onOpenChange={setOpenCreate} membros={membros} clientes={clientes} />
     </>
   );
 }

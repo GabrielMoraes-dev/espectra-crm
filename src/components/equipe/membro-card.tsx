@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Phone, Mail, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Phone, Mail, MoreHorizontal, Pencil, Trash2, Flame } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +13,82 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MembroFormDialog } from "@/components/equipe/membro-form-dialog";
-import { initials, parseResponsabilidades } from "@/lib/utils";
+import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
+import { initials, parseResponsabilidades, cn } from "@/lib/utils";
 import { deleteMembro } from "@/lib/actions/membro-actions";
-import type { MembroEquipe } from "@/generated/prisma/client";
+import type { Cliente, MembroEquipe, Projeto } from "@/generated/prisma/client";
 
-export function MembroCard({ membro }: { membro: MembroEquipe }) {
+const NIVEIS_CARGA = [
+  { max: 1, label: "Tranquilo", cor: "bg-success" },
+  { max: 3, label: "Moderado", cor: "bg-warning" },
+  { max: Infinity, label: "Sobrecarregado", cor: "bg-destructive" },
+];
+
+function CargaTermometro({ projetos }: { projetos: (Projeto & { cliente: Cliente })[] }) {
+  const total = projetos.length;
+  const nivel = NIVEIS_CARGA.find((n) => total <= n.max) ?? NIVEIS_CARGA[NIVEIS_CARGA.length - 1];
+  const blocos = 5;
+  const preenchidos = Math.min(total, blocos);
+
+  return (
+    <Popover>
+      <PopoverTrigger
+        render={<button type="button" className="w-full text-left" />}
+      >
+        <div className="flex items-center gap-2">
+          <Flame className={cn("size-3.5 shrink-0", total === 0 ? "text-muted-foreground" : nivel.cor.replace("bg-", "text-"))} />
+          <div className="flex flex-1 gap-1">
+            {Array.from({ length: blocos }, (_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1.5 flex-1 rounded-full bg-muted",
+                  i < preenchidos && nivel.cor,
+                )}
+              />
+            ))}
+          </div>
+          <span className="shrink-0 text-xs text-muted-foreground">
+            {total} projeto{total !== 1 ? "s" : ""}
+          </span>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[260px]">
+        <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+          {total === 0 ? "Nenhum projeto em andamento" : `${nivel.label} — projetos em andamento`}
+        </p>
+        {total > 0 && (
+          <ul className="space-y-1">
+            {projetos.map((projeto) => (
+              <li key={projeto.id}>
+                <Link
+                  href={`/clientes/${projeto.cliente.id}`}
+                  className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-sm text-foreground hover:bg-accent"
+                >
+                  <span className="truncate">{projeto.cliente.nome}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {ETAPA_PROJETO_CONFIG[projeto.status].label}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export function MembroCard({
+  membro,
+  projetosAtivos,
+}: {
+  membro: MembroEquipe;
+  projetosAtivos: (Projeto & { cliente: Cliente })[];
+}) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const responsabilidades = parseResponsabilidades(membro.responsabilidades);
@@ -54,6 +124,8 @@ export function MembroCard({ membro }: { membro: MembroEquipe }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        <CargaTermometro projetos={projetosAtivos} />
 
         <div className="space-y-1.5 text-sm text-muted-foreground">
           {membro.telefone && (

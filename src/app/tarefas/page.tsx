@@ -18,10 +18,11 @@ export default async function TarefasPage({
   const responsavelId = params.responsavel ?? "";
   const prioridade = params.prioridade ?? "";
 
-  const [tarefas, membros, clientesComPrazo] = await Promise.all([
+  const [tarefas, membros, clientesComPrazo, clientes] = await Promise.all([
     getTarefas({ search, responsavelId, prioridade }),
     prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
     prisma.cliente.findMany({ where: { prazo: { not: null }, status: { not: "FINALIZADO" } } }),
+    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
   ]);
 
   return (
@@ -35,10 +36,10 @@ export default async function TarefasPage({
         <PrazoAlertBanner clientes={clientesComPrazo} />
       </FadeIn>
 
-      <TarefasToolbar search={search} responsavelId={responsavelId} prioridade={prioridade} membros={membros} />
+      <TarefasToolbar search={search} responsavelId={responsavelId} prioridade={prioridade} membros={membros} clientes={clientes} />
 
       <FadeIn>
-        <TarefasBoard tarefas={tarefas} membros={membros} />
+        <TarefasBoard tarefas={tarefas} membros={membros} clientes={clientes} />
       </FadeIn>
     </div>
   );
