@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { sendContratoAssinadoInterno } from "@/lib/email";
 
 type AutentiqueWebhookBody = {
   event: {
@@ -73,6 +74,8 @@ export async function POST(request: Request) {
       entidadeId: cliente.id,
     },
   });
+
+  await sendContratoAssinadoInterno(cliente);
 
   return NextResponse.json({ status: "ok", clienteId: cliente.id });
 }

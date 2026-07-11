@@ -164,6 +164,36 @@ export async function sendPagamentoConfirmadoEmail(cliente: Cliente, valor: numb
   });
 }
 
+export async function sendPagamentoRecebidoInterno(cliente: Cliente, valor: number) {
+  const link = `${SITE_URL}/clientes/${cliente.id}`;
+
+  await enviarEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: `Pagamento confirmado — ${cliente.nome}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px;">
+        <p><strong>${cliente.nome}</strong> pagou <strong>${formatCurrency(valor)}</strong>.</p>
+        <p><a href="${link}" style="color: #5483b3;">Ver cliente no CRM →</a></p>
+      </div>
+    `,
+  });
+}
+
+export async function sendContratoAssinadoInterno(cliente: Cliente) {
+  const link = `${SITE_URL}/clientes/${cliente.id}`;
+
+  await enviarEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: `Contrato assinado — ${cliente.nome}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px;">
+        <p><strong>${cliente.nome}</strong> assinou o contrato.</p>
+        <p><a href="${link}" style="color: #5483b3;">Ver cliente no CRM →</a></p>
+      </div>
+    `,
+  });
+}
+
 export async function sendStaleLeadReminder(leads: Lead[]) {
   const itens = leads
     .map(
