@@ -113,9 +113,18 @@ export async function createBriefing(values: BriefingFormValues) {
     });
 
     if (clienteId) {
+      const clienteAtual = await tx.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+
       await tx.cliente.update({
         where: { id: clienteId },
-        data: { cpfCnpj: data.cpfCnpj },
+        data: {
+          cpfCnpj: data.cpfCnpj,
+          instagram: clienteAtual.instagram ?? clean(data.instagram),
+          email: clienteAtual.email ?? data.email,
+          cidade: clienteAtual.cidade ?? data.cidade,
+          estado: clienteAtual.estado ?? clean(data.estado),
+          whatsapp: clienteAtual.whatsapp ?? data.whatsapp,
+        },
       });
 
       await tx.timelineEvent.create({
