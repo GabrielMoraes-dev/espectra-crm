@@ -30,7 +30,7 @@ export async function enviarContrato(clienteId: string, valor: number) {
 
   await prisma.cliente.update({
     where: { id: clienteId },
-    data: { contratoAutentiqueId: docId },
+    data: { contratoAutentiqueId: docId, valor },
   });
 
   await prisma.timelineEvent.create({

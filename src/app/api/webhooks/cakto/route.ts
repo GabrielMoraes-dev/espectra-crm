@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPagamentoSemMatch, sendPagamentoConfirmadoEmail, sendPagamentoRecebidoInterno } from "@/lib/email";
 import { formatCurrency } from "@/lib/utils";
+import { verificarDivergenciaValor } from "@/lib/actions/pagamento-actions";
 
 type CaktoWebhookItem = {
   amount: number;
@@ -44,19 +45,22 @@ export async function POST(request: Request) {
 
   let cliente = sck ? await prisma.cliente.findUnique({ where: { id: sck } }) : null;
 
+  if (!cliente && customer.email) {
+    cliente = await prisma.cliente.findFirst({ where: { email: customer.email } });
+  }
+
   if (!cliente) {
     const telefoneDigitos = apenasDigitos(customer.phone);
     const sufixoTelefone = telefoneDigitos.slice(-8);
 
-    const clientes = await prisma.cliente.findMany({
-      where: {
-        OR: [
-          { email: customer.email || undefined },
-          sufixoTelefone ? { whatsapp: { contains: sufixoTelefone } } : undefined,
-        ].filter((c): c is NonNullable<typeof c> => Boolean(c)),
-      },
-    });
-    cliente = clientes[0] ?? null;
+    if (sufixoTelefone) {
+      // Só aceita o match por telefone se for único — dois clientes com sufixo parecido
+      // não devem ter pagamento atribuído "no chute".
+      const candidatos = await prisma.cliente.findMany({
+        where: { whatsapp: { contains: sufixoTelefone } },
+      });
+      cliente = candidatos.length === 1 ? candidatos[0] : null;
+    }
   }
 
   if (!cliente) {
@@ -130,6 +134,7 @@ export async function POST(request: Request) {
 
   await sendPagamentoConfirmadoEmail(cliente, valorTotal);
   await sendPagamentoRecebidoInterno(cliente, valorTotal);
+  await verificarDivergenciaValor(cliente, valorTotal);
 
   return NextResponse.json({ status: "ok", clienteId: cliente.id });
 }

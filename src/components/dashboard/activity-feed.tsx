@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   XCircle,
   Users,
+  MailWarning,
   type LucideIcon,
 } from "lucide-react";
 import { timeAgo } from "@/lib/utils";
@@ -20,6 +21,7 @@ const ICONS: Record<string, LucideIcon> = {
   tarefa: CheckCircle2,
   cliente_criado: Users,
   lead_perdido: XCircle,
+  email_falhou: MailWarning,
 };
 
 export function ActivityFeed({
@@ -39,9 +41,16 @@ export function ActivityFeed({
     <ul className="space-y-4">
       {atividades.map((a) => {
         const Icon = ICONS[a.tipo] ?? ArrowRightCircle;
+        const isFalha = a.tipo === "email_falhou";
         return (
           <li key={a.id} className="flex items-start gap-3">
-            <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-brand-100">
+            <div
+              className={
+                isFalha
+                  ? "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-warning/20 text-warning"
+                  : "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-brand-100"
+              }
+            >
               <Icon className="size-3.5" />
             </div>
             <div className="min-w-0">

@@ -118,7 +118,7 @@ export async function createBriefing(values: BriefingFormValues) {
       await tx.cliente.update({
         where: { id: clienteId },
         data: {
-          cpfCnpj: data.cpfCnpj,
+          cpfCnpj: clienteAtual.cpfCnpj ?? data.cpfCnpj,
           instagram: clienteAtual.instagram ?? clean(data.instagram),
           email: clienteAtual.email ?? data.email,
           cidade: clienteAtual.cidade ?? data.cidade,

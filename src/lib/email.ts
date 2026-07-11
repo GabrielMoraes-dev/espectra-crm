@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import type { Briefing, BriefingInicial, Lead, Projeto, Cliente, Pagamento } from "@/generated/prisma/client";
 import { formatDateShort, formatCurrency, getPrazoUrgencia } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
@@ -13,9 +14,34 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+function esc(value: string | number | null | undefined): string {
+  if (value == null) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function registrarFalhaEnvio(subject: string, to: string) {
+  try {
+    await prisma.activityLog.create({
+      data: {
+        tipo: "email_falhou",
+        descricao: `Falha ao enviar e-mail "${subject}" para ${to}`,
+        entidadeTipo: "email",
+      },
+    });
+  } catch {
+    // se nem isso funcionar, já registramos no console acima
+  }
+}
+
 async function enviarEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
   if (!process.env.GMAIL_APP_PASSWORD) {
     console.error(`[email] GMAIL_APP_PASSWORD não configurado, email "${subject}" não enviado para ${to}`);
+    await registrarFalhaEnvio(subject, to);
     return;
   }
   try {
@@ -27,6 +53,7 @@ async function enviarEmail({ to, subject, html }: { to: string; subject: string;
     });
   } catch (error) {
     console.error(`[email] Falha ao enviar "${subject}" para ${to}`, error);
+    await registrarFalhaEnvio(subject, to);
   }
 }
 
@@ -38,9 +65,9 @@ export async function sendBriefingNotification(briefing: Briefing) {
     subject: `Novo briefing recebido — ${briefing.nome}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <p><strong>${briefing.nome}</strong> (${briefing.profissao}) acabou de enviar o briefing.</p>
+        <p><strong>${esc(briefing.nome)}</strong> (${esc(briefing.profissao)}) acabou de enviar o briefing.</p>
         <p style="color: #555;">
-          <strong>Cidade:</strong> ${briefing.cidade}${briefing.estado ? `/${briefing.estado}` : ""}
+          <strong>Cidade:</strong> ${esc(briefing.cidade)}${briefing.estado ? `/${esc(briefing.estado)}` : ""}
         </p>
         ${
           link
@@ -62,7 +89,7 @@ export async function sendBriefingInicialNotification(
     subject: `Briefing inicial recebido — ${briefingInicial.nome}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <p><strong>${briefingInicial.nome}</strong> (${briefingInicial.profissao}) preencheu o briefing inicial — pronto pra montar a amostra gratuita.</p>
+        <p><strong>${esc(briefingInicial.nome)}</strong> (${esc(briefingInicial.profissao)}) preencheu o briefing inicial — pronto pra montar a amostra gratuita.</p>
         <p><a href="${link}" style="color: #5483b3;">Ver lead no CRM →</a></p>
       </div>
     `,
@@ -78,7 +105,7 @@ export async function sendBriefingConfirmation(briefing: Briefing) {
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
         <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
-        <p>Olá, ${briefing.nome}!</p>
+        <p>Olá, ${esc(briefing.nome)}!</p>
         <p style="color: #555;">
           Recebemos o briefing que você preencheu. Obrigado por confiar à Espectra a forma como
           o mercado vai te enxergar. Em breve entraremos em contato com os próximos passos.
@@ -95,7 +122,7 @@ export async function sendBriefingInicialConfirmation(briefingInicial: BriefingI
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
         <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
-        <p>Olá, ${briefingInicial.nome}!</p>
+        <p>Olá, ${esc(briefingInicial.nome)}!</p>
         <p style="color: #555;">
           Recebemos as informações que você enviou. Em breve vamos preparar sua amostra gratuita
           e entrar em contato com os próximos passos.
@@ -114,11 +141,11 @@ export async function sendProjetoPublicadoEmail(cliente: Cliente) {
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
         <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
-        <p>Olá, ${cliente.nome.split(" ")[0]}!</p>
+        <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Seu projeto foi publicado! Sua nova presença digital já está no ar:
         </p>
-        <p><a href="${cliente.site}" style="color: #5483b3;">${cliente.site} →</a></p>
+        <p><a href="${esc(cliente.site)}" style="color: #5483b3;">${esc(cliente.site)} →</a></p>
       </div>
     `,
   });
@@ -134,7 +161,7 @@ export async function sendPesquisaSatisfacaoEmail(cliente: Cliente) {
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
         <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
-        <p>Olá, ${cliente.nome.split(" ")[0]}!</p>
+        <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou —
           leva menos de um minuto:
@@ -154,7 +181,7 @@ export async function sendPagamentoConfirmadoEmail(cliente: Cliente, valor: numb
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
         <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
-        <p>Olá, ${cliente.nome.split(" ")[0]}!</p>
+        <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Confirmamos o recebimento do seu pagamento de <strong>${formatCurrency(valor)}</strong>.
           Obrigado pela confiança!
@@ -172,7 +199,7 @@ export async function sendPagamentoRecebidoInterno(cliente: Cliente, valor: numb
     subject: `Pagamento confirmado — ${cliente.nome}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <p><strong>${cliente.nome}</strong> pagou <strong>${formatCurrency(valor)}</strong>.</p>
+        <p><strong>${esc(cliente.nome)}</strong> pagou <strong>${formatCurrency(valor)}</strong>.</p>
         <p><a href="${link}" style="color: #5483b3;">Ver cliente no CRM →</a></p>
       </div>
     `,
@@ -187,7 +214,7 @@ export async function sendContratoAssinadoInterno(cliente: Cliente) {
     subject: `Contrato assinado — ${cliente.nome}`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <p><strong>${cliente.nome}</strong> assinou o contrato.</p>
+        <p><strong>${esc(cliente.nome)}</strong> assinou o contrato.</p>
         <p><a href="${link}" style="color: #5483b3;">Ver cliente no CRM →</a></p>
       </div>
     `,
@@ -198,7 +225,7 @@ export async function sendStaleLeadReminder(leads: Lead[]) {
   const itens = leads
     .map(
       (lead) =>
-        `<li><strong>${lead.nome}</strong>${lead.empresa ? ` (${lead.empresa})` : ""} — link enviado em ${formatDateShort(lead.linkCopiadoEm)}, sem resposta ao briefing</li>`,
+        `<li><strong>${esc(lead.nome)}</strong>${lead.empresa ? ` (${esc(lead.empresa)})` : ""} — link enviado em ${formatDateShort(lead.linkCopiadoEm)}, sem resposta ao briefing</li>`,
     )
     .join("");
 
@@ -220,7 +247,7 @@ export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })
     .map((projeto) => {
       const urgencia = getPrazoUrgencia(projeto.prazo);
       const situacao = urgencia ? urgencia.label : `prazo em ${formatDateShort(projeto.prazo)}`;
-      return `<li><strong>${projeto.cliente.nome}</strong> — ${situacao}</li>`;
+      return `<li><strong>${esc(projeto.cliente.nome)}</strong> — ${situacao}</li>`;
     })
     .join("");
 
@@ -241,7 +268,7 @@ export async function sendPagamentoAtrasado(pagamentos: (Pagamento & { cliente: 
   const itens = pagamentos
     .map(
       (pagamento) =>
-        `<li><strong>${pagamento.cliente.nome}</strong> — ${formatCurrency(pagamento.valor)}, previsto para ${formatDateShort(pagamento.data)}</li>`,
+        `<li><strong>${esc(pagamento.cliente.nome)}</strong> — ${formatCurrency(pagamento.valor)}, previsto para ${formatDateShort(pagamento.data)}</li>`,
     )
     .join("");
 
@@ -273,9 +300,9 @@ export async function sendPagamentoSemMatch(compra: {
       <div style="font-family: sans-serif; max-width: 480px;">
         <p>Chegou um pagamento aprovado na Cakto, mas não encontramos nenhum cliente com esse email ou telefone no CRM:</p>
         <p style="color: #555;">
-          <strong>Nome:</strong> ${compra.nome}<br/>
-          <strong>Email:</strong> ${compra.email}<br/>
-          <strong>Telefone:</strong> ${compra.telefone}<br/>
+          <strong>Nome:</strong> ${esc(compra.nome)}<br/>
+          <strong>Email:</strong> ${esc(compra.email)}<br/>
+          <strong>Telefone:</strong> ${esc(compra.telefone)}<br/>
           <strong>Valor:</strong> ${valorFormatado}
         </p>
         <p style="color: #888;">Vincule manualmente ao cliente certo no CRM.</p>

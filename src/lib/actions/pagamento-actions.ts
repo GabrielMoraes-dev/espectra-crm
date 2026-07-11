@@ -7,6 +7,19 @@ import { formatCurrency } from "@/lib/utils";
 import { requireAuth } from "@/lib/auth/session";
 import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
 import { sendPagamentoConfirmadoEmail, sendPagamentoRecebidoInterno } from "@/lib/email";
+import type { Cliente } from "@/generated/prisma/client";
+
+export async function verificarDivergenciaValor(cliente: Cliente, valorPago: number) {
+  if (cliente.valor == null) return;
+  if (Math.abs(cliente.valor - valorPago) < 1) return;
+  await prisma.timelineEvent.create({
+    data: {
+      clienteId: cliente.id,
+      titulo: "Valor pago diferente do contrato",
+      descricao: `Contrato: ${formatCurrency(cliente.valor)} · Pago: ${formatCurrency(valorPago)}.`,
+    },
+  });
+}
 
 export async function gerarLinkPagamento(clienteId: string, preco: number, desconto?: number) {
   await requireAuth();
@@ -64,6 +77,7 @@ export async function createPagamento(values: PagamentoFormValues) {
     });
     await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
     await sendPagamentoRecebidoInterno(pagamento.cliente, pagamento.valor);
+    await verificarDivergenciaValor(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");
@@ -107,6 +121,7 @@ export async function updatePagamento(id: string, values: PagamentoFormValues) {
     });
     await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
     await sendPagamentoRecebidoInterno(pagamento.cliente, pagamento.valor);
+    await verificarDivergenciaValor(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");
@@ -117,13 +132,14 @@ export async function updatePagamento(id: string, values: PagamentoFormValues) {
 
 export async function togglePagamentoPago(id: string, pago: boolean) {
   await requireAuth();
+  const before = await prisma.pagamento.findUniqueOrThrow({ where: { id } });
   const pagamento = await prisma.pagamento.update({
     where: { id },
     data: { pago },
     include: { cliente: true },
   });
 
-  if (pago) {
+  if (pago && !before.pago) {
     await prisma.activityLog.create({
       data: {
         tipo: "pagamento",
@@ -141,6 +157,7 @@ export async function togglePagamentoPago(id: string, pago: boolean) {
     });
     await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
     await sendPagamentoRecebidoInterno(pagamento.cliente, pagamento.valor);
+    await verificarDivergenciaValor(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");
