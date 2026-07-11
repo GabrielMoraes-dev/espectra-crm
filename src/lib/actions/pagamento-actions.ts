@@ -30,7 +30,7 @@ export async function gerarLinkPagamento(clienteId: string, preco: number, desco
   const valorFinal = desconto ? Math.round(preco * (1 - desconto / 100)) : preco;
 
   await prisma.pagamento.create({
-    data: { clienteId: cliente.id, valor: valorFinal, pago: false },
+    data: { clienteId: cliente.id, valor: valorFinal, pago: false, desconto: desconto ?? null },
   });
 
   revalidatePath("/financeiro");

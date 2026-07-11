@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Wallet } from "lucide-react";
+import { Wallet, Download } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PagamentoDetailSheet } from "@/components/financeiro/pagamento-detail-sheet";
 import { formatCurrency, formatDate, initials } from "@/lib/utils";
@@ -20,6 +21,29 @@ import { togglePagamentoPago } from "@/lib/actions/pagamento-actions";
 import type { Cliente, Pagamento } from "@/generated/prisma/client";
 
 type PagamentoCompleto = Pagamento & { cliente: Cliente };
+
+function exportarCsv(pagamentos: PagamentoCompleto[]) {
+  const linhas = [
+    ["Cliente", "Empresa", "Valor", "Desconto", "Forma de pagamento", "Status", "Data"],
+    ...pagamentos.map((p) => [
+      p.cliente.nome,
+      p.cliente.empresa ?? "",
+      p.valor.toFixed(2).replace(".", ","),
+      p.desconto ? `${p.desconto}%` : "",
+      p.formaPagamento ?? "",
+      p.pago ? "Pago" : "Pendente",
+      new Date(p.data).toLocaleDateString("pt-BR"),
+    ]),
+  ];
+  const csv = linhas.map((linha) => linha.map((v) => `"${v}"`).join(",")).join("\n");
+  const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `financeiro-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export function FinanceiroTable({
   pagamentos,
@@ -38,6 +62,12 @@ export function FinanceiroTable({
 
   return (
     <>
+      <div className="mb-3 flex justify-end">
+        <Button variant="outline" size="sm" onClick={() => exportarCsv(pagamentos)}>
+          <Download className="size-4" />
+          Baixar CSV
+        </Button>
+      </div>
       <div className="overflow-hidden rounded-xl border border-border">
         <Table>
           <TableHeader>
@@ -69,7 +99,16 @@ export function FinanceiroTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm font-medium font-mono">{formatCurrency(pagamento.valor)}</TableCell>
+                <TableCell className="text-sm font-medium font-mono">
+                  <div className="flex items-center gap-2">
+                    {formatCurrency(pagamento.valor)}
+                    {pagamento.desconto && (
+                      <span className="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-sans font-semibold text-warning">
+                        -{pagamento.desconto}%
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                   {pagamento.formaPagamento ?? "—"}
                 </TableCell>

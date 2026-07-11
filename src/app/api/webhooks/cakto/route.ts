@@ -70,6 +70,14 @@ export async function POST(request: Request) {
       telefone: customer.phone,
       valor: valorTotal,
     });
+    await prisma.pagamentoSemMatch.create({
+      data: {
+        nome: customer.name,
+        email: customer.email,
+        telefone: customer.phone,
+        valor: valorTotal,
+      },
+    });
     await prisma.activityLog.create({
       data: {
         tipo: "pagamento_sem_match",

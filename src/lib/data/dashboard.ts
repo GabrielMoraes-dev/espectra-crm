@@ -37,6 +37,9 @@ export async function getDashboardData() {
     clientesPeriodo,
     pagamentosPeriodo,
     clientesComPrazo,
+    clientesPendencia,
+    pagamentosSemMatch,
+    clientesParaVincular,
   ] = await Promise.all([
     prisma.lead.count({ where: { etapa: { notIn: ["FECHADO", "PERDIDO"] } } }),
     prisma.cliente.count({ where: { status: { not: "FINALIZADO" } } }),
@@ -74,6 +77,21 @@ export async function getDashboardData() {
     prisma.cliente.findMany({
       where: { prazo: { not: null }, status: { not: "FINALIZADO" } },
     }),
+    prisma.cliente.findMany({
+      where: {
+        status: { not: "FINALIZADO" },
+        OR: [
+          { contratoUrl: null, pagamentos: { some: { pago: true } } },
+          { contratoUrl: { not: null }, pagamentos: { none: { pago: true } } },
+        ],
+      },
+      select: { id: true, nome: true, empresa: true, contratoUrl: true },
+    }),
+    prisma.pagamentoSemMatch.findMany({
+      where: { resolvido: false },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.cliente.findMany({ orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
   ]);
 
   const months = lastNMonths(6);
@@ -100,6 +118,13 @@ export async function getDashboardData() {
     return { mes: m.label, clientes: acumulado };
   });
 
+  const pendenciasContratoPagamento = clientesPendencia.map((c) => ({
+    id: c.id,
+    nome: c.nome,
+    empresa: c.empresa,
+    tipo: c.contratoUrl ? ("assinou_sem_pagar" as const) : ("pagou_sem_contrato" as const),
+  }));
+
   const nichoData = clientesPorNicho
     .filter((n) => n.nicho)
     .map((n) => ({ nicho: n.nicho as string, total: n._count._all }))
@@ -121,6 +146,9 @@ export async function getDashboardData() {
     clientesRecentes,
     atividadesRecentes,
     clientesComPrazo,
+    pendenciasContratoPagamento,
+    pagamentosSemMatch,
+    clientesParaVincular,
   };
 }
 

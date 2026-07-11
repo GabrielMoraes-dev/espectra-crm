@@ -232,6 +232,7 @@ model Pagamento {
   valor          Float
   pago           Boolean  @default(false)
   formaPagamento String?
+  desconto       Int?
   data           DateTime @default(now())
   createdAt      DateTime @default(now())
 }
@@ -247,6 +248,16 @@ model PesquisaSatisfacao {
   nota        Int
   comentario  String?
   createdAt   DateTime @default(now())
+}
+
+model PagamentoSemMatch {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String
+  telefone  String
+  valor     Float
+  resolvido Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Tarefa {

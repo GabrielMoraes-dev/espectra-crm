@@ -18,6 +18,8 @@ import { SatisfacaoCard } from "@/components/dashboard/satisfacao-card";
 import { RecentClientsTable } from "@/components/dashboard/recent-clients-table";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { PrazoAlertBanner } from "@/components/shared/prazo-alert-banner";
+import { PendenciasCard } from "@/components/dashboard/pendencias-card";
+import { PagamentosSemMatchCard } from "@/components/dashboard/pagamentos-sem-match-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDashboardData } from "@/lib/data/dashboard";
 import { getPesquisaStats } from "@/lib/data/pesquisas";
@@ -47,6 +49,17 @@ export default async function Home() {
 
       <FadeIn>
         <PrazoAlertBanner clientes={data.clientesComPrazo} />
+      </FadeIn>
+
+      <FadeIn>
+        <PendenciasCard pendencias={data.pendenciasContratoPagamento} />
+      </FadeIn>
+
+      <FadeIn>
+        <PagamentosSemMatchCard
+          pagamentos={data.pagamentosSemMatch}
+          clientes={data.clientesParaVincular}
+        />
       </FadeIn>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

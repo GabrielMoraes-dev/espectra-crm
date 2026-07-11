@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { formatCurrency, formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
+import { formatCurrency, formatDataPrazo, getPrazoUrgencia, waLink, instagramLink } from "@/lib/utils";
 import type { Cliente, MembroEquipe } from "@/generated/prisma/client";
 
 function InfoItem({
@@ -68,8 +68,18 @@ export function ClienteInfoGrid({
   return (
     <Card>
       <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <InfoItem icon={Phone} label="WhatsApp" value={cliente.whatsapp ?? "—"} />
-        <InfoItem icon={AtSign} label="Instagram" value={cliente.instagram ?? "—"} />
+        <InfoItem
+          icon={Phone}
+          label="WhatsApp"
+          value={cliente.whatsapp ?? "—"}
+          href={waLink(cliente.whatsapp)}
+        />
+        <InfoItem
+          icon={AtSign}
+          label="Instagram"
+          value={cliente.instagram ?? "—"}
+          href={instagramLink(cliente.instagram)}
+        />
         <InfoItem icon={Mail} label="Email" value={cliente.email ?? "—"} />
         <InfoItem
           icon={Globe}

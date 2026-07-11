@@ -79,7 +79,15 @@ export function PagamentoDetailSheet({
           </SheetHeader>
 
           <div className="flex-1 space-y-4 overflow-y-auto px-4">
-            <InfoRow icon={Wallet} label="Valor" value={formatCurrency(pagamento.valor)} />
+            <InfoRow
+              icon={Wallet}
+              label="Valor"
+              value={
+                pagamento.desconto
+                  ? `${formatCurrency(pagamento.valor)} (${pagamento.desconto}% de desconto)`
+                  : formatCurrency(pagamento.valor)
+              }
+            />
             <InfoRow icon={CalendarClock} label="Data" value={formatDate(pagamento.data)} />
             <InfoRow icon={CreditCard} label="Forma de pagamento" value={pagamento.formaPagamento ?? "—"} />
 

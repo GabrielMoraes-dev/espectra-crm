@@ -17,7 +17,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { ConvertLeadDialog } from "@/components/leads/convert-lead-dialog";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, waLink, instagramLink } from "@/lib/utils";
 import { deleteLead, registrarLinkCopiado } from "@/lib/actions/lead-actions";
 import { BriefingInicialView } from "@/components/shared/briefing-inicial-view";
 import type { MembroEquipe } from "@/generated/prisma/client";
@@ -27,10 +27,12 @@ function InfoRow({
   icon: Icon,
   label,
   value,
+  href,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
+  href?: string;
 }) {
   return (
     <div className="flex items-start gap-3">
@@ -39,7 +41,18 @@ function InfoRow({
       </div>
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="truncate text-sm font-medium text-foreground">{value}</p>
+        {href ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate text-sm font-medium text-foreground underline-offset-2 hover:text-brand-100 hover:underline"
+          >
+            {value}
+          </a>
+        ) : (
+          <p className="truncate text-sm font-medium text-foreground">{value}</p>
+        )}
       </div>
     </div>
   );
@@ -96,8 +109,13 @@ export function LeadDetailSheet({
           </SheetHeader>
 
           <div className="flex-1 space-y-4 overflow-y-auto px-4">
-            <InfoRow icon={Phone} label="WhatsApp" value={lead.whatsapp ?? "—"} />
-            <InfoRow icon={AtSign} label="Instagram" value={lead.instagram ?? "—"} />
+            <InfoRow icon={Phone} label="WhatsApp" value={lead.whatsapp ?? "—"} href={waLink(lead.whatsapp)} />
+            <InfoRow
+              icon={AtSign}
+              label="Instagram"
+              value={lead.instagram ?? "—"}
+              href={instagramLink(lead.instagram)}
+            />
             <InfoRow icon={Mail} label="Email" value={lead.email ?? "—"} />
             <InfoRow icon={Tag} label="Origem" value={lead.origem ?? "—"} />
             <InfoRow icon={Wallet} label="Valor estimado" value={formatCurrency(lead.valorEstimado)} />

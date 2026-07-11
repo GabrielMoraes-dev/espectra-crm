@@ -13,6 +13,21 @@ export function formatCurrency(value: number | null | undefined) {
   }).format(value)
 }
 
+export function waLink(telefone: string | null | undefined) {
+  if (!telefone) return undefined
+  const digitos = telefone.replace(/\D/g, "")
+  if (!digitos) return undefined
+  const comDdi = digitos.length <= 11 ? `55${digitos}` : digitos
+  return `https://wa.me/${comDdi}`
+}
+
+export function instagramLink(handle: string | null | undefined) {
+  if (!handle) return undefined
+  const usuario = handle.trim().replace(/^@/, "")
+  if (!usuario) return undefined
+  return `https://instagram.com/${usuario}`
+}
+
 export function formatTelefone(value: string) {
   const digitos = value.replace(/\D/g, "").slice(0, 11)
   if (digitos.length <= 2) return digitos.length ? `(${digitos}` : ""
