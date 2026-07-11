@@ -11,6 +11,7 @@ import {
 import { STATUS_CLIENTE_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
 import { sendMensagemFixaWhatsApp } from "@/lib/whatsapp";
+import { sendProjetoPublicadoEmail, sendPesquisaSatisfacaoEmail } from "@/lib/email";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
 
@@ -129,6 +130,14 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
         cliente.whatsapp,
         `Olá, ${cliente.nome.split(" ")[0]}! Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou — leva menos de um minuto: ${link}`,
       );
+    }
+
+    if (cliente.status === "PUBLICADO") {
+      await sendProjetoPublicadoEmail(cliente);
+    }
+
+    if (cliente.status === "FINALIZADO") {
+      await sendPesquisaSatisfacaoEmail(cliente);
     }
   }
 

@@ -6,6 +6,7 @@ import { pagamentoSchema, type PagamentoFormValues } from "@/lib/validations";
 import { formatCurrency } from "@/lib/utils";
 import { requireAuth } from "@/lib/auth/session";
 import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { sendPagamentoConfirmadoEmail } from "@/lib/email";
 
 export async function gerarLinkPagamento(clienteId: string, preco: number) {
   await requireAuth();
@@ -58,6 +59,7 @@ export async function createPagamento(values: PagamentoFormValues) {
         descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
       },
     });
+    await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");
@@ -99,6 +101,7 @@ export async function updatePagamento(id: string, values: PagamentoFormValues) {
         descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
       },
     });
+    await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");
@@ -131,6 +134,7 @@ export async function togglePagamentoPago(id: string, pago: boolean) {
         descricao: `${formatCurrency(pagamento.valor)} confirmado.`,
       },
     });
+    await sendPagamentoConfirmadoEmail(pagamento.cliente, pagamento.valor);
   }
 
   revalidatePath("/financeiro");

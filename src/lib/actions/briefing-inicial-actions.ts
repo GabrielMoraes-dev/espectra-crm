@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { briefingInicialSchema, type BriefingInicialFormValues } from "@/lib/validations";
-import { sendBriefingInicialNotification } from "@/lib/email";
+import { sendBriefingInicialNotification, sendBriefingInicialConfirmation } from "@/lib/email";
 import { requireAuth } from "@/lib/auth/session";
 
 export async function createBriefingInicial(values: BriefingInicialFormValues) {
@@ -30,6 +30,7 @@ export async function createBriefingInicial(values: BriefingInicialFormValues) {
   });
 
   await sendBriefingInicialNotification(briefingInicial);
+  await sendBriefingInicialConfirmation(briefingInicial);
 
   return briefingInicial;
 }

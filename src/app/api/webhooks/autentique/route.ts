@@ -6,10 +6,8 @@ type AutentiqueWebhookBody = {
   event: {
     type: string;
     data: {
-      object: {
-        id: string;
-        files?: { signed?: string; certified?: string; pades?: string };
-      };
+      id: string;
+      files?: { signed?: string; certified?: string; pades?: string };
     };
   };
 };
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ignorado: body.event.type });
   }
 
-  const documento = body.event.data.object;
+  const documento = body.event.data;
   const linkAssinado = documento.files?.signed ?? documento.files?.certified;
 
   if (!linkAssinado) {

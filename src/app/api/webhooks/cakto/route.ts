@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendPagamentoSemMatch } from "@/lib/email";
+import { sendPagamentoSemMatch, sendPagamentoConfirmadoEmail } from "@/lib/email";
 import { formatCurrency } from "@/lib/utils";
 
 type CaktoWebhookItem = {
@@ -114,6 +114,8 @@ export async function POST(request: Request) {
       descricao: `${formatCurrency(valorTotal)} confirmado via Cakto (${paymentMethodName}).`,
     },
   });
+
+  await sendPagamentoConfirmadoEmail(cliente, valorTotal);
 
   return NextResponse.json({ status: "ok", clienteId: cliente.id });
 }
