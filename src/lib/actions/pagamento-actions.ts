@@ -8,21 +8,24 @@ import { requireAuth } from "@/lib/auth/session";
 import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
 import { sendPagamentoConfirmadoEmail } from "@/lib/email";
 
-export async function gerarLinkPagamento(clienteId: string, preco: number) {
+export async function gerarLinkPagamento(clienteId: string, preco: number, desconto?: number) {
   await requireAuth();
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   const linkBase = CAKTO_LINKS_POR_PRECO[preco];
   if (!linkBase) throw new Error("Preço inválido");
 
+  const valorFinal = desconto ? Math.round(preco * (1 - desconto / 100)) : preco;
+
   await prisma.pagamento.create({
-    data: { clienteId: cliente.id, valor: preco, pago: false },
+    data: { clienteId: cliente.id, valor: valorFinal, pago: false },
   });
 
   revalidatePath("/financeiro");
   revalidatePath(`/clientes/${cliente.id}`);
   revalidatePath("/");
 
-  return `${linkBase}?sck=${cliente.id}`;
+  const cupom = desconto ? `&coupon=desconto${desconto}` : "";
+  return `${linkBase}?sck=${cliente.id}${cupom}`;
 }
 
 export async function createPagamento(values: PagamentoFormValues) {

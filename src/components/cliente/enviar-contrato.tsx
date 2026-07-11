@@ -23,6 +23,9 @@ const PRECOS = Object.keys(CAKTO_LINKS_POR_PRECO)
   .map(Number)
   .sort((a, b) => a - b);
 
+// Visualizador de PDF embutido (quadradinho + dialog) — desativado a pedido do Ricardo, que preferiu o link simples.
+const VISUALIZADOR_INLINE = false;
+
 export function EnviarContrato({
   clienteId,
   cpfCnpj,
@@ -61,7 +64,7 @@ export function EnviarContrato({
         <CardTitle className="text-sm font-medium">Contrato</CardTitle>
       </CardHeader>
       <CardContent>
-        {contratoUrl ? (
+        {contratoUrl && VISUALIZADOR_INLINE ? (
           <div className="space-y-1.5">
             <button
               type="button"
@@ -78,6 +81,15 @@ export function EnviarContrato({
               </DialogContent>
             </Dialog>
           </div>
+        ) : contratoUrl ? (
+          <a
+            href={contratoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-medium text-brand-100 hover:underline"
+          >
+            Contrato assinado — ver documento →
+          </a>
         ) : contratoAutentiqueId ? (
           <p className="text-sm text-warning">Aguardando assinatura do cliente...</p>
         ) : !cpfCnpj ? (

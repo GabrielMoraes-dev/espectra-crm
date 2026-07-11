@@ -153,6 +153,9 @@ export const CAKTO_LINKS_POR_PRECO: Record<number, string> = {
   997: "https://pay.cakto.com.br/ddefprf",
 };
 
+// Cupons "desconto5", "desconto10"... já criados no produto da Cakto (percentual embutido no código)
+export const DESCONTOS_DISPONIVEIS = [5, 10, 15, 20, 25, 30] as const;
+
 export const VALOR_EXTENSO_POR_PRECO: Record<number, string> = {
   297: "duzentos e noventa e sete reais",
   397: "trezentos e noventa e sete reais",

@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { CAKTO_LINKS_POR_PRECO, DESCONTOS_DISPONIVEIS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { gerarLinkPagamento } from "@/lib/actions/pagamento-actions";
 
@@ -21,6 +21,7 @@ const PRECOS = Object.keys(CAKTO_LINKS_POR_PRECO)
 
 export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
   const [preco, setPreco] = useState("");
+  const [desconto, setDesconto] = useState("");
   const [link, setLink] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -32,7 +33,11 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
     }
     startTransition(async () => {
       try {
-        const url = await gerarLinkPagamento(clienteId, Number(preco));
+        const url = await gerarLinkPagamento(
+          clienteId,
+          Number(preco),
+          desconto ? Number(desconto) : undefined,
+        );
         setLink(url);
         toast.success("Link gerado e pagamento pendente criado no financeiro");
         router.refresh();
@@ -70,6 +75,26 @@ export function GerarLinkPagamento({ clienteId }: { clienteId: string }) {
           {pending ? "Gerando..." : "Gerar"}
         </Button>
       </div>
+      <Select value={desconto} onValueChange={(v) => setDesconto(v ?? "")}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Sem desconto">
+            {(value: string) => (value ? `${value}% de desconto` : "Sem desconto")}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false}>
+          <SelectItem value="">Sem desconto</SelectItem>
+          {DESCONTOS_DISPONIVEIS.map((d) => (
+            <SelectItem key={d} value={String(d)}>
+              {d}% de desconto
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {preco && desconto && (
+        <p className="text-xs text-muted-foreground">
+          Valor com desconto: {formatCurrency(Math.round(Number(preco) * (1 - Number(desconto) / 100)))}
+        </p>
+      )}
       {link && (
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card/50 px-2.5 py-2">
           <p className="flex-1 truncate text-xs text-foreground">{link}</p>
