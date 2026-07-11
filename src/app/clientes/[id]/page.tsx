@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ClienteHeader } from "@/components/cliente/cliente-header";
 import { ClienteInfoGrid } from "@/components/cliente/cliente-info-grid";
-import { ClienteObservacoes } from "@/components/cliente/cliente-observacoes";
+import { ClienteTarefas } from "@/components/cliente/cliente-tarefas";
 import { ClienteTimeline } from "@/components/cliente/cliente-timeline";
 import { ClienteBriefing } from "@/components/cliente/cliente-briefing";
 import { ClienteSideCards } from "@/components/cliente/cliente-side-cards";
@@ -37,7 +37,12 @@ export default async function ClienteDetailPage({
             <ClienteInfoGrid cliente={cliente} />
           </FadeIn>
           <FadeIn delay={0.08}>
-            <ClienteObservacoes clienteId={cliente.id} observacoes={cliente.observacoes} />
+            <ClienteTarefas
+              clienteId={cliente.id}
+              tarefas={cliente.tarefas}
+              membros={membros}
+              clientes={clientes}
+            />
           </FadeIn>
           <FadeIn delay={0.11}>
             <ClienteTimeline clienteId={cliente.id} events={cliente.timeline} />
@@ -56,9 +61,6 @@ export default async function ClienteDetailPage({
             projetos={cliente.projetos}
             pagamentos={cliente.pagamentos}
             pesquisas={cliente.pesquisas}
-            tarefas={cliente.tarefas}
-            membros={membros}
-            clientes={clientes}
             cpfCnpj={cliente.cpfCnpj}
             contratoAutentiqueId={cliente.contratoAutentiqueId}
             contratoUrl={cliente.contratoUrl}
