@@ -3,9 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -33,6 +35,7 @@ export function EnviarContrato({
   contratoUrl: string | null;
 }) {
   const [preco, setPreco] = useState("");
+  const [openViewer, setOpenViewer] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -59,14 +62,22 @@ export function EnviarContrato({
       </CardHeader>
       <CardContent>
         {contratoUrl ? (
-          <a
-            href={contratoUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-medium text-brand-100 hover:underline"
-          >
-            Contrato assinado — ver documento →
-          </a>
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              onClick={() => setOpenViewer(true)}
+              className="flex size-20 items-center justify-center rounded-lg border border-border bg-card/50 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <FileText className="size-8" />
+            </button>
+            <p className="text-xs text-muted-foreground">Contrato assinado</p>
+            <Dialog open={openViewer} onOpenChange={setOpenViewer}>
+              <DialogContent className="h-[85vh] max-w-[calc(100%-2rem)] p-0 sm:max-w-3xl">
+                <DialogTitle className="sr-only">Contrato assinado</DialogTitle>
+                <iframe src={contratoUrl} title="Contrato assinado" className="size-full rounded-xl" />
+              </DialogContent>
+            </Dialog>
+          </div>
         ) : contratoAutentiqueId ? (
           <p className="text-sm text-warning">Aguardando assinatura do cliente...</p>
         ) : !cpfCnpj ? (
