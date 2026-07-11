@@ -12,11 +12,62 @@ import { STATUS_CLIENTE_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
 import { sendMensagemFixaWhatsApp } from "@/lib/whatsapp";
 import { sendProjetoPublicadoEmail, sendPesquisaSatisfacaoEmail } from "@/lib/email";
+import type { Cliente, StatusCliente } from "@/generated/prisma/client";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
+}
+
+export async function handleClienteStatusChange(cliente: Cliente, statusAnterior: StatusCliente) {
+  if (statusAnterior === cliente.status) return;
+
+  await prisma.timelineEvent.create({
+    data: {
+      clienteId: cliente.id,
+      titulo: STATUS_CLIENTE_CONFIG[cliente.status].label,
+    },
+  });
+  await prisma.activityLog.create({
+    data: {
+      tipo: "cliente_status",
+      descricao: `${cliente.nome} mudou para ${STATUS_CLIENTE_CONFIG[cliente.status].label}`,
+      entidadeTipo: "cliente",
+      entidadeId: cliente.id,
+    },
+  });
+
+  if (cliente.status === "FINALIZADO" && cliente.valor) {
+    const jaTemPagamento = await prisma.pagamento.count({ where: { clienteId: cliente.id } });
+    if (jaTemPagamento === 0) {
+      await prisma.pagamento.create({
+        data: {
+          clienteId: cliente.id,
+          valor: cliente.valor,
+          pago: false,
+          formaPagamento: null,
+          data: new Date(),
+        },
+      });
+    }
+  }
+
+  if (cliente.status === "FINALIZADO" && cliente.whatsapp) {
+    const link = `${SITE_URL}/pesquisa/${cliente.id}`;
+    await sendMensagemFixaWhatsApp(
+      cliente.whatsapp,
+      `Olá, ${cliente.nome.split(" ")[0]}! Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou — leva menos de um minuto: ${link}`,
+    );
+  }
+
+  if (cliente.status === "PUBLICADO") {
+    await sendProjetoPublicadoEmail(cliente);
+  }
+
+  if (cliente.status === "FINALIZADO") {
+    await sendPesquisaSatisfacaoEmail(cliente);
+  }
 }
 
 export async function createCliente(values: ClienteFormValues) {
@@ -93,53 +144,7 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
     });
   }
 
-  if (before.status !== cliente.status) {
-    await prisma.timelineEvent.create({
-      data: {
-        clienteId: cliente.id,
-        titulo: STATUS_CLIENTE_CONFIG[cliente.status].label,
-      },
-    });
-    await prisma.activityLog.create({
-      data: {
-        tipo: "cliente_status",
-        descricao: `${cliente.nome} mudou para ${STATUS_CLIENTE_CONFIG[cliente.status].label}`,
-        entidadeTipo: "cliente",
-        entidadeId: cliente.id,
-      },
-    });
-
-    if (cliente.status === "FINALIZADO" && cliente.valor) {
-      const jaTemPagamento = await prisma.pagamento.count({ where: { clienteId: id } });
-      if (jaTemPagamento === 0) {
-        await prisma.pagamento.create({
-          data: {
-            clienteId: cliente.id,
-            valor: cliente.valor,
-            pago: false,
-            formaPagamento: null,
-            data: new Date(),
-          },
-        });
-      }
-    }
-
-    if (cliente.status === "FINALIZADO" && cliente.whatsapp) {
-      const link = `${SITE_URL}/pesquisa/${cliente.id}`;
-      await sendMensagemFixaWhatsApp(
-        cliente.whatsapp,
-        `Olá, ${cliente.nome.split(" ")[0]}! Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou — leva menos de um minuto: ${link}`,
-      );
-    }
-
-    if (cliente.status === "PUBLICADO") {
-      await sendProjetoPublicadoEmail(cliente);
-    }
-
-    if (cliente.status === "FINALIZADO") {
-      await sendPesquisaSatisfacaoEmail(cliente);
-    }
-  }
+  await handleClienteStatusChange(cliente, before.status);
 
   revalidatePath("/clientes");
   revalidatePath(`/clientes/${id}`);

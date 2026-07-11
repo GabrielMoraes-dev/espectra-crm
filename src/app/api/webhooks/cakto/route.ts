@@ -76,10 +76,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ status: "sem_match" });
   }
 
-  const pagamentoPendente = await prisma.pagamento.findFirst({
-    where: { clienteId: cliente.id, pago: false },
-    orderBy: { createdAt: "desc" },
+  // Evita duplicar o pagamento se a Cakto reenviar o mesmo evento (comum em webhooks de pagamento).
+  const jaProcessado = await prisma.pagamento.findFirst({
+    where: { clienteId: cliente.id, pago: true, data: new Date(paidAt) },
   });
+  if (jaProcessado) {
+    return NextResponse.json({ status: "ja_processado", clienteId: cliente.id });
+  }
+
+  // Entre os pagamentos pendentes do cliente, casa com o mais próximo do valor realmente cobrado
+  // (pode haver mais de um link pendente, ex. um com desconto e outro sem).
+  const pendentes = await prisma.pagamento.findMany({
+    where: { clienteId: cliente.id, pago: false },
+  });
+  const pagamentoPendente = pendentes.reduce<(typeof pendentes)[number] | null>((maisProximo, atual) => {
+    if (!maisProximo) return atual;
+    return Math.abs(atual.valor - valorTotal) < Math.abs(maisProximo.valor - valorTotal) ? atual : maisProximo;
+  }, null);
 
   if (pagamentoPendente) {
     await prisma.pagamento.update({

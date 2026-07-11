@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { projetoSchema, type ProjetoFormValues } from "@/lib/validations";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
+import { handleClienteStatusChange } from "@/lib/actions/cliente-actions";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
@@ -57,10 +58,14 @@ async function registerStatusChange(
   });
 
   if (novoStatus === "PUBLICADO") {
-    await prisma.timelineEvent.create({
-      data: { clienteId, titulo: "Landing publicada" },
-    });
-    await prisma.cliente.update({ where: { id: clienteId }, data: { status: "PUBLICADO" } });
+    const clienteAntes = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+    if (clienteAntes.status !== "PUBLICADO") {
+      const clienteDepois = await prisma.cliente.update({
+        where: { id: clienteId },
+        data: { status: "PUBLICADO" },
+      });
+      await handleClienteStatusChange(clienteDepois, clienteAntes.status);
+    }
   }
 }
 
