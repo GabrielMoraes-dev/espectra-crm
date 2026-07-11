@@ -7,7 +7,10 @@ import type { MembroEquipe } from "@/generated/prisma/client";
 
 export function DuplaCard({ membro }: { membro: MembroEquipe }) {
   const responsabilidades = parseResponsabilidades(membro.responsabilidades);
-  const indicador = CARGO_INDICATOR[membro.cargo];
+  const cargoNormalizado = membro.cargo.trim().toLowerCase();
+  const indicador = Object.entries(CARGO_INDICATOR).find(
+    ([cargo]) => cargo.toLowerCase() === cargoNormalizado,
+  )?.[1];
 
   return (
     <Card className="relative overflow-hidden">

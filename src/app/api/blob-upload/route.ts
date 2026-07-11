@@ -1,7 +1,8 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
-const TIPOS_IMAGEM = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
+// SVG fica de fora: pode embutir script e esse endpoint recebe upload do formulário público, sem login.
+const TIPOS_IMAGEM = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 // Padrão (sem clientPayload "geral"): fotos, logo e PDFs — cobre os uploads de
 // imagem/documento avulsos do CRM (foto de perfil, contrato, etc.).
 const TIPOS_PADRAO = [...TIPOS_IMAGEM, "application/pdf"];

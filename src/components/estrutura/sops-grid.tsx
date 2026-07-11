@@ -18,7 +18,10 @@ function SOPCard({ sop }: { sop: SOP }) {
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent text-brand-100">
               <FileText className="size-4" />
             </div>
-            <p className="text-sm font-medium text-foreground">{sop.titulo}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">{sop.titulo}</p>
+              <p className="text-xs text-muted-foreground">{sop.categoria}</p>
+            </div>
           </div>
           <p className="line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
             {sop.conteudo || "Ainda sem conteúdo. Documente o passo a passo deste processo."}

@@ -3,6 +3,7 @@ import { ProjetosToolbar } from "@/components/projetos/projetos-toolbar";
 import { ProjetosKanban } from "@/components/projetos/projetos-kanban";
 import { ProjetosTable } from "@/components/projetos/projetos-table";
 import { FadeIn } from "@/components/shared/fade-in";
+import { PrazoAlertBanner } from "@/components/shared/prazo-alert-banner";
 import { getProjetos } from "@/lib/data/projetos";
 import { prisma } from "@/lib/prisma";
 
@@ -30,6 +31,12 @@ export default async function ProjetosPage({
         title="Projetos"
         description="Do briefing à publicação — acompanhe cada entrega."
       />
+
+      <FadeIn>
+        <PrazoAlertBanner
+          clientes={clientes.filter((c) => c.prazo && c.status !== "FINALIZADO")}
+        />
+      </FadeIn>
 
       <ProjetosToolbar search={search} status={status} view={view} clientes={clientes} membros={membros} />
 

@@ -66,9 +66,12 @@ export function LeadDetailSheet({
   const podeConverter = !lead.clienteId && lead.etapa !== "PERDIDO";
   const podeEnviarBriefing = lead.etapa !== "PERDIDO";
   const leadId = lead.id;
+  const clienteId = lead.clienteId;
 
   function copiarLinkBriefing() {
-    const url = `${window.location.origin}/formulario/lead/${leadId}`;
+    const url = clienteId
+      ? `${window.location.origin}/formulario/cliente/${clienteId}`
+      : `${window.location.origin}/formulario/lead/${leadId}`;
     navigator.clipboard.writeText(url);
     toast.success("Link do briefing copiado");
     registrarLinkCopiado(leadId);

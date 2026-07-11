@@ -9,16 +9,20 @@ import { requireAuth } from "@/lib/auth/session";
 export async function createBriefingInicial(values: BriefingInicialFormValues) {
   const data = briefingInicialSchema.parse(values);
 
-  const briefingInicial = await prisma.briefingInicial.create({
-    data: {
-      leadId: data.leadId,
-      nome: data.nome,
-      profissao: data.profissao,
-      email: data.email,
-      apresentacao: data.apresentacao,
-      fotosUrls: JSON.stringify(data.fotosUrls),
-    },
-  });
+  // Reenvio do mesmo link atualiza o registro existente em vez de criar um duplicado.
+  const existente = await prisma.briefingInicial.findFirst({ where: { leadId: data.leadId } });
+
+  const camposComuns = {
+    nome: data.nome,
+    profissao: data.profissao,
+    email: data.email,
+    apresentacao: data.apresentacao,
+    fotosUrls: JSON.stringify(data.fotosUrls),
+  };
+
+  const briefingInicial = existente
+    ? await prisma.briefingInicial.update({ where: { id: existente.id }, data: camposComuns })
+    : await prisma.briefingInicial.create({ data: { leadId: data.leadId, ...camposComuns } });
 
   await prisma.activityLog.create({
     data: {
@@ -35,6 +39,8 @@ export async function createBriefingInicial(values: BriefingInicialFormValues) {
   return briefingInicial;
 }
 
+const updateBriefingInicialSchema = briefingInicialSchema.omit({ leadId: true });
+
 export async function updateBriefingInicial(
   id: string,
   values: {
@@ -46,15 +52,16 @@ export async function updateBriefingInicial(
   },
 ) {
   await requireAuth();
+  const data = updateBriefingInicialSchema.parse(values);
 
   const briefingInicial = await prisma.briefingInicial.update({
     where: { id },
     data: {
-      nome: values.nome,
-      profissao: values.profissao,
-      email: values.email,
-      apresentacao: values.apresentacao,
-      fotosUrls: JSON.stringify(values.fotosUrls),
+      nome: data.nome,
+      profissao: data.profissao,
+      email: data.email,
+      apresentacao: data.apresentacao,
+      fotosUrls: JSON.stringify(data.fotosUrls),
     },
   });
 
