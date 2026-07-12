@@ -37,6 +37,7 @@ export async function createProjeto(values: ProjetoFormValues) {
 
   revalidatePath("/projetos");
   revalidatePath("/");
+  revalidatePath(`/clientes/${projeto.clienteId}`);
   return projeto;
 }
 

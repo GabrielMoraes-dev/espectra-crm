@@ -61,6 +61,7 @@ export default async function ClienteDetailPage({
             projetos={cliente.projetos}
             pagamentos={cliente.pagamentos}
             pesquisas={cliente.pesquisas}
+            membros={membros}
             cpfCnpj={cliente.cpfCnpj}
             contratoAutentiqueId={cliente.contratoAutentiqueId}
             contratoUrl={cliente.contratoUrl}

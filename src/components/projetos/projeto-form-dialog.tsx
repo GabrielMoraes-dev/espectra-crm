@@ -53,20 +53,22 @@ export function ProjetoFormDialog({
   projeto,
   clientes,
   membros,
+  clienteIdFixo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projeto?: Projeto | null;
-  clientes: Cliente[];
+  clientes?: Cliente[];
   membros: MembroEquipe[];
+  clienteIdFixo?: string;
 }) {
   const [form, setForm] = useState<FormState>(emptyState());
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- resets the form whenever the dialog opens for a different record
-    if (open) setForm(projeto ? fromProjeto(projeto) : emptyState());
-  }, [open, projeto]);
+    if (open) setForm(projeto ? fromProjeto(projeto) : { ...emptyState(), clienteId: clienteIdFixo ?? "" });
+  }, [open, projeto, clienteIdFixo]);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -101,26 +103,28 @@ export function ProjetoFormDialog({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            <div className="space-y-1.5">
-              <Label>Cliente *</Label>
-              <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o cliente">
-                    {(value: string) => {
-                      const c = clientes.find((c) => c.id === value);
-                      return c ? `${c.nome} ${c.empresa ? `· ${c.empresa}` : ""}` : "Selecione o cliente";
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.nome} {c.empresa ? `· ${c.empresa}` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {!clienteIdFixo && (
+              <div className="space-y-1.5">
+                <Label>Cliente *</Label>
+                <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione o cliente">
+                      {(value: string) => {
+                        const c = clientes?.find((c) => c.id === value);
+                        return c ? `${c.nome} ${c.empresa ? `· ${c.empresa}` : ""}` : "Selecione o cliente";
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientes?.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nome} {c.empresa ? `· ${c.empresa}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

@@ -23,6 +23,9 @@ import type { Cliente, FotoCliente, MembroEquipe, Projeto } from "@/generated/pr
 
 type ProjetoCompleto = Projeto & { cliente: Cliente & { fotos: FotoCliente[] }; responsavel: MembroEquipe | null };
 
+// Desativado a pedido do Ricardo — a organização do projeto ficou mais fácil pelo perfil do cliente.
+const EXIBIR_FOTOS_PROJETO = false;
+
 function InfoRow({
   icon: Icon,
   label,
@@ -99,7 +102,9 @@ export function ProjetoDetailSheet({
               </div>
             )}
 
-            <FotoGallery clienteId={projeto.cliente.id} fotos={projeto.cliente.fotos} />
+            {EXIBIR_FOTOS_PROJETO && (
+              <FotoGallery clienteId={projeto.cliente.id} fotos={projeto.cliente.fotos} />
+            )}
           </div>
 
           <SheetFooter className="flex-row gap-2">
