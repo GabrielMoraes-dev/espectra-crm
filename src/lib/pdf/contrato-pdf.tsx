@@ -18,6 +18,8 @@ export type ContratoPdfProps = {
   clienteNome: string;
   clienteCpfCnpj: string;
   clienteCidadeUf: string;
+  precoFormatado?: string;
+  desconto?: number;
   valorFormatado: string;
   valorExtenso: string;
   data: string;
@@ -27,6 +29,8 @@ export function ContratoPdf({
   clienteNome,
   clienteCpfCnpj,
   clienteCidadeUf,
+  precoFormatado,
+  desconto,
   valorFormatado,
   valorExtenso,
   data,
@@ -98,8 +102,9 @@ export function ContratoPdf({
 
         <Text style={styles.clauseTitle}>Cláusula 3ª — Do valor e da forma de pagamento</Text>
         <Text style={styles.item}>
-          3.1. Pelos serviços objeto deste contrato, o CONTRATANTE pagará à CONTRATADA o valor
-          total de R$ {valorFormatado} ({valorExtenso}).
+          {desconto && precoFormatado
+            ? `3.1. Pelos serviços objeto deste contrato, o CONTRATANTE pagará à CONTRATADA o valor de R$ ${precoFormatado}, com desconto de ${desconto}%, totalizando o valor de R$ ${valorFormatado} (${valorExtenso}).`
+            : `3.1. Pelos serviços objeto deste contrato, o CONTRATANTE pagará à CONTRATADA o valor total de R$ ${valorFormatado} (${valorExtenso}).`}
         </Text>
         <Text style={styles.item}>
           3.2. O pagamento poderá ser realizado à vista ou parcelado em até 12 (doze) vezes,

@@ -156,17 +156,6 @@ export const CAKTO_LINKS_POR_PRECO: Record<number, string> = {
 // Cupons "desconto5", "desconto10"... já criados no produto da Cakto (percentual embutido no código)
 export const DESCONTOS_DISPONIVEIS = [5, 10, 15, 20, 25, 30] as const;
 
-export const VALOR_EXTENSO_POR_PRECO: Record<number, string> = {
-  297: "duzentos e noventa e sete reais",
-  397: "trezentos e noventa e sete reais",
-  497: "quatrocentos e noventa e sete reais",
-  597: "quinhentos e noventa e sete reais",
-  697: "seiscentos e noventa e sete reais",
-  797: "setecentos e noventa e sete reais",
-  897: "oitocentos e noventa e sete reais",
-  997: "novecentos e noventa e sete reais",
-};
-
 export const ESTADOS_BRASIL = [
   { uf: "AC", nome: "Acre" },
   { uf: "AL", nome: "Alagoas" },

@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { CAKTO_LINKS_POR_PRECO, DESCONTOS_DISPONIVEIS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { enviarContrato } from "@/lib/actions/contrato-actions";
 
@@ -38,6 +38,7 @@ export function EnviarContrato({
   contratoUrl: string | null;
 }) {
   const [preco, setPreco] = useState("");
+  const [desconto, setDesconto] = useState("");
   const [openViewer, setOpenViewer] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -49,7 +50,7 @@ export function EnviarContrato({
     }
     startTransition(async () => {
       try {
-        await enviarContrato(clienteId, Number(preco));
+        await enviarContrato(clienteId, Number(preco), desconto ? Number(desconto) : undefined);
         toast.success("Contrato enviado para assinatura!");
         router.refresh();
       } catch (err) {
@@ -115,6 +116,29 @@ export function EnviarContrato({
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1.5">
+              <Label>Desconto</Label>
+              <Select value={desconto} onValueChange={(v) => setDesconto(v ?? "")}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sem desconto">
+                    {(value: string) => (value ? `${value}% de desconto` : "Sem desconto")}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent alignItemWithTrigger={false}>
+                  <SelectItem value="">Sem desconto</SelectItem>
+                  {DESCONTOS_DISPONIVEIS.map((d) => (
+                    <SelectItem key={d} value={String(d)}>
+                      {d}% de desconto
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {preco && desconto && (
+              <p className="text-xs text-muted-foreground">
+                Valor final no contrato: {formatCurrency(Math.round(Number(preco) * (1 - Number(desconto) / 100)))}
+              </p>
+            )}
             <Button type="button" size="sm" onClick={handleEnviar} disabled={pending} className="w-full">
               {pending ? "Enviando..." : "Enviar para assinatura"}
             </Button>

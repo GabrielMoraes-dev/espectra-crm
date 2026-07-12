@@ -18,6 +18,8 @@ export async function enviarContratoParaAssinatura({
   clienteEmail,
   clienteCpfCnpj,
   clienteCidadeUf,
+  precoFormatado,
+  desconto,
   valorFormatado,
   valorExtenso,
 }: {
@@ -26,6 +28,8 @@ export async function enviarContratoParaAssinatura({
   clienteEmail: string;
   clienteCpfCnpj: string;
   clienteCidadeUf: string;
+  precoFormatado: string;
+  desconto?: number;
   valorFormatado: string;
   valorExtenso: string;
 }) {
@@ -45,6 +49,8 @@ export async function enviarContratoParaAssinatura({
       clienteNome,
       clienteCpfCnpj,
       clienteCidadeUf,
+      precoFormatado,
+      desconto,
       valorFormatado,
       valorExtenso,
       data: dataExtenso,
