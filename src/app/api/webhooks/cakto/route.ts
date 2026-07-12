@@ -28,7 +28,12 @@ function apenasDigitos(v: string | null | undefined) {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as CaktoWebhookBody;
+  let body: CaktoWebhookBody;
+  try {
+    body = (await request.json()) as CaktoWebhookBody;
+  } catch {
+    return NextResponse.json({ error: "Corpo inválido" }, { status: 400 });
+  }
 
   if (!process.env.CAKTO_WEBHOOK_SECRET || body.secret !== process.env.CAKTO_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -38,6 +43,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ ignorado: body.event });
   }
 
+  try {
+    return await processarPagamentoAprovado(body);
+  } catch (error) {
+    // Se a Cakto mudar o formato do payload (ou qualquer outro erro inesperado),
+    // não deixa a exceção estourar sem log — isso faria a Cakto reenviar o
+    // mesmo webhook indefinidamente sem ninguém perceber o problema.
+    console.error("[webhook cakto]", error instanceof Error ? error.stack ?? error.message : error);
+    await prisma.activityLog.create({
+      data: {
+        tipo: "webhook_erro",
+        descricao: `Erro ao processar webhook da Cakto: ${error instanceof Error ? error.message : "erro desconhecido"}`,
+        entidadeTipo: "pagamento",
+      },
+    });
+    // Responde 200 pra Cakto não ficar reenviando o mesmo evento quebrado.
+    return NextResponse.json({ status: "erro_registrado" });
+  }
+}
+
+async function processarPagamentoAprovado(body: CaktoWebhookBody) {
   const itens = body.data;
   const itemPrincipal = itens.find((i) => i.offer_type === "main") ?? itens[0];
   const { customer, paymentMethodName, paidAt, sck } = itemPrincipal;

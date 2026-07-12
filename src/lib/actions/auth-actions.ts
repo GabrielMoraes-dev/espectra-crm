@@ -27,14 +27,19 @@ export async function login(values: { email: string; password: string }) {
 
   if (!usuario || !valid) {
     if (usuario) {
-      const tentativas = usuario.tentativasFalhas + 1;
-      await prisma.usuario.update({
+      // Incremento atômico no banco — evita que tentativas concorrentes (várias
+      // requisições erradas ao mesmo tempo) percam contagem por causa de um
+      // read-then-write não atômico, o que poderia atrasar ou nunca disparar o bloqueio.
+      const atualizado = await prisma.usuario.update({
         where: { id: usuario.id },
-        data: {
-          tentativasFalhas: tentativas >= MAX_TENTATIVAS ? 0 : tentativas,
-          bloqueadoAte: tentativas >= MAX_TENTATIVAS ? new Date(Date.now() + BLOQUEIO_MS) : null,
-        },
+        data: { tentativasFalhas: { increment: 1 } },
       });
+      if (atualizado.tentativasFalhas >= MAX_TENTATIVAS) {
+        await prisma.usuario.update({
+          where: { id: usuario.id },
+          data: { tentativasFalhas: 0, bloqueadoAte: new Date(Date.now() + BLOQUEIO_MS) },
+        });
+      }
     }
     throw new Error("Email ou senha inválidos");
   }

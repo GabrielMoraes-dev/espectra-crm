@@ -26,11 +26,18 @@ export async function comprimirImagem(file: File): Promise<File> {
     ctx.drawImage(bitmap, 0, 0, largura, altura);
     bitmap.close();
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", QUALIDADE));
+    // PNG pode ter fundo transparente (ex.: logo) — reexportar como JPEG
+    // apagaria a transparência, preenchendo com preto. Nesse caso mantém PNG.
+    const preservarTransparencia = file.type === "image/png";
+    const tipoSaida = preservarTransparencia ? "image/png" : "image/jpeg";
+    const qualidade = preservarTransparencia ? undefined : QUALIDADE;
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, tipoSaida, qualidade));
     if (!blob || blob.size >= file.size) return file;
 
-    const novoNome = file.name.replace(/\.[^.]+$/, "") + ".jpg";
-    return new File([blob], novoNome, { type: "image/jpeg" });
+    const extensao = preservarTransparencia ? ".png" : ".jpg";
+    const novoNome = file.name.replace(/\.[^.]+$/, "") + extensao;
+    return new File([blob], novoNome, { type: tipoSaida });
   } catch {
     return file;
   }

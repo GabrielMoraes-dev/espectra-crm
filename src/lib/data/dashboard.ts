@@ -22,6 +22,7 @@ function lastNMonths(n: number) {
 export async function getDashboardData() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
   const [
@@ -47,7 +48,7 @@ export async function getDashboardData() {
     prisma.projeto.count({ where: { status: "PUBLICADO" } }),
     prisma.pagamento.aggregate({
       _sum: { valor: true },
-      where: { pago: true, data: { gte: startOfMonth } },
+      where: { pago: true, data: { gte: startOfMonth, lt: startOfNextMonth } },
     }),
     prisma.pagamento.aggregate({
       _sum: { valor: true },

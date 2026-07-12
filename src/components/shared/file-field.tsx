@@ -65,7 +65,10 @@ export function FileField({
         return;
       }
 
-      const novasUrls = await Promise.all(
+      // Promise.allSettled em vez de Promise.all: se um arquivo falhar no meio do
+      // envio (comum em conexão móvel), os que já subiram não se perdem — só o(s)
+      // que falharam ficam de fora, e o usuário só precisa reenviar esse(s).
+      const resultados = await Promise.allSettled(
         preparados.map((file) =>
           upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
             access: "public",
@@ -74,7 +77,20 @@ export function FileField({
           }).then((blob) => blob.url),
         ),
       );
-      onChange([...urls, ...novasUrls]);
+
+      const novasUrls = resultados
+        .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
+        .map((r) => r.value);
+      const falhas = resultados.length - novasUrls.length;
+
+      if (novasUrls.length > 0) onChange([...urls, ...novasUrls]);
+      if (falhas > 0) {
+        toast.error(
+          falhas === 1
+            ? "1 arquivo não foi enviado. Tente selecioná-lo de novo."
+            : `${falhas} arquivos não foram enviados. Tente selecioná-los de novo.`,
+        );
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar o arquivo");
     } finally {

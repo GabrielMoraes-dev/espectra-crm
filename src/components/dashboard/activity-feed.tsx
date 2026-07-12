@@ -9,6 +9,7 @@ import {
   MailWarning,
   LogIn,
   LogOut,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 import { timeAgo } from "@/lib/utils";
@@ -26,7 +27,10 @@ const ICONS: Record<string, LucideIcon> = {
   email_falhou: MailWarning,
   login: LogIn,
   logout: LogOut,
+  webhook_erro: AlertTriangle,
 };
+
+const TIPOS_AVISO = new Set(["email_falhou", "webhook_erro"]);
 
 export function ActivityFeed({
   atividades,
@@ -45,7 +49,7 @@ export function ActivityFeed({
     <ul className="space-y-4">
       {atividades.map((a) => {
         const Icon = ICONS[a.tipo] ?? ArrowRightCircle;
-        const isFalha = a.tipo === "email_falhou";
+        const isFalha = TIPOS_AVISO.has(a.tipo);
         return (
           <li key={a.id} className="flex items-start gap-3">
             <div
