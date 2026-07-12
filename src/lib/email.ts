@@ -104,7 +104,7 @@ export async function sendBriefingConfirmation(briefing: Briefing) {
     subject: "Recebemos seu briefing!",
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+        <img src="${SITE_URL}/logo-espectra-email.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
         <p>Olá, ${esc(briefing.nome)}!</p>
         <p style="color: #555;">
           Recebemos o briefing que você preencheu. Obrigado por confiar à Espectra a forma como
@@ -121,7 +121,7 @@ export async function sendBriefingInicialConfirmation(briefingInicial: BriefingI
     subject: "Recebemos sua amostra gratuita!",
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+        <img src="${SITE_URL}/logo-espectra-email.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
         <p>Olá, ${esc(briefingInicial.nome)}!</p>
         <p style="color: #555;">
           Recebemos as informações que você enviou. Em breve vamos preparar sua amostra gratuita
@@ -140,7 +140,7 @@ export async function sendProjetoPublicadoEmail(cliente: Cliente) {
     subject: "Seu site está no ar! 🎉",
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+        <img src="${SITE_URL}/logo-espectra-email.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
         <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Seu projeto foi publicado! Sua nova presença digital já está no ar:
@@ -160,7 +160,7 @@ export async function sendPesquisaSatisfacaoEmail(cliente: Cliente) {
     subject: "Como foi sua experiência com a Espectra?",
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+        <img src="${SITE_URL}/logo-espectra-email.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
         <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou —
@@ -180,7 +180,7 @@ export async function sendPagamentoConfirmadoEmail(cliente: Cliente, valor: numb
     subject: "Recebemos seu pagamento!",
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <img src="${SITE_URL}/logo-espectra.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
+        <img src="${SITE_URL}/logo-espectra-email.png" alt="Espectra" style="height: 32px; margin-bottom: 24px;" />
         <p>Olá, ${esc(cliente.nome.split(" ")[0])}!</p>
         <p style="color: #555;">
           Confirmamos o recebimento do seu pagamento de <strong>${formatCurrency(valor)}</strong>.
