@@ -1,13 +1,16 @@
 import { upload } from "@vercel/blob/client";
+import { comprimirImagem } from "@/lib/image-compress";
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
 
 export async function uploadImageDirect(file: File): Promise<string> {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) throw new Error("Formato de imagem não suportado");
-  if (file.size > MAX_IMAGE_SIZE) throw new Error("Imagem muito grande (máx. 8MB)");
 
-  const blob = await upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
+  const arquivo = await comprimirImagem(file);
+  if (arquivo.size > MAX_IMAGE_SIZE) throw new Error("Imagem muito grande (máx. 8MB)");
+
+  const blob = await upload(`uploads/${crypto.randomUUID()}-${arquivo.name}`, arquivo, {
     access: "public",
     handleUploadUrl: "/api/blob-upload",
   });

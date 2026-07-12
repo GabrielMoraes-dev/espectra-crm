@@ -8,6 +8,7 @@ import { Upload, Loader2, X, Lock, File as FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { isImagemUrl } from "@/lib/utils";
+import { comprimirImagem } from "@/lib/image-compress";
 
 const LIMITE_PADRAO_MB = 20;
 const LIMITE_GERAL_MB = 1024;
@@ -48,24 +49,31 @@ export function FileField({
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
-    const limiteBytes = limiteMb * 1024 * 1024;
-    const grandeDemais = files.find((f) => f.size > limiteBytes);
-    if (grandeDemais) {
-      toast.error(`"${grandeDemais.name}" é maior que o limite de ${limiteLabel}.`);
-      if (inputRef.current) inputRef.current.value = "";
-      return;
-    }
+
     setUploading(true);
     try {
-      const novasUrls: string[] = [];
-      for (const file of files) {
-        const blob = await upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
-          access: "public",
-          handleUploadUrl: "/api/blob-upload",
-          clientPayload: JSON.stringify({ tipo: permiteVideo ? "geral" : "padrao" }),
-        });
-        novasUrls.push(blob.url);
+      // Fotos de celular vêm com vários MB — comprimir antes acelera muito o
+      // envio em conexão móvel, onde o upload costuma ser bem mais lento que o download.
+      const preparados = await Promise.all(
+        files.map((file) => (file.type.startsWith("image/") ? comprimirImagem(file) : file)),
+      );
+
+      const limiteBytes = limiteMb * 1024 * 1024;
+      const grandeDemais = preparados.find((f) => f.size > limiteBytes);
+      if (grandeDemais) {
+        toast.error(`"${grandeDemais.name}" é maior que o limite de ${limiteLabel}.`);
+        return;
       }
+
+      const novasUrls = await Promise.all(
+        preparados.map((file) =>
+          upload(`uploads/${crypto.randomUUID()}-${file.name}`, file, {
+            access: "public",
+            handleUploadUrl: "/api/blob-upload",
+            clientPayload: JSON.stringify({ tipo: permiteVideo ? "geral" : "padrao" }),
+          }).then((blob) => blob.url),
+        ),
+      );
       onChange([...urls, ...novasUrls]);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar o arquivo");
