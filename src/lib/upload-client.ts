@@ -1,7 +1,7 @@
 import { upload } from "@vercel/blob/client";
 import { comprimirImagem } from "@/lib/image-compress";
 
-const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/heic", "image/heif"];
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
 
 export async function uploadImageDirect(file: File): Promise<string> {

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import {
   clienteSchema,
@@ -155,7 +156,34 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
 
 export async function deleteCliente(id: string) {
   await requireAuth();
+
+  const cliente = await prisma.cliente.findUnique({
+    where: { id },
+    include: { fotos: true, briefings: true, lead: { include: { briefingsIniciais: true } } },
+  });
+
+  const urls = new Set<string>();
+  if (cliente) {
+    for (const foto of cliente.fotos) urls.add(foto.url);
+    for (const b of cliente.briefings) {
+      for (const url of JSON.parse(b.fotosUrls || "[]")) urls.add(url);
+      for (const url of JSON.parse(b.depoimentosUrls || "[]")) urls.add(url);
+      for (const url of JSON.parse(b.arquivosGeraisUrls || "[]")) urls.add(url);
+    }
+    for (const bi of cliente.lead?.briefingsIniciais ?? []) {
+      for (const url of JSON.parse(bi.fotosUrls || "[]")) urls.add(url);
+    }
+  }
+
   await prisma.cliente.delete({ where: { id } });
+
+  // Só apaga do armazenamento depois de confirmar a exclusão no banco — sem isso,
+  // as fotos/depoimentos do cliente ficavam pra sempre no Vercel Blob, sendo
+  // cobrados à toa mesmo depois do cliente sumir do CRM.
+  for (const url of urls) {
+    await del(url).catch(() => {});
+  }
+
   revalidatePath("/clientes");
   revalidatePath("/");
 }

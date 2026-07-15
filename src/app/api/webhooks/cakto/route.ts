@@ -132,10 +132,17 @@ async function processarPagamentoAprovado(body: CaktoWebhookBody) {
   }, null);
 
   if (pagamentoPendente) {
-    await prisma.pagamento.update({
-      where: { id: pagamentoPendente.id },
+    // updateMany com a condição "ainda pendente" em vez de update: se dois webhooks
+    // quase simultâneos chegarem pro mesmo pagamento, só o primeiro realmente atualiza
+    // (count === 1); o segundo não encontra mais nada pendente (count === 0) e para
+    // por ali, sem duplicar e-mail/timeline/activity log abaixo.
+    const { count } = await prisma.pagamento.updateMany({
+      where: { id: pagamentoPendente.id, pago: false },
       data: { pago: true, valor: valorTotal, formaPagamento: paymentMethodName, data: new Date(paidAt) },
     });
+    if (count === 0) {
+      return NextResponse.json({ status: "ja_processado_concorrente", clienteId: cliente.id });
+    }
   } else {
     await prisma.pagamento.create({
       data: {

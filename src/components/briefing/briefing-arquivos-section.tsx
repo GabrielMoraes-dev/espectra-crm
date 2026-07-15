@@ -7,10 +7,12 @@ export function BriefingArquivosSection({
   form,
   set,
   fotosLocked,
+  demo,
 }: {
   form: BriefingFormState;
   set: <K extends keyof BriefingFormState>(key: K, value: BriefingFormState[K]) => void;
   fotosLocked?: string[];
+  demo?: boolean;
 }) {
   return (
     <div className="space-y-5">
@@ -20,6 +22,7 @@ export function BriefingArquivosSection({
         permiteVideo
         urls={form.depoimentosUrls}
         onChange={(urls) => set("depoimentosUrls", urls)}
+        demo={demo}
       />
 
       <FileField
@@ -29,6 +32,7 @@ export function BriefingArquivosSection({
         urls={form.fotosUrls}
         onChange={(urls) => set("fotosUrls", urls)}
         lockedUrls={fotosLocked}
+        demo={demo}
       />
 
       <FileField
@@ -37,6 +41,7 @@ export function BriefingArquivosSection({
         permiteVideo
         urls={form.arquivosGeraisUrls}
         onChange={(urls) => set("arquivosGeraisUrls", urls)}
+        demo={demo}
       />
     </div>
   );

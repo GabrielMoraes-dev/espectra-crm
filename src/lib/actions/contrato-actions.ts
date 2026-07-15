@@ -6,12 +6,15 @@ import { requireAuth } from "@/lib/auth/session";
 import { enviarContratoParaAssinatura } from "@/lib/autentique";
 import { formatCurrency } from "@/lib/utils";
 import { valorPorExtenso } from "@/lib/numero-extenso";
-import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { CAKTO_LINKS_POR_PRECO, DESCONTOS_DISPONIVEIS } from "@/lib/constants";
 
 export async function enviarContrato(clienteId: string, preco: number, desconto?: number) {
   await requireAuth();
 
   if (!CAKTO_LINKS_POR_PRECO[preco]) throw new Error("Preço inválido");
+  if (desconto && !DESCONTOS_DISPONIVEIS.includes(desconto as (typeof DESCONTOS_DISPONIVEIS)[number])) {
+    throw new Error("Desconto inválido");
+  }
 
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   if (!cliente.email) throw new Error("O cliente precisa ter um email cadastrado");

@@ -23,13 +23,26 @@ export function waLink(telefone: string | null | undefined) {
 
 export function instagramLink(handle: string | null | undefined) {
   if (!handle) return undefined
-  const usuario = handle.trim().replace(/^@/, "")
+  // Aceita tanto "@fulano" quanto um link colado (com ou sem @, http(s), www.)
+  const usuario = handle
+    .trim()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/^instagram\.com\//, "")
+    .replace(/^@/, "")
+    .replace(/\/.*$/, "")
   if (!usuario) return undefined
   return `https://instagram.com/${usuario}`
 }
 
 export function formatTelefone(value: string) {
-  const digitos = value.replace(/\D/g, "").slice(0, 11)
+  let digitos = value.replace(/\D/g, "")
+  // Colar um número no formato "+55 51 99999-8888" (13 dígitos) cortava do lado
+  // errado — mantinha o DDI e perdia o fim do número. Remove o DDI antes de truncar.
+  if (digitos.length > 11 && digitos.startsWith("55")) {
+    digitos = digitos.slice(2)
+  }
+  digitos = digitos.slice(0, 11)
   if (digitos.length <= 2) return digitos.length ? `(${digitos}` : ""
   if (digitos.length <= 6) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`
   if (digitos.length <= 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`
@@ -110,6 +123,9 @@ export function initials(name: string) {
 }
 
 export function isImagemUrl(url: string) {
+  // blob:/data:image são URLs de pré-visualização local geradas nas páginas de
+  // demonstração (sem upload de verdade) — não têm extensão no final pra bater no regex.
+  if (url.startsWith("blob:") || url.startsWith("data:image")) return true
   return /\.(jpe?g|png|gif|webp|avif|heic|svg)(\?.*)?$/i.test(url)
 }
 

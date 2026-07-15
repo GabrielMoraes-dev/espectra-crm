@@ -23,6 +23,7 @@ export function FileField({
   lockedUrls,
   max,
   permiteVideo,
+  demo,
 }: {
   label: string;
   hint?: string;
@@ -34,6 +35,8 @@ export function FileField({
   max?: number;
   /** Permite vídeo e arquivos maiores (até 1GB) — sem isso, só imagem/PDF até 20MB. */
   permiteVideo?: boolean;
+  /** Modo de demonstração: gera só uma prévia local (sem upload de verdade pro armazenamento). */
+  demo?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -46,6 +49,14 @@ export function FileField({
     if (files.length === 0) return;
     if (max !== undefined && urls.length + files.length > max) {
       toast.error(`Envie no máximo ${max} arquivos.`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+
+    if (demo) {
+      // Modo de demonstração: só uma prévia local, sem subir nada de verdade.
+      const previewUrls = files.map((file) => URL.createObjectURL(file));
+      onChange([...urls, ...previewUrls]);
       if (inputRef.current) inputRef.current.value = "";
       return;
     }

@@ -12,7 +12,7 @@ export function ContaCard({ membros }: { membros: MembroEquipe[] }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Esta versão é de uso interno e não exige login individual. A equipe com acesso é:
+          O acesso ao CRM é feito com uma conta única e compartilhada (login com email e senha). A equipe com acesso é:
         </p>
         <ul className="space-y-2.5">
           {membros.map((membro) => (

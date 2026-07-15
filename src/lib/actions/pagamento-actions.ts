@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { pagamentoSchema, type PagamentoFormValues } from "@/lib/validations";
 import { formatCurrency } from "@/lib/utils";
 import { requireAuth } from "@/lib/auth/session";
-import { CAKTO_LINKS_POR_PRECO } from "@/lib/constants";
+import { CAKTO_LINKS_POR_PRECO, DESCONTOS_DISPONIVEIS } from "@/lib/constants";
 import { sendPagamentoConfirmadoEmail, sendPagamentoRecebidoInterno } from "@/lib/email";
 import type { Cliente } from "@/generated/prisma/client";
 
@@ -26,6 +26,9 @@ export async function gerarLinkPagamento(clienteId: string, preco: number, desco
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   const linkBase = CAKTO_LINKS_POR_PRECO[preco];
   if (!linkBase) throw new Error("Preço inválido");
+  if (desconto && !DESCONTOS_DISPONIVEIS.includes(desconto as (typeof DESCONTOS_DISPONIVEIS)[number])) {
+    throw new Error("Desconto inválido");
+  }
 
   const valorFinal = desconto ? Math.round(preco * (1 - desconto / 100)) : preco;
 

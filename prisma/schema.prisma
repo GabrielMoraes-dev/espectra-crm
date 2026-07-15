@@ -78,6 +78,16 @@ model Usuario {
   updatedAt        DateTime  @updatedAt
 }
 
+// Registra tentativas de login erradas por IP — camada extra além do bloqueio
+// por conta, já que aquele sozinho não impede um ataque distribuído por vários IPs.
+model TentativaLoginIp {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
+
 model Lead {
   id             String    @id @default(cuid())
   nome           String

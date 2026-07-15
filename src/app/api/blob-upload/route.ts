@@ -2,7 +2,8 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
 // SVG fica de fora: pode embutir script e esse endpoint recebe upload do formulário público, sem login.
-const TIPOS_IMAGEM = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+// HEIC/HEIF: formato padrão de fotos do iPhone quando escolhidas da galeria (não da câmera).
+const TIPOS_IMAGEM = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/heic", "image/heif"];
 // Padrão (sem clientPayload "geral"): fotos, logo e PDFs — cobre os uploads de
 // imagem/documento avulsos do CRM (foto de perfil, contrato, etc.).
 const TIPOS_PADRAO = [...TIPOS_IMAGEM, "application/pdf"];

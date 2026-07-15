@@ -78,7 +78,17 @@ export async function enviarContratoParaAssinatura({
     body: form,
   });
 
-  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(`A Autentique não respondeu corretamente (status ${res.status}). Tente novamente em instantes.`);
+  }
+
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Error("A Autentique retornou uma resposta inesperada. Tente novamente em instantes.");
+  }
+
   if (json.errors) {
     throw new Error(json.errors[0]?.message ?? "Não foi possível enviar o contrato para assinatura");
   }

@@ -112,6 +112,7 @@ type SectionProps = {
   identificacaoLocked?: boolean;
   emailLocked?: boolean;
   fotosLocked?: string[];
+  demo?: boolean;
 };
 
 const SECTIONS: {
@@ -265,6 +266,7 @@ export function BriefingForm({
             identificacaoLocked={identificacaoLocked}
             emailLocked={emailLocked}
             fotosLocked={fotosLocked}
+            demo={demo}
           />
         </section>
       ))}

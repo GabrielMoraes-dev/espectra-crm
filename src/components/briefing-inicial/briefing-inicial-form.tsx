@@ -149,6 +149,7 @@ export function BriefingInicialForm({
           max={6}
           urls={fotosUrls}
           onChange={setFotosUrls}
+          demo={demo}
         />
 
         <Button type="submit" disabled={pending}>

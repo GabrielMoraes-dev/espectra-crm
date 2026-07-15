@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, ListTodo } from "lucide-react";
+import { Plus, ListTodo, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -12,6 +12,8 @@ import { STATUS_TAREFA_CONFIG } from "@/lib/constants";
 import { formatDataPrazo } from "@/lib/utils";
 import type { Cliente, MembroEquipe, Tarefa } from "@/generated/prisma/client";
 
+type TarefaComResponsavel = Tarefa & { responsavel: MembroEquipe | null };
+
 export function ClienteTarefas({
   clienteId,
   tarefas,
@@ -19,11 +21,12 @@ export function ClienteTarefas({
   clientes,
 }: {
   clienteId: string;
-  tarefas: (Tarefa & { responsavel: MembroEquipe | null })[];
+  tarefas: TarefaComResponsavel[];
   membros: MembroEquipe[];
   clientes: Cliente[];
 }) {
   const [openCreate, setOpenCreate] = useState(false);
+  const [editTarefa, setEditTarefa] = useState<TarefaComResponsavel | null>(null);
 
   return (
     <>
@@ -51,7 +54,12 @@ export function ClienteTarefas({
                         {tarefa.prazo && ` · ${formatDataPrazo(tarefa.prazo)}`}
                       </p>
                     </div>
-                    <StatusBadge label={config.label} className={config.className} />
+                    <div className="flex items-center gap-2">
+                      <StatusBadge label={config.label} className={config.className} />
+                      <Button variant="ghost" size="icon-sm" onClick={() => setEditTarefa(tarefa)}>
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -66,6 +74,14 @@ export function ClienteTarefas({
       <TarefaFormDialog
         open={openCreate}
         onOpenChange={setOpenCreate}
+        membros={membros}
+        clientes={clientes}
+        clienteIdFixo={clienteId}
+      />
+      <TarefaFormDialog
+        open={!!editTarefa}
+        onOpenChange={(o) => !o && setEditTarefa(null)}
+        tarefa={editTarefa}
         membros={membros}
         clientes={clientes}
         clienteIdFixo={clienteId}
