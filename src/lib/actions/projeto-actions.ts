@@ -118,7 +118,8 @@ export async function moveProjetoEtapa(id: string, status: ProjetoFormValues["st
 
 export async function deleteProjeto(id: string) {
   await requireAuth();
-  await prisma.projeto.delete({ where: { id } });
+  const projeto = await prisma.projeto.delete({ where: { id } });
   revalidatePath("/projetos");
   revalidatePath("/");
+  revalidatePath(`/clientes/${projeto.clienteId}`);
 }

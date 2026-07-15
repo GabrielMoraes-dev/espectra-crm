@@ -29,10 +29,17 @@ function centenaPorExtenso(n: number): string {
 
 /** Converte um valor inteiro (reais, sem centavos) para texto por extenso em português. */
 export function numeroPorExtenso(valor: number): string {
-  if (valor === 0) return "zero";
+  // Arredonda e usa o valor absoluto — protege contra entrada negativa/quebrada
+  // (não deveria acontecer, já que o desconto é validado antes) ou não-inteira.
+  const n = Math.round(Math.abs(valor));
+  if (n === 0) return "zero";
+  // Acima de 999 mil foge muito do alcance real de preço da Espectra — melhor
+  // devolver o número puro do que arriscar gerar texto quebrado (CENTENAS só
+  // cobre 0-999, então centenaPorExtenso(milhar) quebraria com milhar >= 1000).
+  if (n >= 1_000_000) return String(n);
 
-  const milhar = Math.floor(valor / 1000);
-  const resto = valor % 1000;
+  const milhar = Math.floor(n / 1000);
+  const resto = n % 1000;
 
   const partes: string[] = [];
   if (milhar > 0) partes.push(milhar === 1 ? "mil" : `${centenaPorExtenso(milhar)} mil`);

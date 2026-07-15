@@ -119,6 +119,8 @@ model BriefingInicial {
   apresentacao String
   fotosUrls    String
   createdAt    DateTime @default(now())
+
+  @@index([leadId])
 }
 
 model Cliente {
@@ -154,6 +156,8 @@ model Cliente {
   briefings        Briefing[]
   pesquisas        PesquisaSatisfacao[]
   tarefas          Tarefa[]
+
+  @@index([responsavelId])
 }
 
 model FotoCliente {
@@ -162,6 +166,8 @@ model FotoCliente {
   cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   url       String
   createdAt DateTime @default(now())
+
+  @@index([clienteId])
 }
 
 model Briefing {
@@ -213,6 +219,9 @@ model Briefing {
 
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([clienteId])
 }
 
 model TimelineEvent {
@@ -223,6 +232,8 @@ model TimelineEvent {
   titulo      String
   descricao   String?
   createdAt   DateTime @default(now())
+
+  @@index([clienteId])
 }
 
 model Projeto {
@@ -236,6 +247,9 @@ model Projeto {
   observacoes   String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+
+  @@index([clienteId])
+  @@index([responsavelId])
 }
 
 model Pagamento {
@@ -248,6 +262,8 @@ model Pagamento {
   desconto       Int?
   data           DateTime @default(now())
   createdAt      DateTime @default(now())
+
+  @@index([clienteId])
 }
 
 model PesquisaSatisfacao {
@@ -261,6 +277,8 @@ model PesquisaSatisfacao {
   nota        Int
   comentario  String?
   createdAt   DateTime @default(now())
+
+  @@index([clienteId])
 }
 
 model PagamentoSemMatch {
@@ -286,6 +304,9 @@ model Tarefa {
   status        StatusTarefa      @default(A_FAZER)
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+
+  @@index([responsavelId])
+  @@index([clienteId])
 }
 
 model SOP {

@@ -1,5 +1,6 @@
 "use client";
 
+import { PieChart as PieChartIcon } from "lucide-react";
 import { Cell, Pie, PieChart } from "recharts";
 import {
   ChartContainer,
@@ -7,6 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const COLORS = [
   "var(--color-chart-1)",
@@ -21,6 +23,17 @@ export function NicheChart({ data }: { data: { nicho: string; total: number }[] 
   const config: ChartConfig = Object.fromEntries(
     data.map((d, i) => [d.nicho, { label: d.nicho, color: COLORS[i % COLORS.length] }]),
   );
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        icon={PieChartIcon}
+        title="Nenhum cliente ainda"
+        description="A distribuição por nicho aparece aqui assim que houver clientes cadastrados."
+        className="h-[220px] justify-center py-0"
+      />
+    );
+  }
 
   return (
     <ChartContainer config={config} className="aspect-auto h-[220px] w-full">

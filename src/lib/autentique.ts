@@ -72,11 +72,26 @@ export async function enviarContratoParaAssinatura({
   form.append("map", JSON.stringify(map));
   form.append("0", new Blob([new Uint8Array(pdfBuffer)], { type: "application/pdf" }), `contrato-${clienteId}.pdf`);
 
-  const res = await fetch(AUTENTIQUE_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
+  // Sem timeout, uma API travada deixaria a Server Action pendurada indefinidamente.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20_000);
+
+  let res: Response;
+  try {
+    res = await fetch(AUTENTIQUE_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("A Autentique demorou demais para responder. Tente novamente em instantes.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!res.ok) {
     throw new Error(`A Autentique não respondeu corretamente (status ${res.status}). Tente novamente em instantes.`);

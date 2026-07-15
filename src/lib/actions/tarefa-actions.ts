@@ -90,11 +90,13 @@ export async function moveTarefaStatus(id: string, status: TarefaFormValues["sta
   }
 
   revalidatePath("/tarefas");
+  if (tarefa.clienteId) revalidatePath(`/clientes/${tarefa.clienteId}`);
   return tarefa;
 }
 
 export async function deleteTarefa(id: string) {
   await requireAuth();
-  await prisma.tarefa.delete({ where: { id } });
+  const tarefa = await prisma.tarefa.delete({ where: { id } });
   revalidatePath("/tarefas");
+  if (tarefa.clienteId) revalidatePath(`/clientes/${tarefa.clienteId}`);
 }

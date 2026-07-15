@@ -14,6 +14,11 @@ const loginSchema = z.object({
 const MAX_TENTATIVAS = 5;
 const BLOQUEIO_MS = 15 * 60 * 1000;
 
+// Hash "de mentira" pra rodar o bcrypt.compare mesmo quando o email não existe —
+// sem isso, um email inexistente respondia bem mais rápido que um email real com
+// senha errada, dando pra descobrir por timing quais emails têm conta.
+const DUMMY_HASH = bcrypt.hashSync("nao-existe-conta-com-esse-email", 10);
+
 // Camada extra de proteção por IP — o bloqueio por conta sozinho não impede um
 // ataque vindo de vários IPs diferentes contra a mesma conta compartilhada.
 const MAX_TENTATIVAS_IP = 20;
@@ -41,7 +46,8 @@ export async function login(values: { email: string; password: string }) {
     throw new Error(`Muitas tentativas erradas. Tente novamente em ${minutos} minuto${minutos !== 1 ? "s" : ""}.`);
   }
 
-  const valid = usuario ? await bcrypt.compare(data.password, usuario.passwordHash) : false;
+  const compareResult = await bcrypt.compare(data.password, usuario?.passwordHash ?? DUMMY_HASH);
+  const valid = usuario ? compareResult : false;
 
   if (!usuario || !valid) {
     await prisma.tentativaLoginIp.create({ data: { ip } });

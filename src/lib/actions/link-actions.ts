@@ -8,9 +8,12 @@ import { requireAuth } from "@/lib/auth/session";
 export async function createLinkInterno(values: LinkInternoFormValues) {
   await requireAuth();
   const data = linkInternoSchema.parse(values);
-  const count = await prisma.linkInterno.count();
+  // max(ordem)+1 em vez de count() — depois de excluir um link, count() não bate
+  // mais com o maior ordem existente, podendo colidir com um link já existente.
+  const ultimo = await prisma.linkInterno.findFirst({ orderBy: { ordem: "desc" } });
+  const proximaOrdem = ultimo ? ultimo.ordem + 1 : 0;
   const link = await prisma.linkInterno.create({
-    data: { nome: data.nome, url: data.url, icone: data.icone || null, ordem: count },
+    data: { nome: data.nome, url: data.url, icone: data.icone || null, ordem: proximaOrdem },
   });
   revalidatePath("/estrutura-operacional");
   return link;

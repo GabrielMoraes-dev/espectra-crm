@@ -22,6 +22,11 @@ function clean(v: string | undefined | null) {
 }
 
 export async function handleClienteStatusChange(cliente: Cliente, statusAnterior: StatusCliente) {
+  // Por ser exportada de um arquivo "use server", vira uma Server Action invocável
+  // por conta própria — os dois pontos que já chamam essa função (updateCliente,
+  // registerStatusChange) já passam por requireAuth() antes, mas essa checagem
+  // aqui dentro garante que ninguém consiga chamar essa função direto sem sessão.
+  await requireAuth();
   if (statusAnterior === cliente.status) return;
 
   await prisma.timelineEvent.create({

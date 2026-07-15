@@ -53,6 +53,12 @@ export async function updateMembro(id: string, values: MembroFormValues) {
 export async function deleteMembro(id: string) {
   await requireAuth();
   await prisma.membroEquipe.delete({ where: { id } });
+  // Excluir um membro deixa Cliente/Projeto/Tarefa vinculados a ele sem responsável
+  // (onDelete: SetNull) — revalida também onde esse responsável aparece.
   revalidatePath("/equipe");
   revalidatePath("/estrutura-operacional");
+  revalidatePath("/projetos");
+  revalidatePath("/tarefas");
+  revalidatePath("/clientes");
+  revalidatePath("/");
 }

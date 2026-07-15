@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendPagamentoSemMatch, sendPagamentoConfirmadoEmail, sendPagamentoRecebidoInterno } from "@/lib/email";
 import { formatCurrency } from "@/lib/utils";
 import { verificarDivergenciaValor } from "@/lib/actions/pagamento-actions";
+
+function segredoValido(recebido: string | undefined) {
+  const esperado = process.env.CAKTO_WEBHOOK_SECRET;
+  if (!esperado || !recebido) return false;
+  const bufA = Buffer.from(recebido);
+  const bufB = Buffer.from(esperado);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 type CaktoWebhookItem = {
   amount: number;
@@ -35,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Corpo inválido" }, { status: 400 });
   }
 
-  if (!process.env.CAKTO_WEBHOOK_SECRET || body.secret !== process.env.CAKTO_WEBHOOK_SECRET) {
+  if (!segredoValido(body.secret)) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
