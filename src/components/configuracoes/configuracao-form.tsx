@@ -16,13 +16,21 @@ export function ConfiguracaoForm({ config }: { config: ConfiguracaoEmpresa }) {
   const [nomeEmpresa, setNomeEmpresa] = useState(config.nomeEmpresa);
   const [logoUrl, setLogoUrl] = useState(config.logoUrl ?? "");
   const [sobre, setSobre] = useState(config.sobre ?? "");
+  const [metaFaturamentoMensal, setMetaFaturamentoMensal] = useState(
+    config.metaFaturamentoMensal != null ? String(config.metaFaturamentoMensal) : "",
+  );
   const [pending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     startTransition(async () => {
       try {
-        await updateConfiguracao(config.id, { nomeEmpresa, logoUrl, sobre });
+        await updateConfiguracao(config.id, {
+          nomeEmpresa,
+          logoUrl,
+          sobre,
+          metaFaturamentoMensal: metaFaturamentoMensal.trim() === "" ? null : Number(metaFaturamentoMensal),
+        });
         toast.success("Configurações salvas");
       } catch {
         toast.error("Não foi possível salvar as configurações");
@@ -65,6 +73,19 @@ export function ConfiguracaoForm({ config }: { config: ConfiguracaoEmpresa }) {
               placeholder="Uma breve descrição da Espectra."
               value={sobre}
               onChange={(e) => setSobre(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="metaFaturamentoMensal">Meta de faturamento mensal (R$)</Label>
+            <Input
+              id="metaFaturamentoMensal"
+              type="number"
+              min={0}
+              step={1}
+              placeholder="Ex: 15000"
+              value={metaFaturamentoMensal}
+              onChange={(e) => setMetaFaturamentoMensal(e.target.value)}
             />
           </div>
 

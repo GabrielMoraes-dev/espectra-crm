@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { TarefasToolbar } from "@/components/tarefas/tarefas-toolbar";
 import { TarefasBoard } from "@/components/tarefas/tarefas-board";
+import { TarefasTable } from "@/components/tarefas/tarefas-table";
 import { FadeIn } from "@/components/shared/fade-in";
 import { PrazoAlertBanner } from "@/components/shared/prazo-alert-banner";
 import { getTarefas } from "@/lib/data/tarefas";
@@ -17,12 +18,13 @@ export default async function TarefasPage({
   const search = params.q ?? "";
   const responsavelId = params.responsavel ?? "";
   const prioridade = params.prioridade ?? "";
+  const view = params.view ?? "kanban";
 
   const [tarefas, membros, clientesComPrazo, clientes] = await Promise.all([
     getTarefas({ search, responsavelId, prioridade }),
     prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
-    prisma.cliente.findMany({ where: { prazo: { not: null }, status: { not: "FINALIZADO" } } }),
-    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
+    prisma.cliente.findMany({ where: { prazo: { not: null }, status: { not: "FINALIZADO" }, deletedAt: null } }),
+    prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" } }),
   ]);
 
   return (
@@ -36,10 +38,14 @@ export default async function TarefasPage({
         <PrazoAlertBanner clientes={clientesComPrazo} />
       </FadeIn>
 
-      <TarefasToolbar search={search} responsavelId={responsavelId} prioridade={prioridade} membros={membros} clientes={clientes} />
+      <TarefasToolbar search={search} responsavelId={responsavelId} prioridade={prioridade} view={view} membros={membros} clientes={clientes} />
 
       <FadeIn>
-        <TarefasBoard tarefas={tarefas} membros={membros} clientes={clientes} />
+        {view === "lista" ? (
+          <TarefasTable tarefas={tarefas} membros={membros} clientes={clientes} />
+        ) : (
+          <TarefasBoard tarefas={tarefas} membros={membros} clientes={clientes} />
+        )}
       </FadeIn>
     </div>
   );

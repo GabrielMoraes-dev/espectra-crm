@@ -15,7 +15,7 @@ import {
 import { timeAgo } from "@/lib/utils";
 import type { DashboardData } from "@/lib/data/dashboard";
 
-const ICONS: Record<string, LucideIcon> = {
+export const ICONS: Record<string, LucideIcon> = {
   lead_criado: UserPlus,
   pagamento: Wallet,
   projeto: Rocket,
@@ -30,7 +30,7 @@ const ICONS: Record<string, LucideIcon> = {
   webhook_erro: AlertTriangle,
 };
 
-const TIPOS_AVISO = new Set(["email_falhou", "webhook_erro"]);
+export const TIPOS_AVISO = new Set(["email_falhou", "webhook_erro"]);
 
 export function ActivityFeed({
   atividades,

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { STATUS_CLIENTE_CONFIG, NICHOS_CLIENTE } from "@/lib/constants";
 import { ClienteFormDialog } from "@/components/clientes/cliente-form-dialog";
+import { LixeiraButton } from "@/components/clientes/lixeira-dialog";
 import type { MembroEquipe } from "@/generated/prisma/client";
 
 export function ClientesToolbar({
@@ -118,10 +119,13 @@ export function ClientesToolbar({
           </Select>
         </div>
 
-        <Button onClick={() => setOpenCreate(true)}>
-          <Plus className="size-4" />
-          Novo cliente
-        </Button>
+        <div className="flex items-center gap-2">
+          <LixeiraButton />
+          <Button onClick={() => setOpenCreate(true)}>
+            <Plus className="size-4" />
+            Novo cliente
+          </Button>
+        </div>
       </div>
 
       <ClienteFormDialog open={openCreate} onOpenChange={setOpenCreate} membros={membros} />

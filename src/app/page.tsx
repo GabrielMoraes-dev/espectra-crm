@@ -31,12 +31,23 @@ export default async function Home() {
   const [data, pesquisaStats] = await Promise.all([getDashboardData(), getPesquisaStats()]);
   const { stats } = data;
 
+  const receitaHintPartes = [];
+  if (stats.variacaoReceitaMes !== null) {
+    const sinal = stats.variacaoReceitaMes >= 0 ? "+" : "";
+    receitaHintPartes.push(`${sinal}${stats.variacaoReceitaMes.toFixed(0)}% vs mês passado`);
+  }
+  if (stats.metaFaturamentoMensal) {
+    const pctMeta = Math.round((stats.receitaDoMes / stats.metaFaturamentoMensal) * 100);
+    receitaHintPartes.push(`${pctMeta}% da meta`);
+  }
+  const receitaHint = receitaHintPartes.length > 0 ? receitaHintPartes.join(" · ") : "pagamentos confirmados";
+
   const cards = [
     { label: "Leads", value: String(stats.leadsAtivos), icon: Inbox, hint: "no funil" },
     { label: "Clientes Ativos", value: String(stats.clientesAtivos), icon: Users, hint: "em atendimento" },
     { label: "Projetos em andamento", value: String(stats.projetosEmAndamento), icon: Rocket, hint: "em produção" },
     { label: "Projetos concluídos", value: String(stats.projetosConcluidos), icon: CheckCircle2, hint: "publicados", tone: "success" as const },
-    { label: "Receita do mês", value: formatCurrency(stats.receitaDoMes), icon: Wallet, hint: "pagamentos confirmados", tone: "success" as const },
+    { label: "Receita do mês", value: formatCurrency(stats.receitaDoMes), icon: Wallet, hint: receitaHint, tone: "success" as const },
     { label: "Pendências", value: formatCurrency(stats.pendencias), icon: AlertTriangle, hint: "a receber", tone: "warning" as const },
   ];
 

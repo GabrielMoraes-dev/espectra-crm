@@ -20,7 +20,7 @@ export default async function FinanceiroPage({
 
   const [{ pagamentos, resumo }, clientes] = await Promise.all([
     getFinanceiroData({ search, status, sort }),
-    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
+    prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" } }),
   ]);
 
   return (

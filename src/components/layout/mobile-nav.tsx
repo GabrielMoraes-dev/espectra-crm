@@ -13,9 +13,11 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 export function MobileNav({
   nomeEmpresa,
   logoUrl,
+  pendenciasBadge = 0,
 }: {
   nomeEmpresa?: string;
   logoUrl?: string | null;
+  pendenciasBadge?: number;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -49,6 +51,11 @@ export function MobileNav({
               >
                 <Icon className="size-[18px] shrink-0" />
                 <span>{item.label}</span>
+                {item.href === "/" && pendenciasBadge > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[11px] font-semibold text-warning-foreground">
+                    {pendenciasBadge}
+                  </span>
+                )}
               </Link>
             );
           })}

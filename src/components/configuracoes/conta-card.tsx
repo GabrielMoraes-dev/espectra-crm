@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { TrocarSenhaForm } from "@/components/configuracoes/trocar-senha-form";
 import { initials } from "@/lib/utils";
 import type { MembroEquipe } from "@/generated/prisma/client";
 
@@ -32,6 +33,10 @@ export function ContaCard({ membros }: { membros: MembroEquipe[] }) {
         <Link href="/equipe" className="inline-block text-xs font-medium text-brand-100 hover:underline">
           Gerenciar equipe →
         </Link>
+
+        <div className="border-t border-border pt-4">
+          <TrocarSenhaForm />
+        </div>
       </CardContent>
     </Card>
   );

@@ -115,6 +115,7 @@ export const configuracaoSchema = z.object({
   nomeEmpresa: z.string().min(1, "Informe o nome da empresa"),
   logoUrl: z.string().optional().or(z.literal("")),
   sobre: z.string().optional().or(z.literal("")),
+  metaFaturamentoMensal: z.coerce.number().min(0).optional().nullable(),
 });
 
 export type ConfiguracaoFormValues = z.infer<typeof configuracaoSchema>;

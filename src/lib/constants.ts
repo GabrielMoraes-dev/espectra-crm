@@ -9,6 +9,7 @@ import {
   Network,
   FileText,
   Settings,
+  History,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Mapa", href: "/mapa", icon: Map },
   { label: "Estrutura Operacional", href: "/estrutura-operacional", icon: Network },
   { label: "Modelos", href: "/modelos", icon: FileText },
+  { label: "Atividades", href: "/atividades", icon: History },
   { label: "Configurações", href: "/configuracoes", icon: Settings },
 ];
 

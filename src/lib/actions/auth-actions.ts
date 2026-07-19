@@ -4,7 +4,8 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { createSession, deleteSession, verifySession } from "@/lib/auth/session";
+import { createSession, deleteSession, verifySession, requireAuth } from "@/lib/auth/session";
+import { sendContaBloqueadaAlerta } from "@/lib/email";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -64,6 +65,9 @@ export async function login(values: { email: string; password: string }) {
           where: { id: usuario.id },
           data: { tentativasFalhas: 0, bloqueadoAte: new Date(Date.now() + BLOQUEIO_MS) },
         });
+        // Avisa por e-mail — pode ser vocês mesmos errando a senha, mas também pode
+        // ser alguém tentando adivinhar; melhor saber na hora.
+        await sendContaBloqueadaAlerta(usuario.email, Math.round(BLOQUEIO_MS / 60000));
       }
     }
     throw new Error("Email ou senha inválidos");
@@ -84,6 +88,25 @@ export async function login(values: { email: string; password: string }) {
       entidadeId: usuario.id,
     },
   });
+}
+
+const alterarSenhaSchema = z.object({
+  senhaAtual: z.string().min(1, "Informe a senha atual"),
+  novaSenha: z.string().min(8, "A nova senha precisa ter pelo menos 8 caracteres"),
+});
+
+export async function alterarSenha(values: { senhaAtual: string; novaSenha: string }) {
+  const session = await requireAuth();
+  const data = alterarSenhaSchema.parse(values);
+
+  const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: session.usuarioId } });
+  const senhaCorreta = await bcrypt.compare(data.senhaAtual, usuario.passwordHash);
+  if (!senhaCorreta) {
+    throw new Error("Senha atual incorreta");
+  }
+
+  const passwordHash = await bcrypt.hash(data.novaSenha, 10);
+  await prisma.usuario.update({ where: { id: usuario.id }, data: { passwordHash } });
 }
 
 export async function logout() {

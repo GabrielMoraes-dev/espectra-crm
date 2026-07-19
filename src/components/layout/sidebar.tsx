@@ -19,9 +19,11 @@ const STORAGE_KEY = "espectra:sidebar-collapsed";
 export function AppSidebar({
   nomeEmpresa,
   logoUrl,
+  pendenciasBadge = 0,
 }: {
   nomeEmpresa?: string;
   logoUrl?: string | null;
+  pendenciasBadge?: number;
 }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -82,6 +84,16 @@ export function AppSidebar({
               )}
               <Icon className="size-[18px] shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
+              {item.href === "/" && pendenciasBadge > 0 && (
+                <span
+                  className={cn(
+                    "flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[11px] font-semibold text-warning-foreground",
+                    collapsed ? "absolute -right-1 -top-1" : "ml-auto",
+                  )}
+                >
+                  {pendenciasBadge}
+                </span>
+              )}
             </Link>
           );
 

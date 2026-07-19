@@ -23,6 +23,7 @@ export async function getDashboardData() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
   const [
@@ -31,6 +32,7 @@ export async function getDashboardData() {
     projetosEmAndamento,
     projetosConcluidos,
     pagamentosDoMes,
+    pagamentosDoMesAnterior,
     pagamentosPendentes,
     clientesRecentes,
     atividadesRecentes,
@@ -41,9 +43,10 @@ export async function getDashboardData() {
     clientesPendencia,
     pagamentosSemMatch,
     clientesParaVincular,
+    configuracao,
   ] = await Promise.all([
     prisma.lead.count({ where: { etapa: { notIn: ["FECHADO", "PERDIDO"] } } }),
-    prisma.cliente.count({ where: { status: { not: "FINALIZADO" } } }),
+    prisma.cliente.count({ where: { status: { not: "FINALIZADO" }, deletedAt: null } }),
     prisma.projeto.count({ where: { status: { not: "PUBLICADO" } } }),
     prisma.projeto.count({ where: { status: "PUBLICADO" } }),
     prisma.pagamento.aggregate({
@@ -52,9 +55,14 @@ export async function getDashboardData() {
     }),
     prisma.pagamento.aggregate({
       _sum: { valor: true },
+      where: { pago: true, data: { gte: startOfPrevMonth, lt: startOfMonth } },
+    }),
+    prisma.pagamento.aggregate({
+      _sum: { valor: true },
       where: { pago: false },
     }),
     prisma.cliente.findMany({
+      where: { deletedAt: null },
       orderBy: { dataEntrada: "desc" },
       take: 5,
       include: { responsavel: true },
@@ -65,10 +73,11 @@ export async function getDashboardData() {
     }),
     prisma.cliente.groupBy({
       by: ["nicho"],
+      where: { deletedAt: null },
       _count: { _all: true },
     }),
     prisma.cliente.findMany({
-      where: { dataEntrada: { gte: sixMonthsAgo } },
+      where: { dataEntrada: { gte: sixMonthsAgo }, deletedAt: null },
       select: { dataEntrada: true },
     }),
     prisma.pagamento.findMany({
@@ -76,11 +85,12 @@ export async function getDashboardData() {
       select: { data: true, valor: true },
     }),
     prisma.cliente.findMany({
-      where: { prazo: { not: null }, status: { not: "FINALIZADO" } },
+      where: { prazo: { not: null }, status: { not: "FINALIZADO" }, deletedAt: null },
     }),
     prisma.cliente.findMany({
       where: {
         status: { not: "FINALIZADO" },
+        deletedAt: null,
         OR: [
           { contratoUrl: null, pagamentos: { some: { pago: true } } },
           { contratoUrl: { not: null }, pagamentos: { none: { pago: true } } },
@@ -92,7 +102,8 @@ export async function getDashboardData() {
       where: { resolvido: false },
       orderBy: { createdAt: "desc" },
     }),
-    prisma.cliente.findMany({ orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
+    prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
+    prisma.configuracaoEmpresa.findFirst(),
   ]);
 
   const months = lastNMonths(6);
@@ -131,14 +142,24 @@ export async function getDashboardData() {
     .map((n) => ({ nicho: n.nicho as string, total: n._count._all }))
     .sort((a, b) => b.total - a.total);
 
+  const receitaDoMes = pagamentosDoMes._sum.valor ?? 0;
+  const receitaMesAnterior = pagamentosDoMesAnterior._sum.valor ?? 0;
+  const variacaoReceitaMes = receitaMesAnterior > 0
+    ? ((receitaDoMes - receitaMesAnterior) / receitaMesAnterior) * 100
+    : null;
+
   return {
     stats: {
       leadsAtivos,
       clientesAtivos,
       projetosEmAndamento,
       projetosConcluidos,
-      receitaDoMes: pagamentosDoMes._sum.valor ?? 0,
+      receitaDoMes,
+      receitaMesAnterior,
+      variacaoReceitaMes,
+      metaFaturamentoMensal: configuracao?.metaFaturamentoMensal ?? null,
       pendencias: pagamentosPendentes._sum.valor ?? 0,
+      pendenciasBadge: pendenciasContratoPagamento.length + pagamentosSemMatch.length,
     },
     vendasPorMes,
     receitaPorMes,
@@ -154,3 +175,22 @@ export async function getDashboardData() {
 }
 
 export type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
+
+// Consulta enxuta (sem os 15 fan-outs do dashboard inteiro) só pra mostrar o
+// badge de pendências na sidebar, que aparece em toda página do CRM.
+export async function getPendenciasBadgeCount() {
+  const [clientesPendencia, pagamentosSemMatch] = await Promise.all([
+    prisma.cliente.count({
+      where: {
+        status: { not: "FINALIZADO" },
+        deletedAt: null,
+        OR: [
+          { contratoUrl: null, pagamentos: { some: { pago: true } } },
+          { contratoUrl: { not: null }, pagamentos: { none: { pago: true } } },
+        ],
+      },
+    }),
+    prisma.pagamentoSemMatch.count({ where: { resolvido: false } }),
+  ]);
+  return clientesPendencia + pagamentosSemMatch;
+}

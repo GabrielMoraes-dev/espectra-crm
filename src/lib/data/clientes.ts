@@ -9,7 +9,7 @@ export type ClientesFilter = {
 };
 
 export async function getClientes(filter: ClientesFilter) {
-  const where: Prisma.ClienteWhereInput = {};
+  const where: Prisma.ClienteWhereInput = { deletedAt: null };
 
   if (filter.search) {
     where.OR = [

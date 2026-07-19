@@ -221,6 +221,19 @@ export async function sendContratoAssinadoInterno(cliente: Cliente) {
   });
 }
 
+export async function sendContaBloqueadaAlerta(email: string, minutos: number) {
+  await enviarEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: "Login bloqueado por tentativas erradas",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px;">
+        <p>A conta <strong>${esc(email)}</strong> foi bloqueada por ${minutos} minutos depois de várias tentativas de senha erradas seguidas.</p>
+        <p>Se não foi você tentando entrar, alguém pode estar tentando adivinhar a senha.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendStaleLeadReminder(leads: Lead[]) {
   const itens = leads
     .map(

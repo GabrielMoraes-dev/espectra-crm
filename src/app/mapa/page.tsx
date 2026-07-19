@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MapaPage() {
   const clientes = await prisma.cliente.findMany({
+    where: { deletedAt: null },
     select: { id: true, nome: true, empresa: true, cidade: true, estado: true },
     orderBy: { nome: "asc" },
   });

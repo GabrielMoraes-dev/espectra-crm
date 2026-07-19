@@ -156,6 +156,7 @@ model Cliente {
   prazo            DateTime?
   status           StatusCliente @default(EM_PRODUCAO)
   observacoes      String?
+  deletedAt        DateTime?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
@@ -339,11 +340,12 @@ model LinkInterno {
 }
 
 model ConfiguracaoEmpresa {
-  id           String  @id @default(cuid())
-  nomeEmpresa  String  @default("Espectra")
-  logoUrl      String?
-  sobre        String?
-  tema         String  @default("dark-navy")
+  id                    String  @id @default(cuid())
+  nomeEmpresa           String  @default("Espectra")
+  logoUrl               String?
+  sobre                 String?
+  tema                  String  @default("dark-navy")
+  metaFaturamentoMensal Float?
 }
 
 model ActivityLog {

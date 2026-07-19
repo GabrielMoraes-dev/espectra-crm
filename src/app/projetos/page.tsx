@@ -21,7 +21,7 @@ export default async function ProjetosPage({
 
   const [projetos, clientes, membros] = await Promise.all([
     getProjetos({ search, status }),
-    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
+    prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" } }),
     prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
   ]);
 

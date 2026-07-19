@@ -15,6 +15,7 @@ export async function updateConfiguracao(id: string, values: ConfiguracaoFormVal
       nomeEmpresa: data.nomeEmpresa,
       logoUrl: data.logoUrl?.trim() || null,
       sobre: data.sobre?.trim() || null,
+      metaFaturamentoMensal: data.metaFaturamentoMensal ?? null,
     },
   });
 

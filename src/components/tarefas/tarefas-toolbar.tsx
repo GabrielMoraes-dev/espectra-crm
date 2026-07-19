@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, LayoutGrid, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,18 +14,21 @@ import {
 } from "@/components/ui/select";
 import { PRIORIDADE_TAREFA_CONFIG } from "@/lib/constants";
 import { TarefaFormDialog } from "@/components/tarefas/tarefa-form-dialog";
+import { cn } from "@/lib/utils";
 import type { Cliente, MembroEquipe } from "@/generated/prisma/client";
 
 export function TarefasToolbar({
   search,
   responsavelId,
   prioridade,
+  view,
   membros,
   clientes,
 }: {
   search: string;
   responsavelId: string;
   prioridade: string;
+  view: string;
   membros: MembroEquipe[];
   clientes: Cliente[];
 }) {
@@ -102,10 +105,33 @@ export function TarefasToolbar({
           </Select>
         </div>
 
-        <Button onClick={() => setOpenCreate(true)}>
-          <Plus className="size-4" />
-          Nova tarefa
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-lg border border-border p-0.5">
+            <button
+              onClick={() => updateParam("view", "kanban")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors",
+                view !== "lista" && "bg-accent text-accent-foreground",
+              )}
+            >
+              <LayoutGrid className="size-3.5" /> Kanban
+            </button>
+            <button
+              onClick={() => updateParam("view", "lista")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors",
+                view === "lista" && "bg-accent text-accent-foreground",
+              )}
+            >
+              <List className="size-3.5" /> Lista
+            </button>
+          </div>
+
+          <Button onClick={() => setOpenCreate(true)}>
+            <Plus className="size-4" />
+            Nova tarefa
+          </Button>
+        </div>
       </div>
 
       <TarefaFormDialog open={openCreate} onOpenChange={setOpenCreate} membros={membros} clientes={clientes} />

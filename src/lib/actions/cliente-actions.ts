@@ -159,7 +159,33 @@ export async function updateCliente(id: string, values: ClienteFormValues) {
   return cliente;
 }
 
+// "Excluir" move o cliente pra lixeira (reversível) em vez de apagar de vez —
+// nada de Lead/Briefing/Blob é tocado aqui, só fica escondido das listas normais.
 export async function deleteCliente(id: string) {
+  await requireAuth();
+  await prisma.cliente.update({ where: { id }, data: { deletedAt: new Date() } });
+  revalidatePath("/clientes");
+  revalidatePath("/");
+}
+
+export async function restaurarCliente(id: string) {
+  await requireAuth();
+  await prisma.cliente.update({ where: { id }, data: { deletedAt: null } });
+  revalidatePath("/clientes");
+  revalidatePath("/");
+}
+
+export async function getClientesNaLixeira() {
+  await requireAuth();
+  return prisma.cliente.findMany({
+    where: { deletedAt: { not: null } },
+    orderBy: { deletedAt: "desc" },
+  });
+}
+
+// Apagar de vez, chamado só a partir da Lixeira — aqui sim limpa Lead/Briefing
+// órfãos e os arquivos no Vercel Blob, exatamente como o antigo "excluir" fazia.
+export async function excluirClientePermanentemente(id: string) {
   await requireAuth();
 
   const cliente = await prisma.cliente.findUnique({

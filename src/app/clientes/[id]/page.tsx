@@ -20,7 +20,7 @@ export default async function ClienteDetailPage({
   const [cliente, membros, clientes] = await Promise.all([
     getClienteById(id),
     prisma.membroEquipe.findMany({ orderBy: { nome: "asc" } }),
-    prisma.cliente.findMany({ orderBy: { nome: "asc" } }),
+    prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" } }),
   ]);
 
   if (!cliente) notFound();

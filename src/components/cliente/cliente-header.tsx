@@ -133,11 +133,11 @@ export function ClienteHeader({
         open={openDelete}
         onOpenChange={setOpenDelete}
         title={`Excluir cliente "${cliente.nome}"?`}
-        description="Essa ação remove também o histórico, projetos e pagamentos vinculados."
+        description="O cliente vai pra Lixeira e some das listas — dá pra restaurar depois em Clientes → Lixeira."
         confirmLabel="Excluir"
         onConfirm={async () => {
           await deleteCliente(cliente.id);
-          toast.success("Cliente excluído");
+          toast.success("Cliente movido pra Lixeira");
           router.push("/clientes");
         }}
       />
