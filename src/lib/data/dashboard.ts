@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ETAPA_LEAD_CONFIG, ETAPA_LEAD_ORDEM } from "@/lib/constants";
 
 const MESES = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
@@ -44,6 +45,7 @@ export async function getDashboardData() {
     pagamentosSemMatch,
     clientesParaVincular,
     configuracao,
+    leadsPorEtapaRaw,
   ] = await Promise.all([
     prisma.lead.count({ where: { etapa: { notIn: ["FECHADO", "PERDIDO"] } } }),
     prisma.cliente.count({ where: { status: { not: "FINALIZADO" }, deletedAt: null } }),
@@ -104,6 +106,7 @@ export async function getDashboardData() {
     }),
     prisma.cliente.findMany({ where: { deletedAt: null }, orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
     prisma.configuracaoEmpresa.findFirst(),
+    prisma.lead.groupBy({ by: ["etapa"], _count: { _all: true } }),
   ]);
 
   const months = lastNMonths(6);
@@ -142,6 +145,22 @@ export async function getDashboardData() {
     .map((n) => ({ nicho: n.nicho as string, total: n._count._all }))
     .sort((a, b) => b.total - a.total);
 
+  const contagemPorEtapa = Object.fromEntries(
+    leadsPorEtapaRaw.map((l) => [l.etapa, l._count._all]),
+  ) as Record<(typeof ETAPA_LEAD_ORDEM)[number], number>;
+
+  const funilLeads = ETAPA_LEAD_ORDEM.filter((etapa) => etapa !== "PERDIDO").map((etapa) => ({
+    etapa,
+    label: ETAPA_LEAD_CONFIG[etapa].label,
+    total: contagemPorEtapa[etapa] ?? 0,
+  }));
+
+  const totalLeadsTodos = Object.values(contagemPorEtapa).reduce((acc, n) => acc + n, 0);
+  const leadsPerdidos = contagemPorEtapa.PERDIDO ?? 0;
+  const leadsFechados = contagemPorEtapa.FECHADO ?? 0;
+  const baseConversao = totalLeadsTodos - leadsPerdidos;
+  const taxaConversaoFunil = baseConversao > 0 ? (leadsFechados / baseConversao) * 100 : null;
+
   const receitaDoMes = pagamentosDoMes._sum.valor ?? 0;
   const receitaMesAnterior = pagamentosDoMesAnterior._sum.valor ?? 0;
   const variacaoReceitaMes = receitaMesAnterior > 0
@@ -160,11 +179,13 @@ export async function getDashboardData() {
       metaFaturamentoMensal: configuracao?.metaFaturamentoMensal ?? null,
       pendencias: pagamentosPendentes._sum.valor ?? 0,
       pendenciasBadge: pendenciasContratoPagamento.length + pagamentosSemMatch.length,
+      taxaConversaoFunil,
     },
     vendasPorMes,
     receitaPorMes,
     crescimento,
     nichoData,
+    funilLeads,
     clientesRecentes,
     atividadesRecentes,
     clientesComPrazo,

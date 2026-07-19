@@ -257,6 +257,10 @@ model Projeto {
   responsavel   MembroEquipe? @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
   status        EtapaProjeto @default(BRIEFING)
   observacoes   String?
+  // JSON string de string[] com os ids dos itens do checklist padrão (ver
+  // CHECKLIST_ETAPA_PROJETO em constants.ts) já marcados na etapa atual —
+  // zera automaticamente sempre que o projeto muda de etapa.
+  checklistConcluido String @default("[]")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 

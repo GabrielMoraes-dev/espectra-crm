@@ -105,6 +105,38 @@ export const ETAPA_PROJETO_CONFIG: Record<
   PUBLICADO: { label: "Publicado", className: "bg-success/20 text-success" },
 };
 
+// Checklist padrão por etapa do projeto — só um rascunho inicial, dá pra
+// ajustar os itens aqui conforme o processo real da Espectra for mudando.
+export const CHECKLIST_ETAPA_PROJETO: Record<
+  (typeof ETAPA_PROJETO_ORDEM)[number],
+  { id: string; label: string }[]
+> = {
+  BRIEFING: [
+    { id: "briefing-recebido", label: "Briefing completo recebido" },
+    { id: "contrato-enviado", label: "Contrato enviado pra assinatura" },
+    { id: "pagamento-confirmado", label: "Pagamento confirmado" },
+  ],
+  DESIGN: [
+    { id: "identidade-definida", label: "Paleta de cores e identidade definidas" },
+    { id: "estrutura-aprovada", label: "Estrutura/wireframe aprovado" },
+    { id: "copy-revisado", label: "Copy revisado" },
+  ],
+  DESENVOLVIMENTO: [
+    { id: "landing-implementada", label: "Landing page implementada" },
+    { id: "dominio-configurado", label: "Domínio configurado" },
+    { id: "testado-mobile", label: "Testado em celular e computador" },
+  ],
+  REVISAO: [
+    { id: "ajustes-aplicados", label: "Ajustes do cliente aplicados" },
+    { id: "aprovacao-final", label: "Aprovação final do cliente" },
+  ],
+  PUBLICADO: [
+    { id: "site-no-ar", label: "Site no ar" },
+    { id: "cliente-avisado", label: "Cliente avisado" },
+    { id: "pesquisa-enviada", label: "Pesquisa de satisfação enviada" },
+  ],
+};
+
 // ---------- Tarefas ----------
 
 export const PRIORIDADE_TAREFA_CONFIG = {

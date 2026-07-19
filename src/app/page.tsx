@@ -13,6 +13,7 @@ import { ChartCard } from "@/components/dashboard/chart-card";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { NicheChart } from "@/components/dashboard/niche-chart";
+import { FunilChart } from "@/components/dashboard/funil-chart";
 import { GrowthChart } from "@/components/dashboard/growth-chart";
 import { SatisfacaoCard } from "@/components/dashboard/satisfacao-card";
 import { RecentClientsTable } from "@/components/dashboard/recent-clients-table";
@@ -104,6 +105,18 @@ export default async function Home() {
         <FadeIn delay={0.19}>
           <ChartCard title="Crescimento" description="Clientes acumulados nos últimos 6 meses">
             <GrowthChart data={data.crescimento} />
+          </ChartCard>
+        </FadeIn>
+        <FadeIn delay={0.22}>
+          <ChartCard
+            title="Funil de conversão"
+            description={
+              stats.taxaConversaoFunil !== null
+                ? `${stats.taxaConversaoFunil.toFixed(0)}% dos leads viram cliente`
+                : "Leads em cada etapa do funil"
+            }
+          >
+            <FunilChart data={data.funilLeads} />
           </ChartCard>
         </FadeIn>
       </div>

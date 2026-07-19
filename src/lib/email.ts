@@ -277,6 +277,30 @@ export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })
   });
 }
 
+export async function sendResumoSemanal(resumo: {
+  novosLeads: number;
+  novosClientes: number;
+  receitaSemana: number;
+  tarefasConcluidas: number;
+}) {
+  await enviarEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: "Resumo da semana — Espectra CRM",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px;">
+        <p>Como foi a última semana:</p>
+        <ul style="color: #555;">
+          <li><strong>${resumo.novosLeads}</strong> novo${resumo.novosLeads !== 1 ? "s" : ""} lead${resumo.novosLeads !== 1 ? "s" : ""}</li>
+          <li><strong>${resumo.novosClientes}</strong> cliente${resumo.novosClientes !== 1 ? "s" : ""} fechado${resumo.novosClientes !== 1 ? "s" : ""}</li>
+          <li><strong>${formatCurrency(resumo.receitaSemana)}</strong> confirmado${resumo.receitaSemana !== 1 ? "s" : ""} em pagamentos</li>
+          <li><strong>${resumo.tarefasConcluidas}</strong> tarefa${resumo.tarefasConcluidas !== 1 ? "s" : ""} concluída${resumo.tarefasConcluidas !== 1 ? "s" : ""}</li>
+        </ul>
+        <p><a href="${SITE_URL}" style="color: #5483b3;">Ver dashboard no CRM →</a></p>
+      </div>
+    `,
+  });
+}
+
 export async function sendPagamentoAtrasado(pagamentos: (Pagamento & { cliente: Cliente })[]) {
   const itens = pagamentos
     .map(

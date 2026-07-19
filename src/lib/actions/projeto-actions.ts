@@ -77,6 +77,7 @@ export async function updateProjeto(id: string, values: ProjetoFormValues) {
     where: { id },
     include: { cliente: true },
   });
+  const statusMudou = before.status !== data.status;
 
   const projeto = await prisma.projeto.update({
     where: { id },
@@ -86,6 +87,8 @@ export async function updateProjeto(id: string, values: ProjetoFormValues) {
       responsavelId: clean(data.responsavelId),
       status: data.status,
       observacoes: clean(data.observacoes),
+      // Checklist é por etapa — muda de etapa, começa do zero de novo.
+      ...(statusMudou ? { checklistConcluido: "[]" } : {}),
     },
     include: { cliente: true },
   });
@@ -104,7 +107,7 @@ export async function moveProjetoEtapa(id: string, status: ProjetoFormValues["st
   await requireAuth();
   const projeto = await prisma.projeto.update({
     where: { id },
-    data: { status },
+    data: { status, checklistConcluido: "[]" },
     include: { cliente: true },
   });
 
@@ -114,6 +117,23 @@ export async function moveProjetoEtapa(id: string, status: ProjetoFormValues["st
   revalidatePath("/");
   revalidatePath(`/clientes/${projeto.clienteId}`);
   return projeto;
+}
+
+export async function toggleChecklistItem(id: string, itemId: string) {
+  await requireAuth();
+  const projeto = await prisma.projeto.findUniqueOrThrow({ where: { id } });
+  const concluidos: string[] = JSON.parse(projeto.checklistConcluido || "[]");
+  const novo = concluidos.includes(itemId)
+    ? concluidos.filter((i) => i !== itemId)
+    : [...concluidos, itemId];
+
+  await prisma.projeto.update({
+    where: { id },
+    data: { checklistConcluido: JSON.stringify(novo) },
+  });
+
+  revalidatePath("/projetos");
+  revalidatePath(`/clientes/${projeto.clienteId}`);
 }
 
 export async function deleteProjeto(id: string) {

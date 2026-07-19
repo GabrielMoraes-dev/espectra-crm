@@ -16,6 +16,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FotoGallery } from "@/components/shared/foto-gallery";
 import { ProjetoFormDialog } from "@/components/projetos/projeto-form-dialog";
+import { ProjetoChecklist } from "@/components/projetos/projeto-checklist";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { formatDataPrazo, getPrazoUrgencia } from "@/lib/utils";
 import { deleteProjeto } from "@/lib/actions/projeto-actions";
@@ -94,6 +95,12 @@ export function ProjetoDetailSheet({
               badge={urgencia}
             />
             <InfoRow icon={UserSquare2} label="Responsável" value={projeto.responsavel?.nome ?? "—"} />
+
+            <ProjetoChecklist
+              projetoId={projeto.id}
+              status={projeto.status}
+              checklistConcluido={projeto.checklistConcluido}
+            />
 
             {projeto.observacoes && (
               <div className="space-y-1 rounded-lg border border-border bg-card/50 p-3">
