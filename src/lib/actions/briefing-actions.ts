@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { briefingSchema, type BriefingFormValues } from "@/lib/validations";
 import { sendBriefingNotification, sendBriefingConfirmation } from "@/lib/email";
+import { getIp, verificarRateLimit } from "@/lib/rate-limit";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
 export async function createBriefing(values: BriefingFormValues) {
+  await verificarRateLimit("criar_briefing", await getIp(), 10, 15 * 60 * 1000);
   const data = briefingSchema.parse(values);
 
   const briefing = await prisma.$transaction(async (tx) => {

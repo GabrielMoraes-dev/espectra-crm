@@ -220,9 +220,9 @@ export function LeadFormDialog({
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label>Origem</Label>
+                        <Label htmlFor="origem">Origem</Label>
                         <Select value={form.origem} onValueChange={(v) => set("origem", v ?? "")}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger id="origem" className="w-full">
                             <SelectValue placeholder="Selecione" />
                           </SelectTrigger>
                           <SelectContent>
@@ -235,9 +235,9 @@ export function LeadFormDialog({
                         </Select>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Etapa</Label>
+                        <Label htmlFor="etapa">Etapa</Label>
                         <Select value={form.etapa} onValueChange={(v) => set("etapa", v ?? "NOVO")}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger id="etapa" className="w-full">
                             <SelectValue>
                               {(value: keyof typeof ETAPA_LEAD_CONFIG) => ETAPA_LEAD_CONFIG[value]?.label}
                             </SelectValue>

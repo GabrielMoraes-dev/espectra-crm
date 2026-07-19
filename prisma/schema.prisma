@@ -88,6 +88,17 @@ model TentativaLoginIp {
   @@index([ip, createdAt])
 }
 
+// Rate limit genérico por IP para endpoints públicos sem login (upload, formulários
+// de briefing/pesquisa) — mesma ideia do TentativaLoginIp, mas reutilizável por ação.
+model TentativaAcaoIp {
+  id        String   @id @default(cuid())
+  acao      String
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([acao, ip, createdAt])
+}
+
 model Lead {
   id             String    @id @default(cuid())
   nome           String
@@ -129,7 +140,7 @@ model Cliente {
   empresa          String?
   whatsapp         String?
   instagram        String?
-  email            String?
+  email            String?       @unique
   site             String?
   cidade           String?
   estado           String?
@@ -137,7 +148,7 @@ model Cliente {
   planoContratado  String?
   valor            Float?
   contratoUrl      String?
-  contratoAutentiqueId String?
+  contratoAutentiqueId String?   @unique
   cpfCnpj          String?
   responsavelId    String?
   responsavel      MembroEquipe? @relation(fields: [responsavelId], references: [id], onDelete: SetNull)

@@ -105,9 +105,9 @@ export function ProjetoFormDialog({
           <div className="grid gap-4 py-4">
             {!clienteIdFixo && (
               <div className="space-y-1.5">
-                <Label>Cliente *</Label>
+                <Label htmlFor="clienteId">Cliente *</Label>
                 <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="clienteId" className="w-full">
                     <SelectValue placeholder="Selecione o cliente">
                       {(value: string) => {
                         const c = clientes?.find((c) => c.id === value);
@@ -132,9 +132,9 @@ export function ProjetoFormDialog({
                 <Input id="prazo" type="date" value={form.prazo} onChange={(e) => set("prazo", e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Responsável</Label>
+                <Label htmlFor="responsavelId">Responsável</Label>
                 <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="responsavelId" className="w-full">
                     <SelectValue placeholder="Selecione">
                       {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
                     </SelectValue>

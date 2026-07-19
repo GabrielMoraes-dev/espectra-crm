@@ -218,9 +218,9 @@ export function ClienteFormDialog({
                         <Input id="cidade" placeholder="Ex: São Paulo" value={form.cidade} onChange={(e) => set("cidade", e.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Estado</Label>
+                        <Label htmlFor="estado">Estado</Label>
                         <Select value={form.estado} onValueChange={(v) => set("estado", v ?? "")}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger id="estado" className="w-full">
                             <SelectValue placeholder="Selecione o UF">
                               {(value: string) => {
                                 const e = ESTADOS_BRASIL.find((e) => e.uf === value);
@@ -254,9 +254,9 @@ export function ClienteFormDialog({
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label>Responsável</Label>
+                        <Label htmlFor="responsavelId">Responsável</Label>
                         <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger id="responsavelId" className="w-full">
                             <SelectValue placeholder="Selecione">
                               {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
                             </SelectValue>
@@ -269,9 +269,9 @@ export function ClienteFormDialog({
                         </Select>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Status</Label>
+                        <Label htmlFor="status">Status</Label>
                         <Select value={form.status} onValueChange={(v) => set("status", v ?? "EM_PRODUCAO")}>
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger id="status" className="w-full">
                             <SelectValue>
                               {(value: string) =>
                                 STATUS_CLIENTE_CONFIG[value as keyof typeof STATUS_CLIENTE_CONFIG]?.label

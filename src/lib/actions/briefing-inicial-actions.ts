@@ -5,8 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { briefingInicialSchema, type BriefingInicialFormValues } from "@/lib/validations";
 import { sendBriefingInicialNotification, sendBriefingInicialConfirmation } from "@/lib/email";
 import { requireAuth } from "@/lib/auth/session";
+import { getIp, verificarRateLimit } from "@/lib/rate-limit";
 
 export async function createBriefingInicial(values: BriefingInicialFormValues) {
+  await verificarRateLimit("criar_briefing_inicial", await getIp(), 10, 15 * 60 * 1000);
   const data = briefingInicialSchema.parse(values);
 
   // Reenvio do mesmo link atualiza o registro existente em vez de criar um duplicado.

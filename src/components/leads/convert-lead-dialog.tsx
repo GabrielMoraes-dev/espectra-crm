@@ -89,14 +89,15 @@ export function ConvertLeadDialog({
             <NichoField value={nicho} onChange={setNicho} />
 
             <div className="space-y-1.5">
-              <Label>Plano contratado</Label>
-              <Input value={planoContratado} onChange={(e) => setPlanoContratado(e.target.value)} />
+              <Label htmlFor="planoContratado">Plano contratado</Label>
+              <Input id="planoContratado" value={planoContratado} onChange={(e) => setPlanoContratado(e.target.value)} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Valor</Label>
+                <Label htmlFor="valor">Valor</Label>
                 <Input
+                  id="valor"
                   type="number"
                   min={0}
                   placeholder={lead?.valorEstimado ? String(lead.valorEstimado) : "0"}
@@ -105,9 +106,9 @@ export function ConvertLeadDialog({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Responsável</Label>
+                <Label htmlFor="responsavelId">Responsável</Label>
                 <Select value={responsavelId} onValueChange={(v) => setResponsavelId(v ?? "")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="responsavelId" className="w-full">
                     <SelectValue placeholder="Selecione">
                       {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
                     </SelectValue>

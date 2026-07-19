@@ -20,7 +20,30 @@ function pick<T>(arr: T[], i: number) {
   return arr[i % arr.length];
 }
 
+function extrairHost(url: string) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "(não foi possível ler a URL)";
+  }
+}
+
 async function main() {
+  // Este script apaga clientes/leads/projetos/pagamentos/tarefas reais antes de
+  // recriar dados fake — hoje `.env.local` aponta pro mesmo banco de produção
+  // usado pelo CRM em produção, então rodar isso sem querer apaga dado real.
+  // Exige confirmação explícita até existir um banco de desenvolvimento separado.
+  if (process.env.CONFIRMAR_RESET_SEED !== "sim") {
+    console.error(
+      `\nATENÇÃO: este script vai APAGAR clientes, leads, projetos, pagamentos, tarefas e mais\n` +
+        `no banco: ${extrairHost(process.env.DATABASE_URL ?? "")}\n\n` +
+        `Se esse for MESMO o banco onde você quer recriar dados fake (não o de produção),\n` +
+        `rode de novo assim:\n\n` +
+        `  CONFIRMAR_RESET_SEED=sim npx tsx prisma/seed.ts\n`,
+    );
+    process.exit(1);
+  }
+
   console.log("Limpando dados existentes...");
   await prisma.activityLog.deleteMany();
   await prisma.linkInterno.deleteMany();

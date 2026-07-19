@@ -180,7 +180,19 @@ export async function deleteCliente(id: string) {
     }
   }
 
-  await prisma.cliente.delete({ where: { id } });
+  await prisma.$transaction(async (tx) => {
+    // Sem isso, o Briefing (guarda CPF/CNPJ, endereço, história pessoal) e o Lead
+    // sobreviviam órfãos depois de "excluir" o cliente — o Lead reaparecia no
+    // Kanban de Leads com as fotos do briefing inicial já apagadas do Blob abaixo,
+    // e o Briefing ficava no banco sem dono nenhum, com dado pessoal sensível.
+    await tx.briefing.deleteMany({
+      where: { OR: [{ clienteId: id }, ...(cliente?.lead ? [{ leadId: cliente.lead.id }] : [])] },
+    });
+    if (cliente?.lead) {
+      await tx.lead.delete({ where: { id: cliente.lead.id } });
+    }
+    await tx.cliente.delete({ where: { id } });
+  });
 
   // Só apaga do armazenamento depois de confirmar a exclusão no banco — sem isso,
   // as fotos/depoimentos do cliente ficavam pra sempre no Vercel Blob, sendo

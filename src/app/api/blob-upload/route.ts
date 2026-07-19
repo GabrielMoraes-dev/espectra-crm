@@ -1,5 +1,6 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+import { getIpFromRequest, verificarRateLimit } from "@/lib/rate-limit";
 
 // SVG fica de fora: pode embutir script e esse endpoint recebe upload do formulário público, sem login.
 // HEIC/HEIF: formato padrão de fotos do iPhone quando escolhidas da galeria (não da câmera).
@@ -15,6 +16,12 @@ const LIMITE_PADRAO = 20 * 1024 * 1024;
 const LIMITE_GERAL = 1024 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<NextResponse> {
+  try {
+    await verificarRateLimit("blob_upload", getIpFromRequest(request), 40, 15 * 60 * 1000);
+  } catch {
+    return NextResponse.json({ error: "Muitos uploads vindos do seu endereço. Tente novamente mais tarde." }, { status: 429 });
+  }
+
   const body = (await request.json()) as HandleUploadBody;
 
   try {

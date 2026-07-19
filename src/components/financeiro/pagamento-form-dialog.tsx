@@ -106,9 +106,9 @@ export function PagamentoFormDialog({
 
           <div className="grid gap-4 py-4">
             <div className="space-y-1.5">
-              <Label>Cliente *</Label>
+              <Label htmlFor="clienteId">Cliente *</Label>
               <Select value={form.clienteId} onValueChange={(v) => set("clienteId", v ?? "")}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="clienteId" className="w-full">
                   <SelectValue placeholder="Selecione o cliente">
                     {(value: string) => {
                       const c = clientes.find((c) => c.id === value);
@@ -146,12 +146,12 @@ export function PagamentoFormDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label>Forma de pagamento</Label>
+              <Label htmlFor="formaPagamento">Forma de pagamento</Label>
               <Select
                 value={form.formaPagamento}
                 onValueChange={(v) => set("formaPagamento", v ?? "")}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="formaPagamento" className="w-full">
                   <SelectValue placeholder="Selecione">
                     {(value: string) => value || "Selecione"}
                   </SelectValue>

@@ -32,7 +32,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  const body = JSON.parse(rawBody) as AutentiqueWebhookBody;
+  let body: AutentiqueWebhookBody;
+  try {
+    body = JSON.parse(rawBody) as AutentiqueWebhookBody;
+  } catch {
+    return NextResponse.json({ error: "Payload inválido" }, { status: 400 });
+  }
 
   if (body.event.type !== "document.finished") {
     return NextResponse.json({ ignorado: body.event.type });
@@ -50,7 +55,19 @@ export async function POST(request: Request) {
   });
 
   if (!cliente) {
+    await prisma.activityLog.create({
+      data: {
+        tipo: "webhook_erro",
+        descricao: `Autentique confirmou assinatura do documento ${documento.id}, mas nenhum cliente tem esse contratoAutentiqueId.`,
+      },
+    });
     return NextResponse.json({ status: "sem_match" });
+  }
+
+  // A Autentique pode reenviar o mesmo evento (garantia de entrega) — evita
+  // recriar timeline/log e reenviar o e-mail interno quando já processado.
+  if (cliente.contratoUrl === linkAssinado) {
+    return NextResponse.json({ status: "ja_processado", clienteId: cliente.id });
   }
 
   await prisma.cliente.update({

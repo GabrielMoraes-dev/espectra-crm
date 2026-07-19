@@ -129,12 +129,12 @@ export function TarefaFormDialog({
 
             {!clienteIdFixo && (
               <div className="space-y-1.5">
-                <Label>Cliente</Label>
+                <Label htmlFor="clienteId">Cliente</Label>
                 <Select
                   value={form.clienteId || "nenhum"}
                   onValueChange={(v) => set("clienteId", v === "nenhum" ? "" : (v ?? ""))}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="clienteId" className="w-full">
                     <SelectValue placeholder="Nenhum">
                       {(value: string) => (value === "nenhum" ? "Nenhum" : (clientes.find((c) => c.id === value)?.nome ?? "Nenhum"))}
                     </SelectValue>
@@ -151,9 +151,9 @@ export function TarefaFormDialog({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Responsável</Label>
+                <Label htmlFor="responsavelId">Responsável</Label>
                 <Select value={form.responsavelId} onValueChange={(v) => set("responsavelId", v ?? "")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="responsavelId" className="w-full">
                     <SelectValue placeholder="Selecione">
                       {(value: string) => membros.find((m) => m.id === value)?.nome ?? "Selecione"}
                     </SelectValue>
@@ -173,9 +173,9 @@ export function TarefaFormDialog({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Prioridade</Label>
+                <Label htmlFor="prioridade">Prioridade</Label>
                 <Select value={form.prioridade} onValueChange={(v) => set("prioridade", v ?? "MEDIA")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="prioridade" className="w-full">
                     <SelectValue>
                       {(value: keyof typeof PRIORIDADE_TAREFA_CONFIG) => PRIORIDADE_TAREFA_CONFIG[value]?.label}
                     </SelectValue>
@@ -188,9 +188,9 @@ export function TarefaFormDialog({
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Status</Label>
+                <Label htmlFor="status">Status</Label>
                 <Select value={form.status} onValueChange={(v) => set("status", v ?? "A_FAZER")}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="status" className="w-full">
                     <SelectValue>
                       {(value: (typeof STATUS_TAREFA_ORDEM)[number]) => STATUS_TAREFA_CONFIG[value]?.label}
                     </SelectValue>
