@@ -3,7 +3,10 @@ import type { NextRequest } from "next/server";
 import { decrypt } from "@/lib/auth/session";
 
 const PUBLIC_EXACT = ["/login"];
-const PUBLIC_PREFIXES = ["/formulario", "/pesquisa", "/api/cron", "/api/webhooks", "/api/blob-upload"];
+// "/api/automacoes" tem autenticação própria (Bearer AUTOMACAO_SECRET, checada
+// dentro de cada rota) — mesmo motivo de /api/cron e /api/webhooks já estarem
+// aqui: não usam o cookie de sessão da UI, então o proxy não deve interceptar.
+const PUBLIC_PREFIXES = ["/formulario", "/pesquisa", "/api/cron", "/api/webhooks", "/api/blob-upload", "/api/automacoes"];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_EXACT.includes(pathname)) return true;
