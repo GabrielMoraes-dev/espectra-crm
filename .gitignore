@@ -51,3 +51,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Arquivos de referência/design que não fazem parte do app (não é código do CRM)
+/_referencias-design/
