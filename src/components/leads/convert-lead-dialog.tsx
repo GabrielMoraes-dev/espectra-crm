@@ -59,15 +59,20 @@ export function ConvertLeadDialog({
     if (!lead) return;
     startTransition(async () => {
       try {
-        const cliente = await convertLeadToCliente(lead.id, {
+        const result = await convertLeadToCliente(lead.id, {
           nicho,
           planoContratado,
           valor: valor ? Number(valor) : null,
           responsavelId,
         });
+        if (!result.ok) {
+          toast.error("Esse lead já foi convertido em outro lugar");
+          onOpenChange(false);
+          return;
+        }
         toast.success("Lead convertido em cliente");
         onOpenChange(false);
-        router.push(`/clientes/${cliente.id}`);
+        router.push(`/clientes/${result.data.id}`);
       } catch {
         toast.error("Não foi possível converter o lead");
       }

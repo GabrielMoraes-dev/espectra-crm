@@ -25,6 +25,13 @@ export const leadSchema = z.object({
 
 export type LeadFormValues = z.infer<typeof leadSchema>;
 
+export const registrarInteracaoLeadSchema = z.object({
+  tipo: z.enum(["WHATSAPP", "LIGACAO", "REUNIAO", "AMOSTRA_ENVIADA", "PROPOSTA_ENVIADA", "OUTRO"]),
+  observacao: z.string().trim().max(1000, "Máximo de 1000 caracteres").optional().or(z.literal("")),
+});
+
+export type RegistrarInteracaoLeadValues = z.infer<typeof registrarInteracaoLeadSchema>;
+
 export const clienteSchema = z.object({
   nome: z.string().min(2, "Informe o nome"),
   empresa: z.string().optional().or(z.literal("")),

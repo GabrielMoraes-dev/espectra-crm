@@ -14,7 +14,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LeadDetailSheet } from "@/components/leads/lead-detail-sheet";
 import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, timeAgo } from "@/lib/utils";
 import type { MembroEquipe } from "@/generated/prisma/client";
 import type { LeadComBriefing } from "@/lib/data/leads";
 
@@ -47,6 +47,7 @@ export function LeadsTable({
               <TableHead className="hidden md:table-cell">Origem</TableHead>
               <TableHead className="hidden sm:table-cell">Valor estimado</TableHead>
               <TableHead>Etapa</TableHead>
+              <TableHead className="hidden lg:table-cell">Última interação</TableHead>
               <TableHead className="hidden lg:table-cell">Criado em</TableHead>
             </TableRow>
           </TableHeader>
@@ -75,6 +76,9 @@ export function LeadsTable({
                   </TableCell>
                   <TableCell>
                     <StatusBadge label={etapaConfig.label} className={etapaConfig.className} />
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
+                    {lead.ultimaInteracaoEm ? timeAgo(lead.ultimaInteracaoEm) : `${timeAgo(lead.etapaAlteradaEm)} nesta etapa`}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
                     {formatDate(lead.createdAt)}

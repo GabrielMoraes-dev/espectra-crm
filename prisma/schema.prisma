@@ -22,6 +22,15 @@ enum EtapaLead {
   PERDIDO
 }
 
+enum TipoInteracaoLead {
+  WHATSAPP
+  LIGACAO
+  REUNIAO
+  AMOSTRA_ENVIADA
+  PROPOSTA_ENVIADA
+  OUTRO
+}
+
 enum StatusCliente {
   EM_PRODUCAO
   EM_REVISAO
@@ -110,6 +119,15 @@ model Lead {
   valorEstimado  Float?
   observacoes    String?
   etapa          EtapaLead @default(NOVO)
+  // Atualizado exclusivamente quando `etapa` muda (nunca por outra edição do
+  // cadastro) — usado por relatórios/automações pra saber há quanto tempo o
+  // lead está parado na etapa atual, sem depender de `updatedAt`.
+  etapaAlteradaEm DateTime @default(now())
+  // Preenchidos exclusivamente pela ação `registrarInteracaoLead` — representam
+  // o último contato comercial real (WhatsApp, ligação, reunião etc.), não
+  // qualquer edição do cadastro. Ou os dois estão nulos, ou os dois preenchidos.
+  ultimaInteracaoEm   DateTime?
+  ultimaInteracaoTipo TipoInteracaoLead?
   clienteId      String?   @unique
   cliente        Cliente?  @relation(fields: [clienteId], references: [id])
   linkCopiadoEm  DateTime?

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
@@ -77,15 +78,21 @@ export function LeadFormDialog({
   onOpenChange: (open: boolean) => void;
   lead?: Lead | null;
 }) {
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyState());
   const [expandido, setExpandido] = useState(false);
   const [pending, startTransition] = useTransition();
+  // Etapa que o lead tinha no momento em que o formulário foi aberto — usada
+  // como referência do compare-and-swap no servidor, mesmo que o usuário troque
+  // a etapa no Select antes de salvar.
+  const [etapaOriginal, setEtapaOriginal] = useState<Lead["etapa"]>("NOVO");
 
   useEffect(() => {
     if (open) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- resets the form whenever the dialog opens for a different record
       setForm(lead ? fromLead(lead) : emptyState());
       setExpandido(!!lead);
+      setEtapaOriginal(lead?.etapa ?? "NOVO");
     }
   }, [open, lead]);
 
@@ -103,7 +110,13 @@ export function LeadFormDialog({
           etapa: form.etapa as never,
         };
         if (lead) {
-          await updateLead(lead.id, payload);
+          const result = await updateLead(lead.id, etapaOriginal, payload);
+          if (!result.ok) {
+            toast.error("Esse lead foi alterado em outro lugar — atualizando com a versão mais recente");
+            router.refresh();
+            onOpenChange(false);
+            return;
+          }
           toast.success("Lead atualizado");
         } else {
           await createLead(payload);

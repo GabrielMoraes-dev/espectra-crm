@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Pencil, Trash2, ArrowRightLeft, Phone, AtSign, Mail, Tag, Wallet, Link2 } from "lucide-react";
+import { Pencil, Trash2, ArrowRightLeft, Phone, AtSign, Mail, Tag, Wallet, Link2, MessageCircleMore } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -16,10 +16,11 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { ConvertLeadDialog } from "@/components/leads/convert-lead-dialog";
-import { ETAPA_LEAD_CONFIG } from "@/lib/constants";
-import { formatCurrency, formatDate, waLink, instagramLink } from "@/lib/utils";
+import { ETAPA_LEAD_CONFIG, TIPO_INTERACAO_LEAD_CONFIG } from "@/lib/constants";
+import { formatCurrency, formatDate, timeAgo, waLink, instagramLink } from "@/lib/utils";
 import { deleteLead, registrarLinkCopiado } from "@/lib/actions/lead-actions";
 import { BriefingInicialView } from "@/components/shared/briefing-inicial-view";
+import { RegistrarInteracaoDialog } from "@/components/leads/registrar-interacao-dialog";
 import type { MembroEquipe } from "@/generated/prisma/client";
 import type { LeadComBriefing } from "@/lib/data/leads";
 
@@ -72,6 +73,7 @@ export function LeadDetailSheet({
   const [openEdit, setOpenEdit] = useState(false);
   const [openConvert, setOpenConvert] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openInteracao, setOpenInteracao] = useState(false);
 
   if (!lead) return null;
 
@@ -120,6 +122,25 @@ export function LeadDetailSheet({
             <InfoRow icon={Tag} label="Origem" value={lead.origem ?? "—"} />
             <InfoRow icon={Wallet} label="Valor estimado" value={formatCurrency(lead.valorEstimado)} />
 
+            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-card/50 p-3">
+              <div>
+                <p className="text-xs text-muted-foreground">Nesta etapa há</p>
+                <p className="text-sm font-medium text-foreground">{timeAgo(lead.etapaAlteradaEm)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Última interação</p>
+                <p className="text-sm font-medium text-foreground">
+                  {lead.ultimaInteracaoEm && lead.ultimaInteracaoTipo
+                    ? `${TIPO_INTERACAO_LEAD_CONFIG[lead.ultimaInteracaoTipo].label} · ${timeAgo(lead.ultimaInteracaoEm)}`
+                    : "Nenhuma registrada"}
+                </p>
+              </div>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={() => setOpenInteracao(true)}>
+              <MessageCircleMore className="size-4" /> Registrar interação
+            </Button>
+
             {podeEnviarBriefing && (
               <div className="grid gap-2">
                 <Button variant="outline" className="w-full" onClick={copiarLinkBriefingInicial}>
@@ -165,6 +186,12 @@ export function LeadDetailSheet({
 
       <LeadFormDialog open={openEdit} onOpenChange={setOpenEdit} lead={lead} />
       <ConvertLeadDialog open={openConvert} onOpenChange={setOpenConvert} lead={lead} membros={membros} />
+      <RegistrarInteracaoDialog
+        open={openInteracao}
+        onOpenChange={setOpenInteracao}
+        leadId={lead.id}
+        leadNome={lead.nome}
+      />
       <ConfirmDialog
         open={openDelete}
         onOpenChange={setOpenDelete}

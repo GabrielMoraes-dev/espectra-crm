@@ -63,6 +63,27 @@ export const ETAPA_LEAD_CONFIG: Record<
   PERDIDO: { label: "Perdido", className: "bg-danger/20 text-danger" },
 };
 
+export const TIPO_INTERACAO_LEAD_ORDEM = [
+  "WHATSAPP",
+  "LIGACAO",
+  "REUNIAO",
+  "AMOSTRA_ENVIADA",
+  "PROPOSTA_ENVIADA",
+  "OUTRO",
+] as const;
+
+export const TIPO_INTERACAO_LEAD_CONFIG: Record<
+  (typeof TIPO_INTERACAO_LEAD_ORDEM)[number],
+  { label: string }
+> = {
+  WHATSAPP: { label: "WhatsApp" },
+  LIGACAO: { label: "Ligação" },
+  REUNIAO: { label: "Reunião" },
+  AMOSTRA_ENVIADA: { label: "Amostra enviada" },
+  PROPOSTA_ENVIADA: { label: "Proposta enviada" },
+  OUTRO: { label: "Outro contato" },
+};
+
 // ---------- Clientes ----------
 
 export const STATUS_CLIENTE_CONFIG = {
