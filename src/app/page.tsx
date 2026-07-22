@@ -107,6 +107,9 @@ export default async function Home() {
             <GrowthChart data={data.crescimento} />
           </ChartCard>
         </FadeIn>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <FadeIn delay={0.22}>
           <ChartCard
             title="Funil de conversão"
@@ -119,10 +122,8 @@ export default async function Home() {
             <FunilChart data={data.funilLeads} />
           </ChartCard>
         </FadeIn>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <FadeIn delay={0.22}>
+        <FadeIn delay={0.25}>
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium">Últimos clientes</CardTitle>
@@ -133,7 +134,7 @@ export default async function Home() {
           </Card>
         </FadeIn>
 
-        <FadeIn delay={0.25}>
+        <FadeIn delay={0.28} className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium">Atividades recentes</CardTitle>
