@@ -9,10 +9,7 @@ export function Filosofia() {
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-foreground">Filosofia</h3>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            A Espectra trabalha com divisão clara de responsabilidades entre os dois sócios — um
-            cuida inteiramente da produção, o outro do relacionamento comercial. Essa separação
-            garante maior qualidade em cada entrega, mais velocidade no fluxo entre etapas e uma
-            operação organizada o suficiente para crescer sem perder padrão.
+            Toda autoridade já existe. Nosso trabalho é fazer com que ela seja percebida.
           </p>
         </div>
       </CardContent>

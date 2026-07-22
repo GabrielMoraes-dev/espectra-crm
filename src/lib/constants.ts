@@ -244,8 +244,8 @@ export const ESTADOS_BRASIL = [
 // ---------- Estrutura Operacional ----------
 
 export const CARGO_INDICATOR: Record<string, string> = {
-  Arquiteto: "Produção Contínua",
-  Closer: "Relacionamento Contínuo",
+  "Produto, Design e Entrega": "Produção e entrega",
+  "Estratégia, Comercial e Tecnologia": "Estratégia e crescimento",
 };
 
 export const FLUXO_OPERACIONAL = [
