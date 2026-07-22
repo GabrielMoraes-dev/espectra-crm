@@ -3,16 +3,14 @@ import { FadeIn } from "@/components/shared/fade-in";
 import { DuplaCard } from "@/components/estrutura/dupla-card";
 import { FluxoOperacional } from "@/components/estrutura/fluxo-operacional";
 import { Filosofia } from "@/components/estrutura/filosofia";
-import { SOPsGrid } from "@/components/estrutura/sops-grid";
 import { LinksGrid } from "@/components/estrutura/links-grid";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function EstruturaOperacionalPage() {
-  const [membros, sops, links] = await Promise.all([
+  const [membros, links] = await Promise.all([
     prisma.membroEquipe.findMany({ orderBy: { createdAt: "asc" } }),
-    prisma.sOP.findMany({ orderBy: { createdAt: "asc" } }),
     prisma.linkInterno.findMany({ orderBy: { ordem: "asc" } }),
   ]);
 
@@ -40,10 +38,6 @@ export default async function EstruturaOperacionalPage() {
       </FadeIn>
 
       <FadeIn delay={0.14}>
-        <SOPsGrid sops={sops} />
-      </FadeIn>
-
-      <FadeIn delay={0.18}>
         <LinksGrid links={links} />
       </FadeIn>
     </div>

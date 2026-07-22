@@ -249,17 +249,15 @@ export const CARGO_INDICATOR: Record<string, string> = {
 };
 
 export const FLUXO_OPERACIONAL = [
-  "Prospect",
-  "DM",
-  "Negociação",
+  "Lead",
+  "Briefing inicial",
   "Cliente",
-  "Briefing",
-  "Copy",
-  "Landing",
-  "Pack de Artes",
-  "Ajustes",
+  "Briefing completo",
+  "Projeto",
+  "Contrato",
+  "Pagamento",
   "Entrega",
-  "Depoimento",
+  "Pesquisa de satisfação",
 ];
 
 export const LINK_ICON_MAP: Record<string, string> = {
