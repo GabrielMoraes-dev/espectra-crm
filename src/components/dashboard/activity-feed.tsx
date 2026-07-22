@@ -7,6 +7,7 @@ import {
   XCircle,
   Users,
   MailWarning,
+  MessageCircleWarning,
   LogIn,
   LogOut,
   AlertTriangle,
@@ -25,12 +26,13 @@ export const ICONS: Record<string, LucideIcon> = {
   cliente_criado: Users,
   lead_perdido: XCircle,
   email_falhou: MailWarning,
+  whatsapp_falhou: MessageCircleWarning,
   login: LogIn,
   logout: LogOut,
   webhook_erro: AlertTriangle,
 };
 
-export const TIPOS_AVISO = new Set(["email_falhou", "webhook_erro"]);
+export const TIPOS_AVISO = new Set(["email_falhou", "whatsapp_falhou", "webhook_erro"]);
 
 export function ActivityFeed({
   atividades,

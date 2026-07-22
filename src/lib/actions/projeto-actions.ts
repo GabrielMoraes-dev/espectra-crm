@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { projetoSchema, type ProjetoFormValues } from "@/lib/validations";
 import { ETAPA_PROJETO_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
-import { handleClienteStatusChange } from "@/lib/actions/cliente-actions";
+import { handleClienteStatusChange, dispararEfeitosExternosStatusCliente } from "@/lib/actions/cliente-actions";
+import type { Cliente, StatusCliente } from "@/generated/prisma/client";
 
 function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
@@ -49,24 +50,37 @@ async function registerStatusChange(
 ) {
   const label = ETAPA_PROJETO_CONFIG[novoStatus].label;
 
-  await prisma.activityLog.create({
-    data: {
-      tipo: "projeto",
-      descricao: `Projeto de ${clienteNome} avançou para ${label}`,
-      entidadeTipo: "projeto",
-      entidadeId: projetoId,
-    },
+  // Log do projeto + (quando aplicável) mudança de status do Cliente e seus
+  // efeitos internos ficam na mesma transação — mesmo racional de updateCliente
+  // em cliente-actions.ts.
+  const paraEfeitosExternos = await prisma.$transaction(async (tx) => {
+    await tx.activityLog.create({
+      data: {
+        tipo: "projeto",
+        descricao: `Projeto de ${clienteNome} avançou para ${label}`,
+        entidadeTipo: "projeto",
+        entidadeId: projetoId,
+      },
+    });
+
+    if (novoStatus === "PUBLICADO") {
+      const clienteAntes = await tx.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+      if (clienteAntes.status !== "PUBLICADO") {
+        const clienteDepois = await tx.cliente.update({
+          where: { id: clienteId },
+          data: { status: "PUBLICADO" },
+        });
+        await handleClienteStatusChange(tx, clienteDepois, clienteAntes.status);
+        return { cliente: clienteDepois, statusAnterior: clienteAntes.status };
+      }
+    }
+
+    return null as { cliente: Cliente; statusAnterior: StatusCliente } | null;
   });
 
-  if (novoStatus === "PUBLICADO") {
-    const clienteAntes = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
-    if (clienteAntes.status !== "PUBLICADO") {
-      const clienteDepois = await prisma.cliente.update({
-        where: { id: clienteId },
-        data: { status: "PUBLICADO" },
-      });
-      await handleClienteStatusChange(clienteDepois, clienteAntes.status);
-    }
+  // Efeitos externos só depois do commit da transação acima.
+  if (paraEfeitosExternos) {
+    await dispararEfeitosExternosStatusCliente(paraEfeitosExternos.cliente, paraEfeitosExternos.statusAnterior);
   }
 }
 

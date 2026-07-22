@@ -139,7 +139,9 @@ export function parseResponsabilidades(json: string | null | undefined): string[
   }
 }
 
-function dataEmDiasBrasil(date: Date) {
+// Exportado pra ser reaproveitado onde for preciso classificar "prazo" (meia-noite
+// UTC) contra "hoje" no fuso do Brasil sem duplicar a lógica (ex: cron prazo-digest).
+export function dataEmDiasBrasil(date: Date) {
   const partes = new Intl.DateTimeFormat("en-CA", {
     timeZone: FUSO_BRASIL,
     year: "numeric",

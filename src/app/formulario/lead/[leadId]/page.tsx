@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { BriefingForm } from "@/components/briefing/briefing-form";
 import { getLeadForPrefill } from "@/lib/data/leads";
 import { DEMO_ID } from "@/lib/constants";
@@ -22,28 +23,25 @@ export default async function FormularioLeadPage({
   }
 
   const lead = await getLeadForPrefill(leadId);
+  if (!lead) notFound();
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-2xl pb-24">
         <BriefingForm
-          initialData={
-            lead
-              ? {
-                  leadId: lead.id,
-                  nome: lead.nome,
-                  empresa: lead.empresa,
-                  whatsapp: lead.whatsapp,
-                  instagram: lead.instagram,
-                  email: lead.email,
-                  nomeInicial: lead.nomeInicial,
-                  profissaoInicial: lead.profissaoInicial,
-                  emailInicial: lead.emailInicial,
-                  apresentacao: lead.apresentacaoInicial,
-                  fotosUrls: lead.fotosUrlsIniciais,
-                }
-              : undefined
-          }
+          initialData={{
+            leadId: lead.id,
+            nome: lead.nome,
+            empresa: lead.empresa,
+            whatsapp: lead.whatsapp,
+            instagram: lead.instagram,
+            email: lead.email,
+            nomeInicial: lead.nomeInicial,
+            profissaoInicial: lead.profissaoInicial,
+            emailInicial: lead.emailInicial,
+            apresentacao: lead.apresentacaoInicial,
+            fotosUrls: lead.fotosUrlsIniciais,
+          }}
         />
       </div>
     </main>

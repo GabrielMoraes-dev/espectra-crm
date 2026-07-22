@@ -13,7 +13,7 @@ import { STATUS_CLIENTE_CONFIG } from "@/lib/constants";
 import { requireAuth } from "@/lib/auth/session";
 import { sendMensagemFixaWhatsApp } from "@/lib/whatsapp";
 import { sendProjetoPublicadoEmail, sendPesquisaSatisfacaoEmail } from "@/lib/email";
-import type { Cliente, StatusCliente } from "@/generated/prisma/client";
+import type { Cliente, StatusCliente, Prisma } from "@/generated/prisma/client";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://espectra-crm.vercel.app";
 
@@ -21,7 +21,15 @@ function clean(v: string | undefined | null) {
   return v && v.trim() !== "" ? v.trim() : null;
 }
 
-export async function handleClienteStatusChange(cliente: Cliente, statusAnterior: StatusCliente) {
+// Só as escritas no banco, sempre dentro da MESMA transação de quem mudou o
+// status (recebe `tx`, nunca abre a própria transação) — sem isso, o Cliente
+// podia ficar com o status novo já commitado mesmo que TimelineEvent/ActivityLog/
+// Pagamento falhassem logo depois, um estado parcial inconsistente.
+export async function handleClienteStatusChange(
+  tx: Prisma.TransactionClient,
+  cliente: Cliente,
+  statusAnterior: StatusCliente,
+) {
   // Por ser exportada de um arquivo "use server", vira uma Server Action invocável
   // por conta própria — os dois pontos que já chamam essa função (updateCliente,
   // registerStatusChange) já passam por requireAuth() antes, mas essa checagem
@@ -29,13 +37,13 @@ export async function handleClienteStatusChange(cliente: Cliente, statusAnterior
   await requireAuth();
   if (statusAnterior === cliente.status) return;
 
-  await prisma.timelineEvent.create({
+  await tx.timelineEvent.create({
     data: {
       clienteId: cliente.id,
       titulo: STATUS_CLIENTE_CONFIG[cliente.status].label,
     },
   });
-  await prisma.activityLog.create({
+  await tx.activityLog.create({
     data: {
       tipo: "cliente_status",
       descricao: `${cliente.nome} mudou para ${STATUS_CLIENTE_CONFIG[cliente.status].label}`,
@@ -45,9 +53,12 @@ export async function handleClienteStatusChange(cliente: Cliente, statusAnterior
   });
 
   if (cliente.status === "FINALIZADO" && cliente.valor) {
-    const jaTemPagamento = await prisma.pagamento.count({ where: { clienteId: cliente.id } });
+    // Ainda sujeito a corrida em tese (count + create não é uma constraint) —
+    // risco residual documentado, não uma garantia forte de "no máximo um
+    // pagamento automático". Ver memory/jornada-completa-do-cliente.md.
+    const jaTemPagamento = await tx.pagamento.count({ where: { clienteId: cliente.id } });
     if (jaTemPagamento === 0) {
-      await prisma.pagamento.create({
+      await tx.pagamento.create({
         data: {
           clienteId: cliente.id,
           valor: cliente.valor,
@@ -58,12 +69,34 @@ export async function handleClienteStatusChange(cliente: Cliente, statusAnterior
       });
     }
   }
+}
+
+// Efeitos externos (WhatsApp, e-mail) — sempre chamada DEPOIS que a transação
+// de `handleClienteStatusChange` já deu commit, nunca dentro dela (uma API
+// externa lenta/travada não pode segurar a transação de banco aberta). Cada
+// efeito já engole a própria falha (não lança), então uma falha externa nunca
+// corrompe o que já foi gravado no banco.
+export async function dispararEfeitosExternosStatusCliente(
+  cliente: Cliente,
+  statusAnterior: StatusCliente,
+) {
+  // Por ser exportada de um arquivo "use server", vira Server Action invocável
+  // por conta própria — sem essa checagem, qualquer chamada direta (fora do
+  // fluxo autenticado normal) poderia disparar WhatsApp/e-mail com um `cliente`
+  // fabricado (telefone/email arbitrários), sem nenhuma sessão válida.
+  await requireAuth();
+
+  // Mesma guarda de handleClienteStatusChange — sem isso, editar qualquer outro
+  // campo de um cliente que já está Finalizado/Publicado reenviaria WhatsApp/e-mail
+  // toda vez, mesmo sem o status ter mudado de fato.
+  if (statusAnterior === cliente.status) return;
 
   if (cliente.status === "FINALIZADO" && cliente.whatsapp) {
     const link = `${SITE_URL}/pesquisa/${cliente.id}`;
     await sendMensagemFixaWhatsApp(
       cliente.whatsapp,
       `Olá, ${cliente.nome.split(" ")[0]}! Seu projeto com a Espectra foi entregue 🎉 Queremos muito saber o que você achou — leva menos de um minuto: ${link}`,
+      cliente.id,
     );
   }
 
@@ -121,42 +154,56 @@ export async function createCliente(values: ClienteFormValues) {
 export async function updateCliente(id: string, values: ClienteFormValues) {
   await requireAuth();
   const data = clienteSchema.parse(values);
-  const before = await prisma.cliente.findUniqueOrThrow({ where: { id } });
 
-  const cliente = await prisma.cliente.update({
-    where: { id },
-    data: {
-      nome: data.nome,
-      empresa: clean(data.empresa),
-      whatsapp: clean(data.whatsapp),
-      instagram: clean(data.instagram),
-      email: clean(data.email),
-      site: clean(data.site),
-      cidade: clean(data.cidade),
-      estado: clean(data.estado),
-      nicho: clean(data.nicho),
-      planoContratado: clean(data.planoContratado),
-      valor: data.valor ?? null,
-      responsavelId: clean(data.responsavelId),
-      prazo: data.prazo ? new Date(data.prazo) : null,
-      status: data.status,
-      contratoUrl: clean(data.contratoUrl),
-    },
+  // A mudança de status e seus efeitos internos (timeline/log/pagamento) ficam
+  // na mesma transação — evita o cliente ficar com o status novo já commitado
+  // sem o efeito interno correspondente, caso algo falhe no meio do caminho.
+  // `before` também é lido AQUI DENTRO (não antes de abrir a transação) — lido
+  // fora, uma edição concorrente entre a leitura e o commit usaria um
+  // `statusAnterior`/`contratoUrl` já obsoleto pra decidir os efeitos.
+  const cliente = await prisma.$transaction(async (tx) => {
+    const before = await tx.cliente.findUniqueOrThrow({ where: { id } });
+
+    const atualizado = await tx.cliente.update({
+      where: { id },
+      data: {
+        nome: data.nome,
+        empresa: clean(data.empresa),
+        whatsapp: clean(data.whatsapp),
+        instagram: clean(data.instagram),
+        email: clean(data.email),
+        site: clean(data.site),
+        cidade: clean(data.cidade),
+        estado: clean(data.estado),
+        nicho: clean(data.nicho),
+        planoContratado: clean(data.planoContratado),
+        valor: data.valor ?? null,
+        responsavelId: clean(data.responsavelId),
+        prazo: data.prazo ? new Date(data.prazo) : null,
+        status: data.status,
+        contratoUrl: clean(data.contratoUrl),
+      },
+    });
+
+    if (!before.contratoUrl && atualizado.contratoUrl) {
+      await tx.timelineEvent.create({
+        data: { clienteId: atualizado.id, titulo: "Contrato anexado" },
+      });
+    }
+
+    await handleClienteStatusChange(tx, atualizado, before.status);
+
+    return { atualizado, statusAnterior: before.status };
   });
 
-  if (!before.contratoUrl && cliente.contratoUrl) {
-    await prisma.timelineEvent.create({
-      data: { clienteId: cliente.id, titulo: "Contrato anexado" },
-    });
-  }
-
-  await handleClienteStatusChange(cliente, before.status);
+  // Efeitos externos só depois do commit da transação acima.
+  await dispararEfeitosExternosStatusCliente(cliente.atualizado, cliente.statusAnterior);
 
   revalidatePath("/clientes");
   revalidatePath(`/clientes/${id}`);
   revalidatePath("/financeiro");
   revalidatePath("/");
-  return cliente;
+  return cliente.atualizado;
 }
 
 // "Excluir" move o cliente pra lixeira (reversível) em vez de apagar de vez —

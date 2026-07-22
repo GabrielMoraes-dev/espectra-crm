@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { BriefingForm } from "@/components/briefing/briefing-form";
 import { getClienteForPrefill } from "@/lib/data/clientes";
 
@@ -10,30 +11,27 @@ export default async function FormularioClientePage({
 }) {
   const { clienteId } = await params;
   const cliente = await getClienteForPrefill(clienteId);
+  if (!cliente) notFound();
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-2xl pb-24">
         <BriefingForm
-          initialData={
-            cliente
-              ? {
-                  clienteId: cliente.id,
-                  nome: cliente.nome,
-                  whatsapp: cliente.whatsapp,
-                  instagram: cliente.instagram,
-                  email: cliente.email,
-                  cidade: cliente.cidade,
-                  estado: cliente.estado,
-                  nicho: cliente.nicho,
-                  nomeInicial: cliente.nomeInicial,
-                  profissaoInicial: cliente.profissaoInicial,
-                  emailInicial: cliente.emailInicial,
-                  apresentacao: cliente.apresentacaoInicial,
-                  fotosUrls: cliente.fotosUrlsIniciais,
-                }
-              : undefined
-          }
+          initialData={{
+            clienteId: cliente.id,
+            nome: cliente.nome,
+            whatsapp: cliente.whatsapp,
+            instagram: cliente.instagram,
+            email: cliente.email,
+            cidade: cliente.cidade,
+            estado: cliente.estado,
+            nicho: cliente.nicho,
+            nomeInicial: cliente.nomeInicial,
+            profissaoInicial: cliente.profissaoInicial,
+            emailInicial: cliente.emailInicial,
+            apresentacao: cliente.apresentacaoInicial,
+            fotosUrls: cliente.fotosUrlsIniciais,
+          }}
         />
       </div>
     </main>

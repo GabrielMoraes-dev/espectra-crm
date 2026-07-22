@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import type { Briefing, BriefingInicial, Lead, Projeto, Cliente, Pagamento } from "@/generated/prisma/client";
-import { formatDateShort, formatCurrency, getPrazoUrgencia } from "@/lib/utils";
+import { formatDateShort, formatCurrency, formatDataPrazo } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 
 const NOTIFICATION_EMAIL = "hello.espectra@gmail.com";
@@ -255,22 +255,34 @@ export async function sendStaleLeadReminder(leads: Lead[]) {
   });
 }
 
-export async function sendPrazoDigest(projetos: (Projeto & { cliente: Cliente })[]) {
-  const itens = projetos
-    .map((projeto) => {
-      const urgencia = getPrazoUrgencia(projeto.prazo);
-      const situacao = urgencia ? urgencia.label : `prazo em ${formatDateShort(projeto.prazo)}`;
-      return `<li><strong>${esc(projeto.cliente.nome)}</strong> — ${situacao}</li>`;
-    })
-    .join("");
+export async function sendPrazoDigest(grupos: {
+  atrasados: (Projeto & { cliente: Cliente })[];
+  hoje: (Projeto & { cliente: Cliente })[];
+  proximos7Dias: (Projeto & { cliente: Cliente })[];
+}) {
+  const { atrasados, hoje, proximos7Dias } = grupos;
+  const total = atrasados.length + hoje.length + proximos7Dias.length;
+
+  const listar = (itens: (Projeto & { cliente: Cliente })[]) =>
+    itens
+      .map((projeto) => `<li><strong>${esc(projeto.cliente.nome)}</strong> — prazo ${formatDataPrazo(projeto.prazo)}</li>`)
+      .join("");
+
+  // Três seções sempre separadas — nunca o mesmo projeto aparece em duas, e
+  // atrasados continuam visíveis em vez de escondidos ou lidos como "próximos".
+  const secao = (titulo: string, itens: (Projeto & { cliente: Cliente })[]) =>
+    itens.length > 0
+      ? `<p style="color:#555; margin-bottom:4px;"><strong>${titulo}</strong></p><ul style="color:#555; margin-top:0;">${listar(itens)}</ul>`
+      : "";
 
   await enviarEmail({
     to: NOTIFICATION_EMAIL,
-    subject: `Resumo semanal: ${projetos.length} projeto${projetos.length > 1 ? "s" : ""} com prazo próximo`,
+    subject: `Resumo semanal: ${total} projeto${total !== 1 ? "s" : ""} com prazo em aberto`,
     html: `
       <div style="font-family: sans-serif; max-width: 480px;">
-        <p>Projetos com prazo nos próximos 7 dias (ou já atrasados):</p>
-        <ul style="color: #555;">${itens}</ul>
+        ${secao(`${atrasados.length} atrasado${atrasados.length !== 1 ? "s" : ""}`, atrasados)}
+        ${secao("Vencendo hoje", hoje)}
+        ${secao("Próximos 7 dias", proximos7Dias)}
         <p><a href="${SITE_URL}/projetos" style="color: #5483b3;">Ver projetos no CRM →</a></p>
       </div>
     `,
